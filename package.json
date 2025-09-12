@@ -1,0 +1,42 @@
+{
+    "name": "conversa",
+    "scripts": {
+        "dev:frontend": "npm run dev --prefix frontend",
+        "dev:backend": "npm run dev --prefix backend",
+        "dev": "concurrently \"npm run dev:frontend\" \"npm run dev:backend\"",
+
+        "build:frontend": "npm run build --prefix frontend",
+        "build:backend": "",
+        "build": "npm run build:backend && npm run build:frontend",
+
+        "install:all": "npm install && npm install --prefix frontend && npm install --prefix backend",
+        "clean": "rm -rf node_modules frontend/node_modules backend/node_modules && npm run install:all",
+
+        "test": "",
+        "test:watch": "",
+        "test:coverage": "",
+
+        "db:up": "docker-compose up -d mongodb",
+        "db:down": "docker-compose down",
+        "db:reset": "npm run db:down && docker-compose rm -f && npm run db:up && npm run db:seed",
+        "db:seed": "",
+
+        "logs": "",
+
+        "deploy:prod": "npm run build && npm run deploy:prod --workspace=server",
+        "docker:build": "docker-compose build",
+        "docker:up": "docker-compose up",
+        "docker:watch": "docker-compose watch && docker compose logs --follow",
+        "update:deps": "npm update && npm update --prefix frontend && npm update --prefix backend",
+        "security:audit": "npm audit && npm audit --prefix frontend && npm audit --prefix backend",
+
+        "lint:all": "npm run lint --prefix frontend && npm run lint --prefix backend",
+        "format:all": "npm run format --prefix frontend && npm run format --prefix backend",
+        "lint:fix:all": "npm run lint:fix --prefix frontend && npm run lint:fix --prefix backend"
+    },
+    "devDependencies": {
+        "concurrently": "^8.2.2",
+        "prettier": "^3.0.3",
+        "cross-env": "^7.0.3"
+    }
+}
