@@ -135,3 +135,9 @@ Thumbs.db
 
 # VS Code
 .vscode/
+
+# Database specific
+
+database/data/
+database/logs/
+.env

@@ -13,6 +13,8 @@ services:
                   target: /app
                 - action: rebuild
                   path: ./frontend/package.json
+        depends_on:
+            - backend
 
     backend:
         build: ./backend
@@ -28,3 +30,34 @@ services:
                   target: /app
                 - action: rebuild
                   path: ./backend/package.json
+        depends_on:
+            - mongodb
+    mongodb:
+        image: mongo:7.0
+        container_name: database_mongodb
+        restart: unless-stopped
+        ports:
+            - "27017:27017"
+        command: ["mongod", "--config", "/etc/mongod.conf"]
+        #command: ["mongod", "--auth", "--bind_ip_all"]
+        env_file:
+            - ./database/.env # Load environment variables from database .env file
+        volumes:
+            # Mount the config file from database/config directory
+            - ./database/config/mongod.conf:/etc/mongod.conf
+            # Mount data directory for persistence
+            - ./database/data:/data/db
+            # Mount logs directory
+            - ./database/logs:/var/log/mongodb
+
+    # Database Admin UI
+    mongo-express:
+        image: mongo-express:1.0
+        container_name: database_mongodb_admin
+        restart: unless-stopped
+        ports:
+            - "8081:8081"
+        env_file:
+            - ./database/.env # Load environment variables from database .env file
+        depends_on:
+            - mongodb
