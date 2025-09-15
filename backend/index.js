@@ -62,10 +62,10 @@ mongoose
         // Only create documents after connection is established
         return createTestDocument();
     })
-    .then(() => {
+    .then(async () => {
         console.log("✅ All operations completed");
-        // Optional: close connection if this is a one-time script
-        // mongoose.connection.close();
+        const result = await mongoose.connection.db.admin().ping();
+        console.log("MongoDB ping result:", result);
     })
     .catch((error) => {
         console.log("❌ Error:", error);
