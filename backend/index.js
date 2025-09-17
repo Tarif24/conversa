@@ -1,75 +1,47 @@
 import { createServer } from "http";
 import { Server } from "socket.io";
-import mongoose from "mongoose";
+import cors from "cors";
 import dotenv from "dotenv";
 
-const server = createServer();
-const io = new Server(server);
-const PORT = process.env.PORT || 5000;
+import ConnectionManager from "./socket/managers/connectionManager.js";
+
+import AuthenticationHandler from "./socket/handlers/authenticationHandler.js";
+import ConnectionHandler from "./socket/handlers/connectionHandler.js";
+
 dotenv.config();
+
+// Initialize HTTP server and Socket.IO
+const server = createServer();
+const io = new Server(server, {
+    cors: { origin: "*", methods: ["GET", "POST"] },
+});
+const PORT = process.env.PORT || 5000;
+
+// Initialize connection manager
+const connectionManager = new ConnectionManager();
+
+// Initialize handlers
+const authenticationHandler = new AuthenticationHandler(io, connectionManager);
+const connectionHandler = new ConnectionHandler(io, connectionManager);
+
+// Server error handling
+server.on("error", (error) => {
+    console.error("Server error:", error);
+});
+
+io.on("error", (error) => {
+    console.error("IO error:", error);
+});
 
 io.on("connection", (socket) => {
     console.log("A user connected");
 
-    socket.on("disconnect", () => {
-        console.log("A user disconnected");
-    });
+    // Initialize handlers for the new connection
+    authenticationHandler.handleConnection(socket);
+    connectionHandler.handleConnection(socket);
 });
 
 console.log("Starting application...");
-
-// Define schema first
-const test1 = new mongoose.Schema({
-    name: {
-        type: String,
-        default: "Job Container",
-    },
-    createdAt: {
-        type: Date,
-        default: Date.now,
-    },
-});
-
-console.log("Schema defined");
-
-const TestModel = mongoose.model("Test", test1);
-
-async function createTestDocument() {
-    try {
-        const testDocument = new TestModel({
-            name: "My Test Document", // You can override the default
-        });
-
-        const savedDocument = await testDocument.save();
-        console.log("✅ Test document saved:", savedDocument);
-
-        // Also try the create method
-        const anotherDoc = await TestModel.create({
-            name: "Another Test Document",
-        });
-        console.log("✅ Another document created:", anotherDoc);
-    } catch (error) {
-        console.log("❌ Error saving document:", error);
-    }
-}
-
-// Connect to MongoDB and then create documents
-mongoose
-    .connect("mongodb://admin:password123@mongodb:27017/myapp?authSource=admin")
-    .then(() => {
-        console.log("✅ DB CONNECTED");
-
-        // Only create documents after connection is established
-        return createTestDocument();
-    })
-    .then(async () => {
-        console.log("✅ All operations completed");
-        const result = await mongoose.connection.db.admin().ping();
-        console.log("MongoDB ping result:", result);
-    })
-    .catch((error) => {
-        console.log("❌ Error:", error);
-    });
 
 server.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
@@ -122,3 +94,56 @@ process.on("unhandledRejection", (reason, promise) => {
     console.error("Unhandled Rejection at:", promise, "reason:", reason);
     gracefulShutdown("UNHANDLED_REJECTION");
 });
+
+// // Define schema first
+// const test1 = new mongoose.Schema({
+//     name: {
+//         type: String,
+//         default: "Job Container",
+//     },
+//     createdAt: {
+//         type: Date,
+//         default: Date.now,
+//     },
+// });
+
+// console.log("Schema defined");
+
+// const TestModel = mongoose.model("Test", test1);
+
+// async function createTestDocument() {
+//     try {
+//         const testDocument = new TestModel({
+//             name: "My Test Document", // You can override the default
+//         });
+
+//         const savedDocument = await testDocument.save();
+//         console.log("✅ Test document saved:", savedDocument);
+
+//         // Also try the create method
+//         const anotherDoc = await TestModel.create({
+//             name: "Another Test Document",
+//         });
+//         console.log("✅ Another document created:", anotherDoc);
+//     } catch (error) {
+//         console.log("❌ Error saving document:", error);
+//     }
+// }
+
+// // Connect to MongoDB and then create documents
+// mongoose
+//     .connect("mongodb://admin:password12@mongodb:27017/myapp?authSource=admin")
+//     .then(() => {
+//         console.log("✅ DB CONNECTED");
+
+//         // Only create documents after connection is established
+//         return createTestDocument();
+//     })
+//     .then(async () => {
+//         console.log("✅ All operations completed");
+//         const result = await mongoose.connection.db.admin().ping();
+//         console.log("MongoDB ping result:", result);
+//     })
+//     .catch((error) => {
+//         console.log("❌ Error:", error);
+//     });
