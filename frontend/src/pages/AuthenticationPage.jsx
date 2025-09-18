@@ -1,18 +1,13 @@
-import React, { useEffect } from "react";
-import { io } from "socket.io-client";
+import React from "react";
+import {
+    useSocketIO,
+    useSocketIOEvent,
+    useSocketIOState,
+} from "../hooks/useSocketIO";
 
 const AuthenticationPage = () => {
-    const socket = io("http://localhost:5000");
-
-    useEffect(() => {
-        return () => {
-            socket.disconnect();
-        };
-    }, []);
-
-    socket.on("connect", () => {
-        console.log("Connected to server with ID:", socket.id);
-    });
+    // Get connection status and send function
+    const { isConnected, send, joinRoom, leaveRoom } = useSocketIO();
 
     return (
         <div>
