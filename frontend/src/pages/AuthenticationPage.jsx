@@ -1,17 +1,13 @@
-import React from "react";
-import {
-    useSocketIO,
-    useSocketIOEvent,
-    useSocketIOState,
-} from "../hooks/useSocketIO";
+import React, { useState } from "react";
+import LogIn from "../components/LogIn";
+import SignUp from "../components/SignUp";
 
 const AuthenticationPage = () => {
-    // Get connection status and send function
-    const { isConnected, send, joinRoom, leaveRoom } = useSocketIO();
+    const [isSignUp, setIsSignUp] = useState(true);
 
     return (
-        <div>
-            <h1>AUTHENTICATION PAGE</h1>
+        <div className="w-full h-full flex flex-col items-center justify-center">
+            <div>{isSignUp ? <SignUp /> : <LogIn />}</div>
         </div>
     );
 };

@@ -1,0 +1,29 @@
+# Frontend files
+frontend/
+
+# Backend development files
+backend/node_modules
+backend/dist
+backend/build
+backend/coverage
+backend/logs
+backend/*.log
+backend/.env
+
+# Git and documentation
+.git
+.gitignore
+README.md
+*.md
+.DS_Store
+.gitattributes
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Docker
+Dockerfile
+.dockerignore

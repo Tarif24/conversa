@@ -1,4 +1,5 @@
 import { createServer } from "http";
+import mongoose from "mongoose";
 import { Server } from "socket.io";
 import cors from "cors";
 import dotenv from "dotenv";
@@ -16,6 +17,7 @@ const io = new Server(server, {
     cors: { origin: "*", methods: ["GET", "POST"] },
 });
 const PORT = process.env.PORT || 5000;
+const MONGOURL = process.env.MONGO_URL;
 
 // Initialize connection manager
 const connectionManager = new ConnectionManager();
@@ -43,9 +45,15 @@ io.on("connection", (socket) => {
 
 console.log("Starting application...");
 
-server.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
-});
+mongoose
+    .connect(MONGOURL)
+    .then(() => {
+        console.log("DATABASE CONNECTION SUCCESSFUL");
+        server.listen(PORT, () => {
+            console.log(`Server running on http://localhost:${PORT}`);
+        });
+    })
+    .catch((error) => console.log(error));
 
 // Graceful shutdown handling
 const gracefulShutdown = (signal) => {

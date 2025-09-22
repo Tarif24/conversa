@@ -5,7 +5,7 @@ import {
     useSocketIOState,
 } from "../hooks/useSocketIO";
 
-const LogIn = () => {
+const SignUp = () => {
     const { isConnected, connectionState, send } = useSocketIO();
 
     const [email, setEmail] = useState("");
@@ -18,7 +18,7 @@ const LogIn = () => {
     return (
         <div>
             <h1 className="block text-gray-700 font-bold mb-2 text-4xl text-center">
-                LOG IN
+                SIGN UP
             </h1>
             <form
                 onSubmit={handleSubmit}
@@ -70,7 +70,7 @@ const LogIn = () => {
                         className="bg-gray-500 hover:bg-gray-600 hover:cursor-pointer text-white font-bold py-2 px-4 rounded-full w-full focus:outline-none focus:shadow-outline"
                         type="submit"
                     >
-                        Log In
+                        Sign Up
                     </button>
                 </div>
             </form>
@@ -78,4 +78,4 @@ const LogIn = () => {
     );
 };
 
-export default LogIn;
+export default SignUp;
