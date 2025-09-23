@@ -6,7 +6,7 @@ import {
 } from "../hooks/useSocketIO";
 
 const LogIn = () => {
-    const { isConnected, connectionState, send } = useSocketIO();
+    //const { isConnected, connectionState, send } = useSocketIO();
 
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");

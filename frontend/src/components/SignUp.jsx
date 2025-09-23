@@ -4,6 +4,7 @@ import {
     useSocketIOEvent,
     useSocketIOState,
 } from "../hooks/useSocketIO";
+import EVENTS from "../../../constants/socketEvents";
 
 const SignUp = () => {
     const { isConnected, connectionState, send } = useSocketIO();
@@ -13,6 +14,14 @@ const SignUp = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        const result = send(EVENTS.USER_SIGNUP, {
+            username: "Tom",
+            email,
+            password,
+        });
+
+        console.log(result);
     };
 
     return (

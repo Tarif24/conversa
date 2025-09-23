@@ -13,8 +13,8 @@ const SOCKET_EVENTS = {
     USER_LOGOUT: "user_logout",
     USER_ONLINE: "user_online",
     USER_OFFLINE: "user_offline",
-    USER_SIGNUP_SUCCESS: "user_signup_success",
-    USER_LOGIN_SUCCESS: "user_login_success",
+    USER_SIGNUP_RESULT: "user_signup_result",
+    USER_LOGIN_RESULT: "user_login_result",
 
     // Room events
     ROOM_JOINED: "room_joined",

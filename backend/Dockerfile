@@ -12,8 +12,10 @@ RUN npm install
 #COPY patches/ ./patches/
 #RUN npx patch-package
 
-# Copy the rest of your app
+# Copy constants
 COPY constants/ ./constants/
+
+# Copy the rest of your app
 COPY backend/ ./backend/
 
 # Optional:

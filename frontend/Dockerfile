@@ -5,13 +5,21 @@ FROM node:20-alpine AS builder
 WORKDIR /app
 
 # Copy package files and install dependencies
-COPY package*.json ./
+COPY frontend/package*.json ./frontend/
+
+WORKDIR /app/frontend
+
 RUN npm install
 
-# Copy all other project files
-COPY . .
+# Copy constants
+WORKDIR /app
+COPY constants/ ./constants/
+
+# Copy the rest of your app
+COPY frontend/ ./frontend/
 
 # Build the app for production
+WORKDIR /app/frontend
 RUN npm run build
 
 # Use a minimal Node.js image to serve the built files
@@ -22,9 +30,9 @@ RUN npm install -g serve
 
 # Set working directory and copy built files
 WORKDIR /app
-COPY --from=builder /app/dist .
+COPY --from=builder /app/frontend/dist .
 
-# Expose port 3000 (or whatever you prefer)
+# Expose port 3000 
 EXPOSE 3000
 
 # Command to run the static server

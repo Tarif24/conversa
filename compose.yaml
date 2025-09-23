@@ -1,6 +1,8 @@
 services:
     frontend:
-        build: ./frontend
+        build:
+            context: .
+            dockerfile: ./frontend/Dockerfile
         container_name: vite_frontend
         ports:
             - "3000:3000" # Serve frontend on localhost:3000
@@ -10,7 +12,7 @@ services:
             watch:
                 - action: sync
                   path: ./frontend/src
-                  target: /app
+                  target: /app/frontend/src
                 - action: rebuild
                   path: ./frontend/package.json
         depends_on:
@@ -22,14 +24,14 @@ services:
             dockerfile: ./backend/Dockerfile
         container_name: socket_backend
         ports:
-            - "8000:8000" # Backend runs on port 8000
+            - "5000:5000" # Backend runs on port 5000
         env_file:
             - ./backend/.env # Load environment variables from backend .env file
         develop:
             watch:
                 - action: sync
                   path: ./backend
-                  target: /app
+                  target: /app/backend
                 - action: rebuild
                   path: ./backend/package.json
         depends_on:

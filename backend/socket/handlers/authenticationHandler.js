@@ -14,13 +14,19 @@ class AuthenticationHandler {
 
     async handleSignup(socket, user) {
         try {
-            console.log("Signup attempt for user: ", user);
+            console.log("Handel signup for user: ", user);
 
             const result = await signup(user);
 
             if (result.success) {
-                socket.emit(EVENTS.USER_SIGNUP_SUCCESS, {
+                socket.emit(EVENTS.USER_SIGNUP_RESULT, {
+                    success: true,
                     message: "Signup successful",
+                });
+            } else {
+                socket.emit(EVENTS.USER_SIGNUP_RESULT, {
+                    success: false,
+                    message: result.error || "Signup failed",
                 });
             }
         } catch (error) {

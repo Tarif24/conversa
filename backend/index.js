@@ -11,14 +11,13 @@ import ConnectionManager from "./socket/managers/connectionManager.js";
 
 import AuthenticationHandler from "./socket/handlers/authenticationHandler.js";
 import ConnectionHandler from "./socket/handlers/connectionHandler.js";
-import { start } from "repl";
 
 // Initialize HTTP server and Socket.IO
 const server = createServer();
 const io = new Server(server, {
     cors: { origin: "*", methods: ["GET", "POST"] },
 });
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT;
 
 // Initialize connection manager
 const connectionManager = new ConnectionManager();
@@ -119,56 +118,3 @@ const startServer = async () => {
 
 // Start the server
 startServer();
-
-// // Define schema first
-// const test1 = new mongoose.Schema({
-//     name: {
-//         type: String,
-//         default: "Job Container",
-//     },
-//     createdAt: {
-//         type: Date,
-//         default: Date.now,
-//     },
-// });
-
-// console.log("Schema defined");
-
-// const TestModel = mongoose.model("Test", test1);
-
-// async function createTestDocument() {
-//     try {
-//         const testDocument = new TestModel({
-//             name: "My Test Document", // You can override the default
-//         });
-
-//         const savedDocument = await testDocument.save();
-//         console.log("✅ Test document saved:", savedDocument);
-
-//         // Also try the create method
-//         const anotherDoc = await TestModel.create({
-//             name: "Another Test Document",
-//         });
-//         console.log("✅ Another document created:", anotherDoc);
-//     } catch (error) {
-//         console.log("❌ Error saving document:", error);
-//     }
-// }
-
-// // Connect to MongoDB and then create documents
-// mongoose
-//     .connect("mongodb://admin:password12@mongodb:27017/myapp?authSource=admin")
-//     .then(() => {
-//         console.log("✅ DB CONNECTED");
-
-//         // Only create documents after connection is established
-//         return createTestDocument();
-//     })
-//     .then(async () => {
-//         console.log("✅ All operations completed");
-//         const result = await mongoose.connection.db.admin().ping();
-//         console.log("MongoDB ping result:", result);
-//     })
-//     .catch((error) => {
-//         console.log("❌ Error:", error);
-//     });
