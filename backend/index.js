@@ -1,15 +1,17 @@
 import { createServer } from "http";
-import mongoose from "mongoose";
 import { Server } from "socket.io";
 import cors from "cors";
 import dotenv from "dotenv";
+
+dotenv.config();
+
+import { connectToDatabase } from "./database/connection.js";
 
 import ConnectionManager from "./socket/managers/connectionManager.js";
 
 import AuthenticationHandler from "./socket/handlers/authenticationHandler.js";
 import ConnectionHandler from "./socket/handlers/connectionHandler.js";
-
-dotenv.config();
+import { start } from "repl";
 
 // Initialize HTTP server and Socket.IO
 const server = createServer();
@@ -17,7 +19,6 @@ const io = new Server(server, {
     cors: { origin: "*", methods: ["GET", "POST"] },
 });
 const PORT = process.env.PORT || 5000;
-const MONGOURL = process.env.MONGO_URL;
 
 // Initialize connection manager
 const connectionManager = new ConnectionManager();
@@ -25,35 +26,6 @@ const connectionManager = new ConnectionManager();
 // Initialize handlers
 const authenticationHandler = new AuthenticationHandler(io, connectionManager);
 const connectionHandler = new ConnectionHandler(io, connectionManager);
-
-// Server error handling
-server.on("error", (error) => {
-    console.error("Server error:", error);
-});
-
-io.on("error", (error) => {
-    console.error("IO error:", error);
-});
-
-io.on("connection", (socket) => {
-    console.log("A user connected");
-
-    // Initialize handlers for the new connection
-    authenticationHandler.handleConnection(socket);
-    connectionHandler.handleConnection(socket);
-});
-
-console.log("Starting application...");
-
-mongoose
-    .connect(MONGOURL)
-    .then(() => {
-        console.log("DATABASE CONNECTION SUCCESSFUL");
-        server.listen(PORT, () => {
-            console.log(`Server running on http://localhost:${PORT}`);
-        });
-    })
-    .catch((error) => console.log(error));
 
 // Graceful shutdown handling
 const gracefulShutdown = (signal) => {
@@ -84,24 +56,69 @@ const gracefulShutdown = (signal) => {
     }, 10000);
 };
 
-// Handle shutdown signals
-//process.on("SIGTERM", () => gracefulShutdown("SIGTERM"));
-process.on("SIGTERM", () => {
-    console.log("SIGTERM handler called");
-    gracefulShutdown("SIGTERM");
-});
-process.on("SIGINT", () => gracefulShutdown("SIGINT"));
+// Server signal handling
+const serverSignalHandler = () => {
+    // Error handling
+    server.on("error", (error) => {
+        console.error("Server error:", error);
+    });
 
-// Handle uncaught exceptions
-process.on("uncaughtException", (err) => {
-    console.error("Uncaught Exception:", err);
-    gracefulShutdown("UNCAUGHT_EXCEPTION");
-});
+    io.on("error", (error) => {
+        console.error("IO error:", error);
+    });
 
-process.on("unhandledRejection", (reason, promise) => {
-    console.error("Unhandled Rejection at:", promise, "reason:", reason);
-    gracefulShutdown("UNHANDLED_REJECTION");
-});
+    // New client connection handling
+    io.on("connection", (socket) => {
+        console.log("A user connected");
+
+        // Initialize handlers for the new connection
+        authenticationHandler.handleConnection(socket);
+        connectionHandler.handleConnection(socket);
+    });
+
+    // Shutdown signals handling
+    process.on("SIGTERM", () => {
+        console.log("SIGTERM handler called");
+        gracefulShutdown("SIGTERM");
+    });
+    process.on("SIGINT", () => gracefulShutdown("SIGINT"));
+
+    // Handle uncaught exceptions
+    process.on("uncaughtException", (err) => {
+        console.error("Uncaught Exception:", err);
+        gracefulShutdown("UNCAUGHT_EXCEPTION");
+    });
+
+    process.on("unhandledRejection", (reason, promise) => {
+        console.error("Unhandled Rejection at:", promise, "reason:", reason);
+        gracefulShutdown("UNHANDLED_REJECTION");
+    });
+};
+
+const startServer = async () => {
+    try {
+        console.log("Starting application setup");
+
+        console.log("Setting up server signal handlers");
+        serverSignalHandler();
+
+        console.log("Connecting to database");
+        await connectToDatabase();
+
+        console.log("Starting server");
+        server.listen(PORT, () => {
+            console.log(`Server running on http://localhost:${PORT}`);
+        });
+
+        console.log("Application setup complete");
+    } catch (error) {
+        console.error("Failed to start server:", error);
+        process.exit(1);
+    }
+};
+
+// Start the server
+startServer();
 
 // // Define schema first
 // const test1 = new mongoose.Schema({
