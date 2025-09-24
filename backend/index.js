@@ -52,7 +52,7 @@ const gracefulShutdown = (signal) => {
     setTimeout(() => {
         console.error("Forced shutdown after timeout");
         process.exit(1);
-    }, 10000);
+    }, 5000);
 };
 
 // Server signal handling

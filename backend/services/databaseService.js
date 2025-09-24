@@ -14,6 +14,14 @@ export const getUserByEmail = async (email) => {
     return { success: true, exists: false };
 };
 
+export const getUserByUsername = async (username) => {
+    const user = await User.findOne({ username: username });
+    if (user) {
+        return { success: true, exists: true, user: user };
+    }
+    return { success: true, exists: false };
+};
+
 // Message Services
 export const createMessage = async (messageData) => {
     const message = await Message.create(messageData);

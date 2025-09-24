@@ -2,21 +2,35 @@ import {
     doesUserExist,
     createNewUser,
 } from "../services/authenticationService.js";
-import { createUser, getUserByEmail } from "../services/databaseService.js";
+import {
+    createUser,
+    getUserByEmail,
+    getUserByUsername,
+} from "../services/databaseService.js";
 
 export const signup = async (user) => {
     try {
-        console.log("Signup attempt for user: ", user);
+        console.log("Signup attempt for user: ", user.email);
 
-        const userExists = await getUserByEmail(user.email);
-        if (!userExists.exists) {
+        const emailExists = await getUserByEmail(user.email);
+        const usernameExists = await getUserByUsername(user.username);
+        if (!emailExists.exists && !usernameExists.exists) {
             const newUser = await createUser(user);
-            return { success: true, user: newUser };
+            return {
+                success: true,
+                user: newUser,
+                message: "Signup successful",
+            };
         }
 
-        return { success: false, error: "User already exists" };
+        return {
+            success: false,
+            message: "User already exists signup failed",
+            exist: true,
+        };
     } catch (error) {
         console.error("sign up error:", error);
-        return { success: false, error: "Failed to sign up" };
+        const message = "Failed to sign up user: " + error;
+        return { success: false, message: message };
     }
 };

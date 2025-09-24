@@ -5,14 +5,10 @@ const fileSchema = new mongoose.Schema(
         roomID: {
             type: String,
             required: true,
-            unique: true,
-            index: true,
         },
         name: {
             type: String,
             required: true,
-            unique: true,
-            index: true,
         },
         path: {
             type: String,
@@ -25,19 +21,14 @@ const fileSchema = new mongoose.Schema(
         user: {
             type: String,
             required: true,
-            unique: true,
-            index: true,
         },
         type: {
             type: String,
             required: true,
-            unique: true,
-            index: true,
         },
         timeStamp: {
             type: Date,
             default: Date.now,
-            index: true,
         },
     },
     {
@@ -46,12 +37,18 @@ const fileSchema = new mongoose.Schema(
 );
 
 // Compound indexes
-fileSchema.index({ name: 1, roomID: 1, timeStamp: -1 });
-fileSchema.index({ timeStamp: -1, roomID: 1 });
+fileSchema.index(
+    { name: 1, roomID: 1, timeStamp: -1 },
+    { name: "FileNameRoomTimeIndex" }
+);
+fileSchema.index({ timeStamp: -1, roomID: 1 }, { name: "FileTimeRoomIndex" });
 
 // Text search index
-fileSchema.index({
-    path: "text",
-});
+fileSchema.index(
+    {
+        path: "text",
+    },
+    { name: "FilePathTextIndex" }
+);
 
 export default mongoose.model("File", fileSchema);

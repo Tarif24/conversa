@@ -8,13 +8,12 @@ const userSchema = new mongoose.Schema(
             type: String,
             required: true,
             unique: true,
-            index: true,
         },
         email: {
             type: String,
             required: true,
             unique: true,
-            index: true,
+            lowercase: true,
         },
         password: {
             type: String,
@@ -23,7 +22,6 @@ const userSchema = new mongoose.Schema(
         lastSeen: {
             type: Date,
             default: Date.now,
-            index: true,
         },
         rooms: {
             type: Array,
@@ -42,7 +40,6 @@ const userSchema = new mongoose.Schema(
         createdAt: {
             type: Date,
             default: Date.now,
-            index: true,
         },
     },
     {
@@ -51,14 +48,23 @@ const userSchema = new mongoose.Schema(
 );
 
 // Compound indexes
-userSchema.index({ "profile.firstName": 1, "profile.lastName": 1 });
-userSchema.index({ email: 1, createdAt: -1 });
+userSchema.index(
+    { "profile.firstName": 1, "profile.lastName": 1 },
+    { name: "UserProfileNameIndex" }
+);
+userSchema.index(
+    { email: 1, createdAt: -1 },
+    { name: "UserEmailCreatedAtIndex" }
+);
 
 // Text search index
-userSchema.index({
-    username: "text",
-    "profile.firstName": "text",
-    "profile.lastName": "text",
-});
+userSchema.index(
+    {
+        username: "text",
+        "profile.firstName": "text",
+        "profile.lastName": "text",
+    },
+    { name: "UserTextIndex" }
+);
 
 export default mongoose.model("User", userSchema);

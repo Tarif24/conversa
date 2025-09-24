@@ -43,12 +43,8 @@ services:
         ports:
             - "27017:27017"
         command: ["mongod", "--config", "/etc/mongod.conf"]
-        #command: ["mongod", "--auth", "--bind_ip_all"]
         env_file:
             - ./database/.env # Load environment variables from database .env file
-        # environment:
-        #     - MONGO_INITDB_ROOT_USERNAME=admin
-        #     - MONGO_INITDB_ROOT_PASSWORD=password123
         volumes:
             # Mount the config file from database/config directory
             - ./database/config/mongod.conf:/etc/mongod.conf
@@ -56,15 +52,3 @@ services:
             - ./database/data:/data/db
             # Mount logs directory
             - ./database/logs:/var/log/mongodb
-
-    # Database Admin UI
-    # mongo-express:
-    #     image: mongo-express:1.0
-    #     container_name: mongodb_admin
-    #     restart: unless-stopped
-    #     ports:
-    #         - "8081:8081"
-    #     env_file:
-    #         - ./database/.env # Load environment variables from database .env file
-    #     depends_on:
-    #         - mongodb

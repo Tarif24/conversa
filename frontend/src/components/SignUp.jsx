@@ -9,20 +9,37 @@ import EVENTS from "../../../constants/socketEvents";
 const SignUp = () => {
     const { isConnected, connectionState, send } = useSocketIO();
 
-    const [email, setEmail] = useState("");
+    const [user, setUser] = useState({
+        username: "",
+        email: "",
+        password: "",
+        profile: {
+            firstName: "",
+            lastName: "",
+        },
+    });
     const [password, setPassword] = useState("");
 
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        const result = send(EVENTS.USER_SIGNUP, {
-            username: "Tom",
-            email,
-            password,
-        });
-
-        console.log(result);
+        send(EVENTS.USER_SIGNUP, user);
     };
+
+    // Listen for signup result
+    useSocketIOEvent(EVENTS.USER_SIGNUP_RESULT, (data) => {
+        console.log("Signup result received:", data);
+
+        if (data.success) {
+            alert("Signup successful!");
+            return;
+        } else if (data.exist) {
+            alert("User already exists. Please log in.");
+            return;
+        }
+
+        alert("Signup failed: Server error");
+    });
 
     return (
         <div>
@@ -49,8 +66,10 @@ const SignUp = () => {
                         placeholder="Enter a email address"
                         autoComplete="off"
                         required
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
+                        value={user.email}
+                        onChange={(e) =>
+                            setUser({ ...user, email: e.target.value })
+                        }
                     />
                 </div>
                 {/* PASSWORD */}
@@ -69,8 +88,88 @@ const SignUp = () => {
                         placeholder="Enter a password"
                         autoComplete="off"
                         required
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
+                        value={user.password}
+                        onChange={(e) =>
+                            setUser({ ...user, password: e.target.value })
+                        }
+                    />
+                </div>
+                {/* USERNAME */}
+                <div>
+                    <label
+                        htmlFor="username"
+                        className="block text-gray-700 font-bold mb-2"
+                    >
+                        Username
+                    </label>
+                    <input
+                        type="text"
+                        id="username"
+                        name="username"
+                        className="border rounded w-full py-2 px-3"
+                        placeholder="Enter a username"
+                        autoComplete="off"
+                        required
+                        value={user.username}
+                        onChange={(e) =>
+                            setUser({ ...user, username: e.target.value })
+                        }
+                    />
+                </div>
+                {/* FIRSTNAME */}
+                <div>
+                    <label
+                        htmlFor="firstName"
+                        className="block text-gray-700 font-bold mb-2"
+                    >
+                        First Name
+                    </label>
+                    <input
+                        type="text"
+                        id="firstName"
+                        name="firstName"
+                        className="border rounded w-full py-2 px-3"
+                        placeholder="Enter your first name"
+                        autoComplete="off"
+                        required
+                        value={user.profile.firstName}
+                        onChange={(e) =>
+                            setUser({
+                                ...user,
+                                profile: {
+                                    ...user.profile,
+                                    firstName: e.target.value,
+                                },
+                            })
+                        }
+                    />
+                </div>
+                {/* LASTNAME */}
+                <div>
+                    <label
+                        htmlFor="lastName"
+                        className="block text-gray-700 font-bold mb-2"
+                    >
+                        Last Name
+                    </label>
+                    <input
+                        type="text"
+                        id="lastName"
+                        name="lastName"
+                        className="border rounded w-full py-2 px-3"
+                        placeholder="Enter your last name"
+                        autoComplete="off"
+                        required
+                        value={user.profile.lastName}
+                        onChange={(e) =>
+                            setUser({
+                                ...user,
+                                profile: {
+                                    ...user.profile,
+                                    lastName: e.target.value,
+                                },
+                            })
+                        }
                     />
                 </div>
                 {/* SUBMIT BUTTON */}

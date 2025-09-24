@@ -5,8 +5,6 @@ const roomSchema = new mongoose.Schema(
         roomName: {
             type: String,
             required: true,
-            unique: true,
-            index: true,
         },
         message: {
             type: Array,
@@ -15,8 +13,6 @@ const roomSchema = new mongoose.Schema(
         users: {
             type: Array,
             default: [],
-            unique: true,
-            index: true,
         },
         type: {
             type: String,
@@ -25,7 +21,6 @@ const roomSchema = new mongoose.Schema(
         timeStamp: {
             type: Date,
             default: Date.now,
-            index: true,
         },
     },
     {
