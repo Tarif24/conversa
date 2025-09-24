@@ -4,16 +4,31 @@ import {
     useSocketIOEvent,
     useSocketIOState,
 } from "../hooks/useSocketIO";
+import EVENTS from "../../../constants/socketEvents";
 
 const LogIn = () => {
-    //const { isConnected, connectionState, send } = useSocketIO();
+    const { isConnected, connectionState, send } = useSocketIO();
 
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
+    const [login, setLogin] = useState({ email: "", password: "" });
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        send(EVENTS.USER_LOGIN, login);
     };
+
+    // Listen for login result
+    useSocketIOEvent(EVENTS.USER_LOGIN_RESULT, (data) => {
+        if (data.success) {
+            alert("Login successful!");
+        } else {
+            if (!data.exist) {
+                alert("User does not exist. Please sign up first.");
+            } else {
+                alert("Login failed. Incorrect password.");
+            }
+        }
+    });
 
     return (
         <div>
@@ -40,8 +55,10 @@ const LogIn = () => {
                         placeholder="Enter a email address"
                         autoComplete="off"
                         required
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
+                        value={login.email}
+                        onChange={(e) =>
+                            setLogin({ ...login, email: e.target.value })
+                        }
                     />
                 </div>
                 {/* PASSWORD */}
@@ -60,8 +77,10 @@ const LogIn = () => {
                         placeholder="Enter a password"
                         autoComplete="off"
                         required
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
+                        value={login.password}
+                        onChange={(e) =>
+                            setLogin({ ...login, password: e.target.value })
+                        }
                     />
                 </div>
                 {/* SUBMIT BUTTON */}

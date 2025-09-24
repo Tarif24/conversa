@@ -28,8 +28,6 @@ const SignUp = () => {
 
     // Listen for signup result
     useSocketIOEvent(EVENTS.USER_SIGNUP_RESULT, (data) => {
-        console.log("Signup result received:", data);
-
         if (data.success) {
             alert("Signup successful!");
             return;
