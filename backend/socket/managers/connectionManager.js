@@ -11,7 +11,17 @@ class ConnectionManager {
             userId,
             connectedAt: new Date(),
         });
+
         if (userId) {
+            this.userSockets.set(userId, socket.id);
+        }
+    }
+
+    addUserIDToConnection(socket, userId) {
+        const conn = this.connections.get(socket.id);
+
+        if (conn && userId) {
+            this.connections.set(socket.id, { ...conn, userId });
             this.userSockets.set(userId, socket.id);
         }
     }
@@ -27,6 +37,11 @@ class ConnectionManager {
     getSocketByUserId(userId) {
         const socketId = this.userSockets.get(userId);
         return socketId ? this.connections.get(socketId)?.socket : null;
+    }
+
+    getUserIdBySocketId(socketId) {
+        const conn = this.connections.get(socketId);
+        return conn ? conn.userId : null;
     }
 
     getActiveConnections() {

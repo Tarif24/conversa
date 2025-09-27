@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 
 const fileSchema = new mongoose.Schema(
     {
-        roomID: {
+        roomId: {
             type: String,
             required: true,
         },

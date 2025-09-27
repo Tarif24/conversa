@@ -4,6 +4,7 @@ import {
     useSocketIOEvent,
     useSocketIOState,
 } from "../hooks/useSocketIO";
+import { useNavigate } from "react-router-dom";
 import EVENTS from "../../../constants/socketEvents";
 
 const SignUp = () => {
@@ -20,6 +21,8 @@ const SignUp = () => {
     });
     const [password, setPassword] = useState("");
 
+    const navigate = useNavigate();
+
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -30,6 +33,7 @@ const SignUp = () => {
     useSocketIOEvent(EVENTS.USER_SIGNUP_RESULT, (data) => {
         if (data.success) {
             alert("Signup successful!");
+            navigate("/conversa");
             return;
         } else if (data.exist) {
             alert("User already exists. Please log in.");

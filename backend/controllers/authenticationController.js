@@ -37,20 +37,21 @@ export const signup = async (user) => {
 
 export const login = async (user) => {
     try {
-        console.log("Login attempt for user: ", user.email);
+        const emailFixed = user.email.trim().toLowerCase();
 
-        const emailExists = await getUserByEmail(user.email);
+        console.log("Login attempt for user: ", emailFixed);
+
+        const emailExists = await getUserByEmail(emailFixed);
         if (!emailExists.exists) {
-            const newUser = await createUser(user);
             return {
                 success: false,
-                user: newUser,
+                user: emailExists.user,
                 exist: false,
                 message: "Login failed user does not exist",
             };
         }
 
-        const existingUser = (await getUserByEmail(user.email)).user;
+        const existingUser = (await getUserByEmail(emailFixed)).user;
 
         if (existingUser.password === user.password) {
             return {
@@ -66,7 +67,7 @@ export const login = async (user) => {
             exist: true,
         };
     } catch (error) {
-        console.error("login up error:", error);
+        console.error("login error:", error);
         const message = "Failed to login user: " + error;
         return { success: false, message: message };
     }

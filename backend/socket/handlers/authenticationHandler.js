@@ -20,8 +20,16 @@ class AuthenticationHandler {
 
             const result = await signup(user);
 
+            if (result.success) {
+                this.connectionManager.addUserIDToConnection(
+                    socket,
+                    result.user._id.toString()
+                );
+            }
+
             socket.emit(EVENTS.USER_SIGNUP_RESULT, result);
         } catch (error) {
+            console.error("Signup error:", error);
             socket.emit(EVENTS.ERROR, {
                 event: EVENTS.USER_SIGNUP,
                 message: "Server error",
@@ -35,8 +43,15 @@ class AuthenticationHandler {
 
             const result = await login(user);
 
+            if (result.success) {
+                this.connectionManager.addUserIDToConnection(
+                    socket,
+                    result.user._id.toString()
+                );
+            }
             socket.emit(EVENTS.USER_LOGIN_RESULT, result);
         } catch (error) {
+            console.error("Login error:", error);
             socket.emit(EVENTS.ERROR, {
                 event: EVENTS.USER_LOGIN,
                 message: "Server error",

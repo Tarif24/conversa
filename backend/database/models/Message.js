@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 
 const messageSchema = new mongoose.Schema(
     {
-        roomID: {
+        roomId: {
             type: String,
             required: true,
         },
@@ -10,7 +10,7 @@ const messageSchema = new mongoose.Schema(
             type: String,
             required: true,
         },
-        user: {
+        userId: {
             type: String,
             required: true,
         },

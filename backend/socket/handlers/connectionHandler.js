@@ -18,6 +18,8 @@ class ConnectionHandler {
     async handleDisconnect(socket, user) {
         try {
             console.log("user with socket ID:", socket.id, "disconnected");
+
+            this.connectionManager.removeConnection(socket.id);
         } catch (error) {
             socket.emit(EVENTS.ERROR, {
                 event: EVENTS.DISCONNECT,
