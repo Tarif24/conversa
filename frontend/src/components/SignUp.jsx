@@ -26,22 +26,19 @@ const SignUp = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        send(EVENTS.USER_SIGNUP, user);
+        send(EVENTS.USER_SIGNUP, user, (response) => {
+            if (response.success) {
+                alert("Signup successful!");
+                navigate("/conversa");
+                return;
+            } else if (response.exist) {
+                alert("User already exists. Please log in.");
+                return;
+            }
+
+            alert("Signup failed: Server error");
+        });
     };
-
-    // Listen for signup result
-    useSocketIOEvent(EVENTS.USER_SIGNUP_RESULT, (data) => {
-        if (data.success) {
-            alert("Signup successful!");
-            navigate("/conversa");
-            return;
-        } else if (data.exist) {
-            alert("User already exists. Please log in.");
-            return;
-        }
-
-        alert("Signup failed: Server error");
-    });
 
     return (
         <div>

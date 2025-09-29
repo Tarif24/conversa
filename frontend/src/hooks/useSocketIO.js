@@ -35,8 +35,8 @@ export const useSocketIO = (options = {}) => {
     }, []);
 
     // Send event function
-    const send = useCallback((eventType, payload) => {
-        socketManager.send(eventType, payload);
+    const send = useCallback((eventType, payload, callback) => {
+        socketManager.send(eventType, payload, callback);
     }, []);
 
     // Join room function

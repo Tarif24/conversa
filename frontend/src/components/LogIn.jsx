@@ -17,23 +17,20 @@ const LogIn = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        send(EVENTS.USER_LOGIN, login);
-    };
-
-    // Listen for login result
-    useSocketIOEvent(EVENTS.USER_LOGIN_RESULT, (data) => {
-        if (data.success) {
-            alert("Login successful!");
-            navigate("/conversa");
-            return;
-        } else {
-            if (!data.exist) {
-                alert("User does not exist. Please sign up first.");
+        send(EVENTS.USER_LOGIN, login, (response) => {
+            if (response.success) {
+                alert("Login successful!");
+                navigate("/conversa");
+                return;
             } else {
-                alert("Login failed. Incorrect password.");
+                if (!response.exist) {
+                    alert("User does not exist. Please sign up first.");
+                } else {
+                    alert("Login failed. Incorrect password.");
+                }
             }
-        }
-    });
+        });
+    };
 
     return (
         <div>

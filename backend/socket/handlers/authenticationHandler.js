@@ -8,13 +8,15 @@ class AuthenticationHandler {
     }
 
     handleConnection(socket) {
-        socket.on(EVENTS.USER_SIGNUP, (user) =>
-            this.handleSignup(socket, user)
+        socket.on(EVENTS.USER_SIGNUP, (user, callback) =>
+            this.handleSignup(socket, user, callback)
         );
-        socket.on(EVENTS.USER_LOGIN, (user) => this.handleLogin(socket, user));
+        socket.on(EVENTS.USER_LOGIN, (user, callback) =>
+            this.handleLogin(socket, user, callback)
+        );
     }
 
-    async handleSignup(socket, user) {
+    async handleSignup(socket, user, callback) {
         try {
             console.log("Handel signup for user: ", user.email);
 
@@ -27,7 +29,11 @@ class AuthenticationHandler {
                 );
             }
 
-            socket.emit(EVENTS.USER_SIGNUP_RESULT, result);
+            if (callback) {
+                callback(result);
+            } else {
+                console.log("No callback provided for signup event");
+            }
         } catch (error) {
             console.error("Signup error:", error);
             socket.emit(EVENTS.ERROR, {
@@ -37,7 +43,7 @@ class AuthenticationHandler {
         }
     }
 
-    async handleLogin(socket, user) {
+    async handleLogin(socket, user, callback) {
         try {
             console.log("Handel login for user: ", user.email);
 
@@ -49,7 +55,12 @@ class AuthenticationHandler {
                     result.user._id.toString()
                 );
             }
-            socket.emit(EVENTS.USER_LOGIN_RESULT, result);
+
+            if (callback) {
+                callback(result);
+            } else {
+                console.log("No callback provided for login event");
+            }
         } catch (error) {
             console.error("Login error:", error);
             socket.emit(EVENTS.ERROR, {

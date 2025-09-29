@@ -60,13 +60,13 @@ class SocketIOManager {
     }
 
     // Send event (with or without data)
-    send(eventType, payload = null) {
+    send(eventType, payload = null, callback = null) {
         if (!this.isConnected()) {
             console.warn("Socket.IO not connected");
             return;
         }
 
-        this.socket.emit(eventType, payload);
+        this.socket.emit(eventType, payload, callback);
     }
 
     // Subscribe to events
