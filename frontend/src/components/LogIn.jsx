@@ -4,7 +4,6 @@ import {
     useSocketIOEvent,
     useSocketIOState,
 } from "../hooks/useSocketIO";
-import EVENTS from "../../../constants/socketEvents";
 import { useNavigate } from "react-router-dom";
 
 const LogIn = () => {

@@ -9,6 +9,7 @@ import { connectToDatabase } from "./database/connection.js";
 
 import ConnectionManager from "./socket/managers/connectionManager.js";
 
+// Import all the handlers
 import AuthenticationHandler from "./socket/handlers/authenticationHandler.js";
 import ConnectionHandler from "./socket/handlers/connectionHandler.js";
 import MessageHandler from "./socket/handlers/messageHandler.js";
@@ -50,7 +51,7 @@ const gracefulShutdown = (signal) => {
         process.exit(0);
     });
 
-    // Force close after 10 seconds
+    // Force close after 5 seconds
     setTimeout(() => {
         console.error("Forced shutdown after timeout");
         process.exit(1);

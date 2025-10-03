@@ -35,7 +35,7 @@ export const AuthProvider = ({ children }) => {
         localStorage.removeItem("user");
     };
 
-    // Login function
+    // Login function to save auth
     const login = async (response) => {
         setIsLoading(true);
 
@@ -58,7 +58,7 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
-    // Register function
+    // Signup function to save auth
     const signup = async (response) => {
         setIsLoading(true);
 
@@ -81,7 +81,7 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
-    // Refresh token function
+    // Refresh token function to update access token
     const refreshAccessToken = async (response, logoutEmit) => {
         if (!refreshToken) return;
 

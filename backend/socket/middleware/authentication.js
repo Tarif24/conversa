@@ -4,6 +4,7 @@ import EVENTS from "../../../constants/socketEvents.js";
 const authenticateSocket = (socket) => {
     return ([eventName, data], next) => {
         try {
+            // Skip the auth middleware if its the following events
             if (
                 eventName === EVENTS.CONNECT ||
                 eventName === EVENTS.DISCONNECT ||

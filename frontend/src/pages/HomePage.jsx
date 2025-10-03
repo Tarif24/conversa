@@ -7,11 +7,10 @@ import {
 import EVENTS from "../../../constants/socketEvents";
 
 const HomePage = () => {
-    const API_URL = import.meta.env.VITE_CONVERSA_API_URL;
-
     const {
         isConnected,
         connectionState,
+        user,
         sendProtected,
         sendRefresh,
         sendLastEmitted,
@@ -49,12 +48,15 @@ const HomePage = () => {
             { role: "user", content: `${input}` },
         ]);
 
+        const userId = user._id.toString();
+
         try {
             setIsTyping(true);
 
             sendProtected(EVENTS.SEND_MESSAGE, {
                 roomId: "default",
                 message: input,
+                userId: userId,
             });
         } catch (error) {
             console.error("Error fetching data", error);

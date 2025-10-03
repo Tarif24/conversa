@@ -11,10 +11,6 @@ dist/
 
 # Environment variables
 .env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
 
 # Database
 *.db
@@ -22,10 +18,6 @@ dist/
 *.sqlite3
 data/
 mongo-data/
-
-# Logs
-logs/
-*.log
 
 # Runtime data
 pids/
@@ -71,7 +63,8 @@ jspm_packages/
 .vscode-test
 
 # IDE files
-.vscode/
+.vscode/*
+!.vscode/extensions.json
 .idea/
 *.swp
 *.swo
@@ -90,25 +83,18 @@ Thumbs.db
 tmp/
 temp/
 
-# Frontend specific
-
 # Logs
 logs
-*.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
+logs/
+*.log
 
-node_modules
 dist
 dist-ssr
 *.local
 
 # Editor directories and files
-.vscode/*
-!.vscode/extensions.json
 .idea
 .DS_Store
 *.suo
@@ -119,25 +105,11 @@ dist-ssr
 
 # Backend specific
 
-# Dependencies
-node_modules/
-
-# Environment variables
-.env
-
-# Logs
-*.log
-npm-debug.log*
-
 # OS files
 .DS_Store
 Thumbs.db
-
-# VS Code
-.vscode/
 
 # Database specific
 
 database/data/
 database/logs/
-.env

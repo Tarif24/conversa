@@ -29,9 +29,11 @@ class AuthenticationHandler {
 
     async handleSignup(socket, user, callback) {
         try {
-            console.log("Handel signup for user: ", user.email);
+            const emailFixed = user.email.trim().toLowerCase();
 
-            const result = await signup(user);
+            console.log("Handel signup for user: ", emailFixed);
+
+            const result = await signup({ ...user, email: emailFixed });
 
             if (result.success) {
                 this.connectionManager.addUserIDToConnection(
@@ -59,9 +61,11 @@ class AuthenticationHandler {
 
     async handleLogin(socket, user, callback) {
         try {
-            console.log("Handel login for user: ", user.email);
+            const emailFixed = user.email.trim().toLowerCase();
 
-            const result = await login(user);
+            console.log("Handel login for user: ", emailFixed);
+
+            const result = await login({ ...user, email: emailFixed });
 
             if (result.success) {
                 this.connectionManager.addUserIDToConnection(

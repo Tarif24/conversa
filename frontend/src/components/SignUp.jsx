@@ -5,7 +5,6 @@ import {
     useSocketIOState,
 } from "../hooks/useSocketIO";
 import { useNavigate } from "react-router-dom";
-import EVENTS from "../../../constants/socketEvents";
 
 const SignUp = () => {
     const { isConnected, connectionState, send, sendSignup } = useSocketIO();
@@ -19,7 +18,6 @@ const SignUp = () => {
             lastName: "",
         },
     });
-    const [password, setPassword] = useState("");
 
     const navigate = useNavigate();
 

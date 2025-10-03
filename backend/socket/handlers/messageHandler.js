@@ -31,7 +31,7 @@ class MessageHandler {
                 return;
             }
 
-            const result = await sendMessage({ ...message, userId: userId });
+            const result = await sendMessage(message);
 
             if (!result.success) {
                 socket.emit(EVENTS.ERROR, {

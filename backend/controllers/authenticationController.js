@@ -32,12 +32,9 @@ export const signup = async (user) => {
 
         const hashedPassword = await hashPassword(user.password);
 
-        const emailFixed = user.email.trim().toLowerCase();
-
         const finalUser = {
             ...user,
             password: hashedPassword,
-            email: emailFixed,
         };
 
         const newUser = await createUser(finalUser);
@@ -66,8 +63,6 @@ export const signup = async (user) => {
 
 export const login = async (user) => {
     try {
-        const emailFixed = user.email.trim().toLowerCase();
-
         console.log("Login attempt for user: ", emailFixed);
 
         const emailExists = await getUserByEmail(emailFixed);

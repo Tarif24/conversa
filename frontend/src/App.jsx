@@ -31,6 +31,7 @@ function App() {
     );
 
     return (
+        // The Route provider has to wrapped in the AuthProvider or else we cant use the context
         <AuthProvider>
             <RouterProvider router={router} />
         </AuthProvider>

@@ -4,10 +4,12 @@ import socketManager from "../api/socketio";
 import { useAuth } from "../contexts/Authentication";
 import EVENTS from "../../../constants/socketEvents";
 
-// Hook to establish Socket.IO connection
+// Hook to establish Socket.IO connection and give any file using it functions to work with the api
 export const useSocketIO = (options = {}) => {
     const [isConnected, setIsConnected] = useState(false);
     const [connectionState, setConnectionState] = useState("DISCONNECTED");
+
+    // The auth context
     const {
         user,
         isAuthenticated,
@@ -136,12 +138,13 @@ export const useSocketIO = (options = {}) => {
                     refreshToken
                 );
             },
-            1 * 30 * 1000
+            10 * 30 * 1000
         ); // 10 minutes
 
         return () => clearInterval(interval);
     }, [isAuthenticated, refreshToken]);
 
+    // Returns all the functions and vars needed to work with the api
     return {
         isConnected,
         connectionState,

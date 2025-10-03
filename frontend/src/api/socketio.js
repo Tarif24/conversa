@@ -42,7 +42,7 @@ class SocketIOManager {
                 console.log("Socket.IO disconnected:", reason);
             });
 
-            // Forward all events to our listeners
+            // onAny receives all events and forwards the events to our listeners
             this.socket.onAny((eventType, ...args) => {
                 // Skip internal socket.io events
                 if (
@@ -61,21 +61,13 @@ class SocketIOManager {
         });
     }
 
-    // Send event (with or without data)
+    // Send event (with or without data, callback and a token)
     send(eventType, payload = null, callback = null, token = null) {
-        // Add a error check that refreshes token if not valid and retires sending the event
-
-        // if (
-        //     error.message.includes("expired") ||
-        //     error.message.includes("Invalid")
-        // ) {
-        //     refreshAccessToken();
-        // }
-
         this.lastEmitted = { eventType, payload, callback };
 
         let finalPayload = payload;
 
+        // These events do not need a token
         if (
             eventType !== EVENTS.CONNECT &&
             eventType !== EVENTS.DISCONNECT &&
@@ -94,7 +86,7 @@ class SocketIOManager {
         this.socket.emit(eventType, finalPayload, callback);
     }
 
-    // Subscribe to events
+    // Subscribe to events by adding them to the listener map and each item in the map has a corresponding set so that each event can have multiple callbacks
     subscribe(eventType, callback) {
         if (!this.listeners.has(eventType)) {
             this.listeners.set(eventType, new Set());
@@ -108,7 +100,7 @@ class SocketIOManager {
         };
     }
 
-    // Unsubscribe from events
+    // Unsubscribe from events takes that specific callback from the set
     unsubscribe(eventType, callback) {
         const callbacks = this.listeners.get(eventType);
         if (callbacks) {
@@ -119,7 +111,7 @@ class SocketIOManager {
         }
     }
 
-    // Emit event to all our listeners (internal use)
+    // Emit event to all our listeners checks if we have a listener for the event that was forwarded then runs every callback for that event if found
     notifyListeners(eventType, payload) {
         const callbacks = this.listeners.get(eventType);
         if (callbacks) {
@@ -169,7 +161,7 @@ class SocketIOManager {
     }
 }
 
-// Create singleton instance
+// Create singleton instance this instance of the socket manager is sent only not a new one every time
 const socketManager = new SocketIOManager();
 
 export default socketManager;
