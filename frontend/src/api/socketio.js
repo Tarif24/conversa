@@ -1,11 +1,13 @@
 // api/socketio.js
 import { io } from "socket.io-client";
+import EVENTS from "../../../constants/socketEvents.js";
 
 class SocketIOManager {
     constructor() {
         this.socket = null;
         this.url = import.meta.env.VITE_CONVERSA_API_URL;
         this.listeners = new Map(); // eventType -> Set of callbacks
+        this.lastEmitted = null;
     }
 
     // Connect to Socket.IO server
@@ -60,13 +62,36 @@ class SocketIOManager {
     }
 
     // Send event (with or without data)
-    send(eventType, payload = null, callback = null) {
+    send(eventType, payload = null, callback = null, token = null) {
+        // Add a error check that refreshes token if not valid and retires sending the event
+
+        // if (
+        //     error.message.includes("expired") ||
+        //     error.message.includes("Invalid")
+        // ) {
+        //     refreshAccessToken();
+        // }
+
+        this.lastEmitted = { eventType, payload, callback };
+
+        let finalPayload = payload;
+
+        if (
+            eventType !== EVENTS.CONNECT &&
+            eventType !== EVENTS.DISCONNECT &&
+            eventType !== EVENTS.ERROR &&
+            eventType !== EVENTS.USER_LOGIN &&
+            eventType !== EVENTS.USER_SIGNUP
+        ) {
+            finalPayload = { ...payload, token: token };
+        }
+
         if (!this.isConnected()) {
             console.warn("Socket.IO not connected");
             return;
         }
 
-        this.socket.emit(eventType, payload, callback);
+        this.socket.emit(eventType, finalPayload, callback);
     }
 
     // Subscribe to events

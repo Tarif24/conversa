@@ -1,5 +1,6 @@
 import EVENTS from "../../../constants/socketEvents.js";
 import { sendMessage } from "../../controllers/messageController.js";
+import { authentication } from "../middleware/index.js";
 
 class MessageHandler {
     constructor(io, connectionManager) {
@@ -8,6 +9,8 @@ class MessageHandler {
     }
 
     handleConnection(socket) {
+        socket.use(authentication(socket));
+
         socket.on(EVENTS.SEND_MESSAGE, (message) =>
             this.handleSendMessage(socket, message)
         );

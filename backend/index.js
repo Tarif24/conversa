@@ -90,7 +90,7 @@ const serverSignalHandler = () => {
     // Handle uncaught exceptions
     process.on("uncaughtException", (err) => {
         console.error("Uncaught Exception:", err);
-        gracefulShutdown("UNCAUGHT_EXCEPTION");
+        //gracefulShutdown("UNCAUGHT_EXCEPTION");
     });
 
     process.on("unhandledRejection", (reason, promise) => {

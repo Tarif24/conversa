@@ -8,7 +8,7 @@ import EVENTS from "../../../constants/socketEvents";
 import { useNavigate } from "react-router-dom";
 
 const LogIn = () => {
-    const { isConnected, connectionState, send } = useSocketIO();
+    const { isConnected, connectionState, send, sendLogin } = useSocketIO();
 
     const [login, setLogin] = useState({ email: "", password: "" });
 
@@ -17,7 +17,7 @@ const LogIn = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        send(EVENTS.USER_LOGIN, login, (response) => {
+        sendLogin(login, (response) => {
             if (response.success) {
                 alert("Login successful!");
                 navigate("/conversa");

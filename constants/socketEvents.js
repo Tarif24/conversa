@@ -8,11 +8,14 @@ const SOCKET_EVENTS = {
     MESSAGES_LOADED: "messages_loaded",
 
     // User events
+    USER_ONLINE: "user_online",
+    USER_OFFLINE: "user_offline",
+
+    // Authentication events
     USER_SIGNUP: "user_signup",
     USER_LOGIN: "user_login",
     USER_LOGOUT: "user_logout",
-    USER_ONLINE: "user_online",
-    USER_OFFLINE: "user_offline",
+    USER_REFRESH_TOKEN: "user_refresh_token",
 
     // Room events
     ROOM_JOINED: "room_joined",
@@ -21,8 +24,8 @@ const SOCKET_EVENTS = {
 
     // System events
     ERROR: "error",
+    CONNECT: "connect",
     DISCONNECT: "disconnect",
-    CONNECTION: "connection",
 };
 
 export default SOCKET_EVENTS;

@@ -9,7 +9,13 @@ import EVENTS from "../../../constants/socketEvents";
 const HomePage = () => {
     const API_URL = import.meta.env.VITE_CONVERSA_API_URL;
 
-    const { isConnected, connectionState, send } = useSocketIO();
+    const {
+        isConnected,
+        connectionState,
+        sendProtected,
+        sendRefresh,
+        sendLastEmitted,
+    } = useSocketIO();
 
     // State to hold the selected group chat name
     const [name, setName] = useState("");
@@ -46,7 +52,10 @@ const HomePage = () => {
         try {
             setIsTyping(true);
 
-            send(EVENTS.SEND_MESSAGE, { roomId: "default", message: input });
+            sendProtected(EVENTS.SEND_MESSAGE, {
+                roomId: "default",
+                message: input,
+            });
         } catch (error) {
             console.error("Error fetching data", error);
         } finally {
@@ -61,6 +70,19 @@ const HomePage = () => {
                 ...prev,
                 { role: "assistant", content: data.message.message },
             ]);
+        }
+    });
+
+    // Listen for incoming messages
+    useSocketIOEvent(EVENTS.ERROR, (error) => {
+        if (error.message.includes("Invalid or expired token")) {
+            sendRefresh((response) => {
+                if (response.success) {
+                    sendLastEmitted();
+                } else {
+                    console.error("Token refresh failed:", response.message);
+                }
+            });
         }
     });
 

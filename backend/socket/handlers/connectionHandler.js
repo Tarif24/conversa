@@ -10,7 +10,7 @@ class ConnectionHandler {
             this.handleDisconnect(socket, user)
         );
 
-        socket.on(EVENTS.ERROR, (user) => {
+        socket.on(EVENTS.ERROR, (error) => {
             console.error("Socket error for", socket.id, ":", error);
         });
     }

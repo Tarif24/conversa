@@ -1,4 +1,10 @@
-import { User, Message, File, Room } from "../database/models/index.js";
+import {
+    User,
+    Message,
+    File,
+    Room,
+    RefreshToken,
+} from "../database/models/index.js";
 
 // User Services
 export const createUser = async (userData) => {
@@ -38,4 +44,29 @@ export const createFile = async (fileData) => {
 export const createRoom = async (roomData) => {
     const room = await Room.create(roomData);
     return room;
+};
+
+// Refresh Token Services
+export const createRefreshToken = async (tokenData) => {
+    const token = await RefreshToken.create(tokenData);
+    return token;
+};
+
+export const getRefreshToken = async (token) => {
+    const refreshToken = await RefreshToken.findOne({ token: token });
+
+    if (refreshToken) {
+        return { success: true, exists: true, refreshToken: refreshToken };
+    }
+    return { success: true, exists: false };
+};
+
+export const deleteRefreshToken = async (token) => {
+    await RefreshToken.deleteOne({ token: token });
+    return { success: true };
+};
+
+export const deleteRefreshTokensByUserId = async (userId) => {
+    await RefreshToken.deleteMany({ userId: userId });
+    return { success: true };
 };

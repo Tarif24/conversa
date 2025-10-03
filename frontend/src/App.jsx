@@ -5,6 +5,8 @@ import {
     RouterProvider,
 } from "react-router-dom";
 
+import { AuthProvider } from "./contexts/Authentication";
+
 import MainLayout from "./layouts/MainLayout";
 import AuthenticationLayout from "./layouts/AuthenticationLayout";
 import AppLayout from "./layouts/AppLayout";
@@ -28,7 +30,11 @@ function App() {
         )
     );
 
-    return <RouterProvider router={router} />;
+    return (
+        <AuthProvider>
+            <RouterProvider router={router} />
+        </AuthProvider>
+    );
 }
 
 export default App;

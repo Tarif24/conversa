@@ -1,16 +1,29 @@
 // hooks/useSocketIO.js
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, use } from "react";
 import socketManager from "../api/socketio";
+import { useAuth } from "../contexts/Authentication";
+import EVENTS from "../../../constants/socketEvents";
 
 // Hook to establish Socket.IO connection
 export const useSocketIO = (options = {}) => {
     const [isConnected, setIsConnected] = useState(false);
     const [connectionState, setConnectionState] = useState("DISCONNECTED");
+    const {
+        user,
+        isAuthenticated,
+        isLoading,
+        login,
+        signup,
+        logout,
+        refreshAccessToken,
+        accessToken,
+        refreshToken,
+    } = useAuth();
 
     useEffect(() => {
         // Connect on mount
         socketManager
-            .connect(options)
+            .connect({ auth: { token: accessToken }, ...options })
             .then(() => {
                 setIsConnected(true);
                 setConnectionState("CONNECTED");
@@ -35,9 +48,12 @@ export const useSocketIO = (options = {}) => {
     }, []);
 
     // Send event function
-    const send = useCallback((eventType, payload, callback) => {
-        socketManager.send(eventType, payload, callback);
-    }, []);
+    const sendProtected = useCallback(
+        (eventType, payload, callback) => {
+            socketManager.send(eventType, payload, callback, accessToken);
+        },
+        [accessToken, refreshToken]
+    );
 
     // Join room function
     const joinRoom = useCallback((roomName) => {
@@ -49,12 +65,96 @@ export const useSocketIO = (options = {}) => {
         socketManager.leaveRoom(roomName);
     }, []);
 
+    // Login
+    const sendLogin = useCallback((payload, callback) => {
+        socketManager.send(EVENTS.USER_LOGIN, payload, (response) => {
+            login(response);
+            callback(response);
+        });
+    }, []);
+
+    // Signup
+    const sendSignup = useCallback((payload, callback) => {
+        socketManager.send(EVENTS.USER_SIGNUP, payload, (response) => {
+            signup(response);
+            callback(response);
+        });
+    }, []);
+
+    // Logout
+    const sendLogout = useCallback((payload, callback) => {
+        socketManager.send(EVENTS.USER_LOGOUT, payload, (response) => {
+            logout();
+            if (callback) callback(response);
+        });
+    }, []);
+
+    // Refresh Token
+    const sendRefresh = useCallback(
+        (callback) => {
+            socketManager.send(
+                EVENTS.USER_REFRESH_TOKEN,
+                {},
+                (response) => {
+                    refreshAccessToken(response, () => {
+                        send(EVENTS.USER_LOGOUT, {
+                            token: refreshToken,
+                        });
+                    });
+
+                    if (callback) callback(response);
+                },
+                refreshToken
+            );
+        },
+        [refreshToken]
+    );
+
+    const sendLastEmitted = useCallback(() => {
+        if (socketManager.lastEmitted) {
+            const { eventType, payload, callback } = socketManager.lastEmitted;
+            socketManager.send(eventType, payload, callback, accessToken);
+        }
+    });
+
+    // Auto-refresh token every 10 minutes
+    useEffect(() => {
+        if (!isAuthenticated || !refreshToken) return;
+
+        const interval = setInterval(
+            () => {
+                socketManager.send(
+                    EVENTS.USER_REFRESH_TOKEN,
+                    {},
+                    (response) => {
+                        refreshAccessToken(response, () => {
+                            send(EVENTS.USER_LOGOUT, {
+                                token: refreshToken,
+                            });
+                        });
+                    },
+                    refreshToken
+                );
+            },
+            1 * 30 * 1000
+        ); // 10 minutes
+
+        return () => clearInterval(interval);
+    }, [isAuthenticated, refreshToken]);
+
     return {
         isConnected,
         connectionState,
-        send,
+        sendProtected,
         joinRoom,
         leaveRoom,
+        sendLogin,
+        sendSignup,
+        sendLogout,
+        sendRefresh,
+        sendLastEmitted,
+        user,
+        isAuthenticated,
     };
 };
 
