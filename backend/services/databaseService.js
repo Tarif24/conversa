@@ -28,6 +28,21 @@ export const getUserByUsername = async (username) => {
     return { success: true, exists: false };
 };
 
+export const getUsersByUsernameSearch = async (usernameQuery) => {
+    const users = await User.find({
+        username: {
+            $regex: usernameQuery,
+            $options: "i", // case-insensitive
+        },
+    }).limit(10);
+
+    if (users && users.length !== 0) {
+        return { success: true, list: users, foundUsers: true };
+    } else {
+        return { success: true, foundUsers: false };
+    }
+};
+
 // Message Services
 export const createMessage = async (messageData) => {
     const message = await Message.create(messageData);

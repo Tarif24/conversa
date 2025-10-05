@@ -63,6 +63,7 @@ userSchema.index(
         username: "text",
         "profile.firstName": "text",
         "profile.lastName": "text",
+        email: "text",
     },
     { name: "UserTextIndex" }
 );

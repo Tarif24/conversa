@@ -10,6 +10,7 @@ const SOCKET_EVENTS = {
     // User events
     USER_ONLINE: "user_online",
     USER_OFFLINE: "user_offline",
+    USER_SEARCH: "user_search",
 
     // Authentication events
     USER_SIGNUP: "user_signup",

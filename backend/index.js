@@ -13,6 +13,8 @@ import ConnectionManager from "./socket/managers/connectionManager.js";
 import AuthenticationHandler from "./socket/handlers/authenticationHandler.js";
 import ConnectionHandler from "./socket/handlers/connectionHandler.js";
 import MessageHandler from "./socket/handlers/messageHandler.js";
+import UserHandler from "./socket/handlers/userHandler.js";
+import { Socket } from "dgram";
 
 // Initialize HTTP server and Socket.IO
 const server = createServer();
@@ -28,6 +30,7 @@ const connectionManager = new ConnectionManager();
 const authenticationHandler = new AuthenticationHandler(io, connectionManager);
 const connectionHandler = new ConnectionHandler(io, connectionManager);
 const messageHandler = new MessageHandler(io, connectionManager);
+const userHandler = new UserHandler(io, connectionManager);
 
 // Graceful shutdown handling
 const gracefulShutdown = (signal) => {
@@ -79,6 +82,7 @@ const serverSignalHandler = () => {
         authenticationHandler.handleConnection(socket);
         connectionHandler.handleConnection(socket);
         messageHandler.handleConnection(socket);
+        userHandler.handleConnection(socket);
     });
 
     // Shutdown signals handling
