@@ -6,7 +6,7 @@ import {
 } from "../hooks/useSocketIO";
 import EVENTS from "../../../constants/socketEvents";
 
-const UserSearch = () => {
+const UserSearch = ({ handleOnUserClicked }) => {
     const {
         isConnected,
         connectionState,
@@ -78,14 +78,12 @@ const UserSearch = () => {
     };
 
     const userResultOnClick = (user) => {
-        console.log(user);
+        handleOnUserClicked(user);
     };
 
     return (
-        <div className="w-[90%] flex flex-col justify-center h-fit">
-            <h1>User Search</h1>
-
-            <div className="w-full border-2 border-black rounded-xl p-1 overflow-hidden">
+        <div className="w-full flex flex-col justify-center h-fit">
+            <div className="w-full border-1 border-black rounded-xl p-0 overflow-hidden">
                 <input
                     type="text"
                     placeholder="Search for users here"
@@ -93,11 +91,11 @@ const UserSearch = () => {
                     value={inputText}
                     onChange={textOnChange}
                 />
-                {searchResult.length > 0 && (
-                    <div className="flex flex-col w-full gap-2">
+                {searchResult && searchResult.length > 0 && (
+                    <div className="flex flex-col w-full gap-2 max-h-36 overflow-x-hidden px-2 ">
                         {searchResult.map((result) => (
                             <div
-                                className="px-5 py-2 w-full bg-gray-100 rounded-xl hover:cursor-pointer"
+                                className="px-5 py-1 w-full bg-gray-100 border-1 border-gray-400 rounded-xl hover:cursor-pointer"
                                 key={result._id}
                                 onClick={() => {
                                     userResultOnClick(result);

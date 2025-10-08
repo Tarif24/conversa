@@ -7,8 +7,7 @@ const roomSchema = new mongoose.Schema(
             required: true,
         },
         message: {
-            type: Array,
-            required: true,
+            type: Object,
         },
         users: {
             type: Array,

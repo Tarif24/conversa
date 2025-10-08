@@ -40,10 +40,10 @@ class AuthenticationHandler {
                     socket,
                     result.user._id.toString()
                 );
-            }
 
-            socket.userId = result.user._id.toString();
-            socket.userEmail = result.email;
+                socket.userId = result.user._id.toString();
+                socket.userEmail = result.user.email;
+            }
 
             if (callback) {
                 callback(result);
@@ -51,7 +51,7 @@ class AuthenticationHandler {
                 console.log("No callback provided for signup event");
             }
         } catch (error) {
-            console.error("Signup error:", error);
+            console.error("Handle Signup error:", error);
             socket.emit(EVENTS.ERROR, {
                 event: EVENTS.USER_SIGNUP,
                 message: "Server error",
@@ -67,15 +67,15 @@ class AuthenticationHandler {
 
             const result = await login({ ...user, email: emailFixed });
 
-            if (result.success) {
+            if (result.success && result.exist) {
                 this.connectionManager.addUserIDToConnection(
                     socket,
                     result.user._id.toString()
                 );
-            }
 
-            socket.userId = result.user._id.toString();
-            socket.userEmail = result.email;
+                socket.userId = result.user._id.toString();
+                socket.userEmail = result.user.email;
+            }
 
             if (callback) {
                 callback(result);
@@ -83,7 +83,7 @@ class AuthenticationHandler {
                 console.log("No callback provided for login event");
             }
         } catch (error) {
-            console.error("Login error:", error);
+            console.error("Handle Login error:", error);
             socket.emit(EVENTS.ERROR, {
                 event: EVENTS.USER_LOGIN,
                 message: "Server error",
@@ -105,7 +105,7 @@ class AuthenticationHandler {
                 console.log("No callback provided for logout event");
             }
         } catch (error) {
-            console.error("Logout error:", error);
+            console.error("Handle Logout error:", error);
             socket.emit(EVENTS.ERROR, {
                 event: EVENTS.USER_LOGOUT,
                 message: "Server error",
@@ -134,7 +134,7 @@ class AuthenticationHandler {
                 console.log("No callback provided for refresh token event");
             }
         } catch (error) {
-            console.error("Refresh Token error:", error);
+            console.error("Handle Refresh Token error:", error);
             socket.emit(EVENTS.ERROR, {
                 event: EVENTS.USER_REFRESH_TOKEN,
                 message: "Server error",

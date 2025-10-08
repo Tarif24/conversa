@@ -7,6 +7,15 @@ export const userSearch = async (query) => {
 
         const result = await getUsersByUsernameSearch(query.text);
 
+        if (!result.foundUsers) {
+            return {
+                success: false,
+                userList: [{ username: "No users found" }],
+                foundUsers: false,
+                message: "No users found",
+            };
+        }
+
         // Secure list only sends the userid and username
         const resultListSecure = result.list.map((user) => {
             const id = user._id.toString();
@@ -16,20 +25,11 @@ export const userSearch = async (query) => {
             };
         });
 
-        if (result.foundUsers) {
-            return {
-                success: true,
-                userList: resultListSecure,
-                foundUsers: true,
-                message: "Found Users",
-            };
-        }
-
         return {
-            success: false,
-            userList: [{ username: "No users found" }],
-            foundUsers: false,
-            message: "No users found",
+            success: true,
+            userList: resultListSecure,
+            foundUsers: true,
+            message: "Found Users",
         };
     } catch (error) {
         console.error("user search error:", error);

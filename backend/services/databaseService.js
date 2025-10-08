@@ -5,6 +5,7 @@ import {
     Room,
     RefreshToken,
 } from "../database/models/index.js";
+import mongoose from "mongoose";
 
 // User Services
 export const createUser = async (userData) => {
@@ -28,6 +29,14 @@ export const getUserByUsername = async (username) => {
     return { success: true, exists: false };
 };
 
+export const getUserByUserId = async (userId) => {
+    const user = await User.findById(userId);
+    if (user) {
+        return { success: true, exists: true, user: user };
+    }
+    return { success: true, exists: false };
+};
+
 export const getUsersByUsernameSearch = async (usernameQuery) => {
     const users = await User.find({
         username: {
@@ -41,6 +50,22 @@ export const getUsersByUsernameSearch = async (usernameQuery) => {
     } else {
         return { success: true, foundUsers: false };
     }
+};
+
+export const addRoomToUsers = async (roomId, userIds = []) => {
+    const result = await User.updateMany(
+        { _id: { $in: userIds } },
+        { $push: { rooms: roomId } }
+    );
+    // for (const userId of userIds) {
+    //     // const result = await User.updateOne(
+    //     //     { _id: userId },
+    //     //     { $push: { rooms: roomId } }
+    //     // );
+    //     // const result = await User.findOne({ _id: userId });
+    //     const result = await User.findById(userId);
+    //     console.log(result);
+    // }
 };
 
 // Message Services

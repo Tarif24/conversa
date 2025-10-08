@@ -14,7 +14,7 @@ import AuthenticationHandler from "./socket/handlers/authenticationHandler.js";
 import ConnectionHandler from "./socket/handlers/connectionHandler.js";
 import MessageHandler from "./socket/handlers/messageHandler.js";
 import UserHandler from "./socket/handlers/userHandler.js";
-import { Socket } from "dgram";
+import RoomHandler from "./socket/handlers/roomHandler.js";
 
 // Initialize HTTP server and Socket.IO
 const server = createServer();
@@ -31,6 +31,7 @@ const authenticationHandler = new AuthenticationHandler(io, connectionManager);
 const connectionHandler = new ConnectionHandler(io, connectionManager);
 const messageHandler = new MessageHandler(io, connectionManager);
 const userHandler = new UserHandler(io, connectionManager);
+const roomHandler = new RoomHandler(io, connectionManager);
 
 // Graceful shutdown handling
 const gracefulShutdown = (signal) => {
@@ -83,6 +84,7 @@ const serverSignalHandler = () => {
         connectionHandler.handleConnection(socket);
         messageHandler.handleConnection(socket);
         userHandler.handleConnection(socket);
+        roomHandler.handleConnection(socket);
     });
 
     // Shutdown signals handling

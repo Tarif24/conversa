@@ -47,19 +47,15 @@ const MessagingInterface = () => {
 
         const userId = user._id.toString();
 
-        try {
-            setIsTyping(true);
+        setIsTyping(true);
 
-            sendProtected(EVENTS.SEND_MESSAGE, {
-                roomId: "default",
-                message: input,
-                userId: userId,
-            });
-        } catch (error) {
-            console.error("Error fetching data", error);
-        } finally {
-            setIsTyping(false);
-        }
+        sendProtected(EVENTS.SEND_MESSAGE, {
+            roomId: "default",
+            message: input,
+            userId: userId,
+        });
+
+        setIsTyping(false);
     };
 
     // Listen for incoming messages
@@ -91,8 +87,8 @@ const MessagingInterface = () => {
     }, [chatHistory]);
 
     return (
-        <div className="w-full h-full flex flex-col items-center justify-center">
-            <div className="flex flex-col justify-end border-2 sm:border-3 rounded-2xl w-[95%] sm:w-[90%] h-[85%] max-h-[85%] bg-white sm:mb-4">
+        <div className="w-full h-full flex flex-col items-center justify-center border-2 border-red-600 p-4">
+            <div className="flex flex-col justify-end border-2 sm:border-3 rounded-2xl w-full h-full bg-white">
                 <div className="flex flex-col overflow-y-auto px-2 sm:px-10">
                     {chatHistory.map(({ role, content }, index) => (
                         <div

@@ -1,11 +1,19 @@
-import React from "react";
+import React, { useState } from "react";
 import MessagingInterface from "../components/MessagingInterface";
-import UserSearch from "../components/UserSearch";
+import ChatsSidebar from "../components/ChatsSidebar";
+import CreateChat from "../components/CreateChat";
 
 const HomePage = () => {
+    const [isCreateChatActive, setIsCreateChatActive] = useState(false);
+
     return (
-        <div className="w-full h-full flex flex-col items-center justify-center">
-            <MessagingInterface />
+        <div className="w-full h-full flex items-center justify-center">
+            <ChatsSidebar isCreateChatActive={setIsCreateChatActive} />
+            {isCreateChatActive ? (
+                <CreateChat isCreateChatActive={setIsCreateChatActive} />
+            ) : (
+                <MessagingInterface />
+            )}
         </div>
     );
 };

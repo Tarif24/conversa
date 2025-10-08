@@ -37,6 +37,7 @@ const authenticateSocket = (socket) => {
 
             socket.userId = decoded.userId;
             socket.userEmail = decoded.email;
+
             next();
         } catch (error) {
             console.error("Socket authentication middleware error:", error);
