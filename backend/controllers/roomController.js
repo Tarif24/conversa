@@ -2,11 +2,17 @@ import {
     createRoom,
     addRoomToUsers,
     getUserByUserId,
+    getRoomByRoomId,
+    getMessagesForRoom,
 } from "../services/databaseService.js";
 
 export const createChatRoom = async (room) => {
     try {
-        const newRoom = await createRoom(room);
+        const finalRoom = {
+            ...room,
+            message: { user: "system", message: "New Room" },
+        };
+        const newRoom = await createRoom(finalRoom);
 
         if (!newRoom) {
             return {
@@ -31,27 +37,60 @@ export const createChatRoom = async (room) => {
     }
 };
 
-export const getUserRooms = async (userId) => {
+export const getUserChats = async (userId) => {
     try {
-        const user = await getUserByUserId(userId);
+        const result = await getUserByUserId(userId);
+        let rooms = [];
 
-        if (!user.exists) {
+        if (!result.exists) {
             return {
                 success: false,
-                exist: false,
+                exists: false,
                 message: "User does not exist",
+            };
+        }
+
+        for (const roomId of result.user.rooms) {
+            const room = await getRoomByRoomId(roomId);
+
+            if (room.exists) {
+                rooms.push(room.room);
+            }
+        }
+
+        return {
+            success: true,
+            exists: true,
+            rooms: rooms,
+            message: "Got all user rooms",
+        };
+    } catch (error) {
+        console.error("Handle get user rooms error:", error);
+        const message = "Failed to get user rooms: " + error;
+        return { success: false, message: message };
+    }
+};
+
+export const getMessagesForChat = async (roomId) => {
+    try {
+        const messages = await getMessagesForRoom(roomId);
+
+        if (!messages) {
+            return {
+                success: false,
+                message: `Could not get messages for roomId: ${roomId}`,
             };
         }
 
         return {
             success: true,
-            exist: true,
-            rooms: user.rooms,
-            message: "Got all user rooms",
+            roomId: roomId,
+            messages: messages,
+            message: `Got messages for roomId: ${roomId}`,
         };
     } catch (error) {
-        console.error("Get user rooms error:", error);
-        const message = "Failed to get user rooms: " + error;
+        console.error("controller get messages for chat error:", error);
+        const message = "Failed to get messages for chat: " + error;
         return { success: false, message: message };
     }
 };

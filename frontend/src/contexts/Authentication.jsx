@@ -15,6 +15,8 @@ export const AuthProvider = ({ children }) => {
         const savedRefreshToken = localStorage.getItem("refreshToken");
         const savedUser = localStorage.getItem("user");
 
+        console.log("Saved user from localStorage:", JSON.parse(savedUser)._id);
+
         if (savedAccessToken && savedRefreshToken && savedUser) {
             setAccessToken(savedAccessToken);
             setRefreshToken(savedRefreshToken);
@@ -26,6 +28,7 @@ export const AuthProvider = ({ children }) => {
 
     // Clear auth helper
     const clearAuth = () => {
+        console.log("clearAuth");
         setUser(null);
         setAccessToken(null);
         setRefreshToken(null);
@@ -37,6 +40,7 @@ export const AuthProvider = ({ children }) => {
 
     // Login function to save auth
     const login = async (response) => {
+        console.log("login");
         setIsLoading(true);
 
         try {
@@ -60,6 +64,7 @@ export const AuthProvider = ({ children }) => {
 
     // Signup function to save auth
     const signup = async (response) => {
+        console.log("signup");
         setIsLoading(true);
 
         try {

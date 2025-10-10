@@ -96,7 +96,7 @@ const UserSearch = ({ handleOnUserClicked }) => {
                         {searchResult.map((result) => (
                             <div
                                 className="px-5 py-1 w-full bg-gray-100 border-1 border-gray-400 rounded-xl hover:cursor-pointer"
-                                key={result._id}
+                                key={result.userId}
                                 onClick={() => {
                                     userResultOnClick(result);
                                 }}

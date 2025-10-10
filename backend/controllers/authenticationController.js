@@ -26,7 +26,7 @@ export const signup = async (user) => {
             return {
                 success: false,
                 message: "User already exists signup failed",
-                exist: true,
+                exists: true,
             };
         }
 
@@ -70,7 +70,7 @@ export const login = async (user) => {
             return {
                 success: false,
                 user: emailExists.user,
-                exist: false,
+                exists: false,
                 message: "Login failed user does not exist",
             };
         }

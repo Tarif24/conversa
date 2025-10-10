@@ -7,7 +7,10 @@ const SOCKET_EVENTS = {
 
     // Room events
     CREATE_CHAT_ROOM: "create_chat_room",
+    GET_MESSAGES_FOR_ROOM: "get_messages_for_room",
     GET_USER_ROOMS: "get_user_rooms",
+    ROOM_REFRESH: "room_refresh",
+    SET_ACTIVE_ROOM: "set_active_room",
     LEAVE_ROOM: "leave_room",
 
     // User events

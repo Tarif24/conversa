@@ -67,7 +67,7 @@ class AuthenticationHandler {
 
             const result = await login({ ...user, email: emailFixed });
 
-            if (result.success && result.exist) {
+            if (result.success && result.exists) {
                 this.connectionManager.addUserIDToConnection(
                     socket,
                     result.user._id.toString()
@@ -75,6 +75,11 @@ class AuthenticationHandler {
 
                 socket.userId = result.user._id.toString();
                 socket.userEmail = result.user.email;
+            }
+
+            // Join all existing user rooms on login
+            for (const room of result.user.rooms) {
+                socket.join(room);
             }
 
             if (callback) {

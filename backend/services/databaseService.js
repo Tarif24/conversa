@@ -57,21 +57,22 @@ export const addRoomToUsers = async (roomId, userIds = []) => {
         { _id: { $in: userIds } },
         { $push: { rooms: roomId } }
     );
-    // for (const userId of userIds) {
-    //     // const result = await User.updateOne(
-    //     //     { _id: userId },
-    //     //     { $push: { rooms: roomId } }
-    //     // );
-    //     // const result = await User.findOne({ _id: userId });
-    //     const result = await User.findById(userId);
-    //     console.log(result);
-    // }
+
+    return result;
 };
 
 // Message Services
 export const createMessage = async (messageData) => {
     const message = await Message.create(messageData);
     return message;
+};
+
+export const getMessagesForRoom = async (roomId) => {
+    const result = await Message.find({ roomId: roomId }).limit(50).sort({
+        createdAt: 1,
+    });
+
+    return result;
 };
 
 // File Services
@@ -84,6 +85,22 @@ export const createFile = async (fileData) => {
 export const createRoom = async (roomData) => {
     const room = await Room.create(roomData);
     return room;
+};
+
+export const getRoomByRoomId = async (roomId) => {
+    const room = await Room.findById(roomId);
+    if (room) {
+        return { success: true, exists: true, room: room };
+    }
+    return { success: true, exists: false };
+};
+
+export const updateRoomLastMessage = async (roomId, message) => {
+    const result = await Room.findByIdAndUpdate(roomId, {
+        $set: { message: message },
+    });
+
+    return result;
 };
 
 // Refresh Token Services

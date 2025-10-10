@@ -1,7 +1,8 @@
 import EVENTS from "../../../constants/socketEvents.js";
 import {
     createChatRoom,
-    getUserRooms,
+    getUserChats,
+    getMessagesForChat,
 } from "../../controllers/roomController.js";
 import { authentication } from "../middleware/index.js";
 
@@ -21,6 +22,14 @@ class RoomHandler {
         socket.on(EVENTS.GET_USER_ROOMS, (user, callback) =>
             this.handleGetUserRooms(socket, user, callback)
         );
+
+        socket.on(EVENTS.SET_ACTIVE_ROOM, (room, callback) =>
+            this.handleSetActiveRoom(socket, room, callback)
+        );
+
+        socket.on(EVENTS.GET_MESSAGES_FOR_ROOM, (room, callback) =>
+            this.handleGetMessagesForRoom(socket, room, callback)
+        );
     }
 
     async handleCreateRoom(socket, room, callback) {
@@ -34,14 +43,31 @@ class RoomHandler {
             const result = await createChatRoom(finalRoom);
 
             if (result.success) {
-                for (const userId of finalRoom.users) {
+                // Wait for all users to join the room
+                const joinPromises = finalRoom.users.map(async (userId) => {
                     const userSocket =
                         this.connectionManager.getSocketByUserId(userId);
 
                     if (userSocket) {
-                        userSocket.join(result.roomId);
+                        await userSocket.join(result.roomId);
+                        console.log(
+                            `User ${userId} rooms:`,
+                            Array.from(userSocket.rooms)
+                        );
+                        return { userId, joined: true };
                     }
-                }
+                    return { userId, joined: false };
+                });
+
+                // Wait for all joins to complete
+                await Promise.all(joinPromises);
+
+                const rooms = Array.from(socket.rooms);
+                console.log(rooms);
+
+                this.io.to(result.roomId).emit(EVENTS.ROOM_REFRESH, {
+                    message: "New room available please refresh rooms",
+                });
             }
 
             if (callback) {
@@ -60,8 +86,8 @@ class RoomHandler {
 
     async handleGetUserRooms(socket, user, callback) {
         try {
-            const userId = user._id.toString();
-            const result = getUserRooms(userId);
+            const userId = user.userId;
+            const result = await getUserChats(userId);
 
             if (callback) {
                 callback(result);
@@ -72,6 +98,55 @@ class RoomHandler {
             console.error("handle get user rooms:", error);
             socket.emit(EVENTS.ERROR, {
                 event: EVENTS.GET_USER_ROOMS,
+                message: "Server error",
+            });
+        }
+    }
+
+    async handleSetActiveRoom(socket, room, callback) {
+        try {
+            if (room.roomId) {
+                callback({ success: false, message: "No roomId provided" });
+                return;
+            }
+
+            socket.activeRoomId = room.roomId;
+
+            if (callback) {
+                callback({
+                    success: true,
+                    message: `Active roomId set to ${room.roomId}`,
+                });
+            } else {
+                console.log("No callback provided for user_search event");
+            }
+        } catch (error) {
+            console.error("handle get user rooms:", error);
+            socket.emit(EVENTS.ERROR, {
+                event: EVENTS.GET_USER_ROOMS,
+                message: "Server error",
+            });
+        }
+    }
+
+    async handleGetMessagesForRoom(socket, room, callback) {
+        try {
+            if (!room.roomId) {
+                callback({ success: false, message: "No roomId provided" });
+                return;
+            }
+
+            const result = await getMessagesForChat(room.roomId);
+
+            if (callback) {
+                callback(result);
+            } else {
+                console.log("No callback provided for user_search event");
+            }
+        } catch (error) {
+            console.error("handle get messages for room:", error);
+            socket.emit(EVENTS.ERROR, {
+                event: EVENTS.GET_MESSAGES_FOR_ROOM,
                 message: "Server error",
             });
         }

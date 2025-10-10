@@ -18,29 +18,27 @@ class MessageHandler {
 
     async handleSendMessage(socket, message) {
         try {
-            console.log("user with socket ID:", socket.id, "sent a message");
-
-            const userId = this.connectionManager.getUserIdBySocketId(
-                socket.id
+            console.log(
+                "user with socket ID:",
+                socket.userId,
+                "sent a message"
             );
-            if (!userId) {
-                socket.emit(EVENTS.ERROR, {
-                    event: EVENTS.SEND_MESSAGE,
-                    message: "User not found",
-                });
-                return;
-            }
 
             const result = await sendMessage(message);
 
             if (!result.success) {
                 socket.emit(EVENTS.ERROR, {
                     event: EVENTS.SEND_MESSAGE,
+                    message: result.message,
                 });
                 return;
             }
 
-            socket.broadcast.emit(EVENTS.RECEIVE_MESSAGE, result);
+            if (result.roomExists) {
+                socket.broadcast
+                    .to(message.roomId)
+                    .emit(EVENTS.RECEIVE_MESSAGE, result);
+            }
         } catch (error) {
             console.error("handle send message error:", error);
             socket.emit(EVENTS.ERROR, {
