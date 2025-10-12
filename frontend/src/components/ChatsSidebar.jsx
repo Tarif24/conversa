@@ -26,9 +26,8 @@ const MessagesSidebar = ({ isCreateChatActive, onRoomClicked }) => {
                 setRooms(response.rooms);
             }
         );
-    }, []);
+    }, [user, isConnected]);
 
-    // When a new room is created for the user the server will call a room refresh to tell the front to refresh the rooms
     useSocketIOEvent(EVENTS.ROOM_REFRESH, (data) => {
         console.log("here");
         sendProtected(
@@ -45,6 +44,7 @@ const MessagesSidebar = ({ isCreateChatActive, onRoomClicked }) => {
     };
 
     const handleOnRoomClicked = (room) => {
+        console.log(user);
         sendProtected(
             EVENTS.SET_ACTIVE_ROOM,
             { roomId: room._id },

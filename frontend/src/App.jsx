@@ -15,6 +15,8 @@ import AuthenticationPage from "./pages/AuthenticationPage";
 import HomePage from "./pages/HomePage";
 import NotFoundPage from "./pages/NotFoundPage";
 
+import ProtectedRoute from "./components/ProtectedRoute";
+
 function App() {
     const router = createBrowserRouter(
         createRoutesFromElements(
@@ -22,7 +24,14 @@ function App() {
                 <Route path="/" element={<AuthenticationLayout />}>
                     <Route index element={<AuthenticationPage />} />
                 </Route>
-                <Route path="/conversa" element={<AppLayout />}>
+                <Route
+                    path="/conversa"
+                    element={
+                        <ProtectedRoute>
+                            <AppLayout />
+                        </ProtectedRoute>
+                    }
+                >
                     <Route index element={<HomePage />} />
                 </Route>
                 <Route path="*" element={<NotFoundPage />} />

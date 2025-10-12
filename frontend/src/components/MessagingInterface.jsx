@@ -16,10 +16,6 @@ const MessagingInterface = ({ room }) => {
         sendLastEmitted,
     } = useSocketIO();
 
-    useEffect(() => {
-        console.log(user);
-    }, [user]);
-
     // State to hold the input text and typing status
     const [inputText, setInputText] = useState("");
     const [isTyping, setIsTyping] = useState(false);

@@ -22,10 +22,6 @@ const HomePage = () => {
     const [isCreateChatActive, setIsCreateChatActive] = useState(false);
     const [activeRoom, setActiveRoom] = useState(null);
 
-    const roomClicked = (room) => {
-        setActiveRoom(room);
-    };
-
     // Listen for incoming messages
     useSocketIOEvent(EVENTS.ERROR, (error) => {
         if (error.message.includes("Invalid or expired token")) {
@@ -38,6 +34,21 @@ const HomePage = () => {
             });
         }
     });
+
+    // Wait for both user and socket connection
+    if (!user || !isConnected) {
+        return (
+            <div className="w-full h-full flex items-center justify-center">
+                <div className="text-xl">
+                    {!user ? "Loading user..." : "Connecting to server..."}
+                </div>
+            </div>
+        );
+    }
+
+    const roomClicked = (room) => {
+        setActiveRoom(room);
+    };
 
     return (
         <div className="w-full h-full flex items-center justify-center">

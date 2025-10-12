@@ -1,5 +1,5 @@
 // hooks/useSocketIO.js
-import { useEffect, useState, useCallback, use } from "react";
+import { useEffect, useState, useCallback } from "react";
 import socketManager from "../api/socketio";
 import { useAuth } from "../contexts/Authentication";
 import EVENTS from "../../../constants/socketEvents";
@@ -68,28 +68,37 @@ export const useSocketIO = (options = {}) => {
     }, []);
 
     // Login
-    const sendLogin = useCallback((payload, callback) => {
-        socketManager.send(EVENTS.USER_LOGIN, payload, (response) => {
-            login(response);
-            callback(response);
-        });
-    }, []);
+    const sendLogin = useCallback(
+        (payload, callback) => {
+            socketManager.send(EVENTS.USER_LOGIN, payload, (response) => {
+                login(response);
+                callback(response);
+            });
+        },
+        [login]
+    );
 
     // Signup
-    const sendSignup = useCallback((payload, callback) => {
-        socketManager.send(EVENTS.USER_SIGNUP, payload, (response) => {
-            signup(response);
-            callback(response);
-        });
-    }, []);
+    const sendSignup = useCallback(
+        (payload, callback) => {
+            socketManager.send(EVENTS.USER_SIGNUP, payload, (response) => {
+                signup(response);
+                callback(response);
+            });
+        },
+        [signup]
+    );
 
     // Logout
-    const sendLogout = useCallback((payload, callback) => {
-        socketManager.send(EVENTS.USER_LOGOUT, payload, (response) => {
-            logout();
-            if (callback) callback(response);
-        });
-    }, []);
+    const sendLogout = useCallback(
+        (payload, callback) => {
+            socketManager.send(EVENTS.USER_LOGOUT, payload, (response) => {
+                logout();
+                if (callback) callback(response);
+            });
+        },
+        [logout]
+    );
 
     // Refresh Token
     const sendRefresh = useCallback(
@@ -109,7 +118,7 @@ export const useSocketIO = (options = {}) => {
                 refreshToken
             );
         },
-        [refreshToken]
+        [refreshToken, refreshAccessToken]
     );
 
     const sendLastEmitted = useCallback(() => {
