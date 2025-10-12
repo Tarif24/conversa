@@ -48,14 +48,8 @@ class RoomHandler {
                     const userSocket =
                         this.connectionManager.getSocketByUserId(userId);
 
-                    console.log(userSocket);
-
                     if (userSocket) {
                         await userSocket.join(result.roomId);
-                        // console.log(
-                        //     `User ${userId} rooms:`,
-                        //     Array.from(userSocket.rooms)
-                        // );
                         return { userId, joined: true };
                     }
                     return { userId, joined: false };
@@ -63,9 +57,6 @@ class RoomHandler {
 
                 // Wait for all joins to complete
                 await Promise.all(joinPromises);
-
-                const rooms = Array.from(socket.rooms);
-                console.log(rooms);
 
                 this.io.to(result.roomId).emit(EVENTS.ROOM_REFRESH, {
                     message: "New room available please refresh rooms",
