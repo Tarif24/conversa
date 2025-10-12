@@ -67,15 +67,25 @@ class AuthenticationHandler {
 
             const result = await login({ ...user, email: emailFixed });
 
-            if (result.success && result.exists) {
-                this.connectionManager.addUserIDToConnection(
-                    socket,
-                    result.user._id.toString()
-                );
-
-                socket.userId = result.user._id.toString();
-                socket.userEmail = result.user.email;
+            if (!result.success && !result.exists) {
+                if (callback) {
+                    callback(result);
+                } else {
+                    console.log("No callback provided for login event");
+                }
             }
+
+            this.connectionManager.addUserIDToConnection(
+                socket,
+                result.user._id.toString()
+            );
+
+            socket.userId = result.user._id.toString();
+            socket.userEmail = result.user.email;
+
+            const userSocket = this.connectionManager.getSocketByUserId(
+                result.user._id.toString()
+            );
 
             // Join all existing user rooms on login
             for (const room of result.user.rooms) {

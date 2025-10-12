@@ -86,7 +86,7 @@ export const login = async (user) => {
             return {
                 success: false,
                 message: "password incorrect login failed",
-                exist: true,
+                exists: true,
             };
         }
 
@@ -104,6 +104,7 @@ export const login = async (user) => {
             refreshToken: refreshToken,
             user: existingUser,
             message: "Login successful",
+            exists: true,
         };
     } catch (error) {
         console.error("Controller Login error:", error);

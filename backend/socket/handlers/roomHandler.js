@@ -48,12 +48,14 @@ class RoomHandler {
                     const userSocket =
                         this.connectionManager.getSocketByUserId(userId);
 
+                    console.log(userSocket);
+
                     if (userSocket) {
                         await userSocket.join(result.roomId);
-                        console.log(
-                            `User ${userId} rooms:`,
-                            Array.from(userSocket.rooms)
-                        );
+                        // console.log(
+                        //     `User ${userId} rooms:`,
+                        //     Array.from(userSocket.rooms)
+                        // );
                         return { userId, joined: true };
                     }
                     return { userId, joined: false };
