@@ -4,6 +4,7 @@ import {
     useSocketIOEvent,
     useSocketIOState,
 } from "../hooks/useSocketIO";
+import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 
 const SignUp = () => {
@@ -26,15 +27,15 @@ const SignUp = () => {
 
         sendSignup(user, (response) => {
             if (response.success) {
-                alert("Signup successful!");
+                toast.success("Signup successful!");
                 navigate("/conversa");
                 return;
             } else if (response.exist) {
-                alert("User already exists. Please log in.");
+                toast.error("User already exists. Please log in.");
                 return;
             }
 
-            alert("Signup failed: Server error");
+            toast.error("Signup failed: Server error");
         });
     };
 

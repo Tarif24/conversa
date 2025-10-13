@@ -4,6 +4,7 @@ import {
     useSocketIOEvent,
     useSocketIOState,
 } from "../hooks/useSocketIO";
+import { toast } from "react-toastify";
 import EVENTS from "../../../constants/socketEvents";
 
 const MessagingInterface = ({ room }) => {
@@ -83,7 +84,16 @@ const MessagingInterface = ({ room }) => {
                 ...prev,
                 { role: "other", message: data.message.message },
             ]);
+            return;
         }
+
+        const message = `${data.sentByUser}: ${data.message.message}`;
+        toast(
+            <div className="flex flex-col gap-1">
+                <h1 className="text-2xl font-bold">{data.roomName}</h1>
+                <h1>{message}</h1>
+            </div>
+        );
     });
 
     // Scroll to the bottom of the chat history when a new message is added
@@ -99,7 +109,7 @@ const MessagingInterface = ({ room }) => {
             <div className="flex flex-col justify-end border-2 sm:border-3 rounded-2xl w-full h-full bg-white">
                 {room ? (
                     <>
-                        <div className="flex flex-col overflow-y-auto px-2 sm:px-10">
+                        <div className="flex flex-col overflow-y-auto px-2 sm:px-10 max-h-155">
                             {chatHistory.map(({ role, message }, index) => (
                                 <div
                                     className={`w-fit max-w-[70%] sm:max-w-[60%] mt-2 sm:mt-4 p-3 sm:p-4 break-words ${

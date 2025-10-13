@@ -31,7 +31,13 @@ export const sendMessage = async (message) => {
 
         await updateRoomLastMessage(message.roomId, savedMessage);
 
-        return { success: true, message: savedMessage, roomExists: true };
+        return {
+            success: true,
+            message: savedMessage,
+            roomExists: true,
+            roomName: room.room.roomName,
+            sentByUser: result.user.username,
+        };
     } catch (error) {
         console.error("send message error:", error);
         const message = "Failed to send message: " + error;

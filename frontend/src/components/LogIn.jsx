@@ -4,6 +4,7 @@ import {
     useSocketIOEvent,
     useSocketIOState,
 } from "../hooks/useSocketIO";
+import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 
 const LogIn = () => {
@@ -18,14 +19,14 @@ const LogIn = () => {
 
         sendLogin(login, (response) => {
             if (response.success) {
-                alert("Login successful!");
+                toast.success("Login successful!");
                 navigate("/conversa");
                 return;
             } else {
                 if (!response.exist) {
-                    alert("User does not exist. Please sign up first.");
+                    toast.error("User does not exist. Please sign up first.");
                 } else {
-                    alert("Login failed. Incorrect password.");
+                    toast.error("Login failed. Incorrect password.");
                 }
             }
         });
