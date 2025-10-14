@@ -1,16 +1,18 @@
 import {
     createRoom,
+    createMessage,
     addRoomToUsers,
     getUserByUserId,
     getRoomByRoomId,
     getMessagesForRoom,
+    updateRoomLastMessage,
 } from "../services/databaseService.js";
 
 export const createChatRoom = async (room) => {
     try {
         const finalRoom = {
             ...room,
-            message: { user: "system", message: "New Room" },
+            message: { userId: "system", message: "New Room" },
         };
         const newRoom = await createRoom(finalRoom);
 
@@ -22,6 +24,16 @@ export const createChatRoom = async (room) => {
         }
 
         const roomId = newRoom._id.toString();
+
+        const message = {
+            userId: "system",
+            message: "New Room",
+            roomId: roomId,
+        };
+
+        const initialMessage = await createMessage(message);
+
+        updateRoomLastMessage(roomId, initialMessage);
 
         await addRoomToUsers(roomId, room.users);
 
@@ -58,10 +70,20 @@ export const getUserChats = async (userId) => {
             }
         }
 
+        const roomsSorted = rooms.sort((a, b) => {
+            const dateA = a.message.updatedAt
+                ? new Date(a.message.updatedAt)
+                : new Date(0);
+            const dateB = b.message.updatedAt
+                ? new Date(b.message.updatedAt)
+                : new Date(0);
+            return dateB - dateA;
+        });
+
         return {
             success: true,
             exists: true,
-            rooms: rooms,
+            rooms: roomsSorted,
             message: "Got all user rooms",
         };
     } catch (error) {

@@ -36,10 +36,19 @@ const MessagingInterface = ({ room }) => {
             (response) => {
                 if (!response.success) return;
                 const fixedMessages = response.messages.map((message) => {
-                    if (message.userId !== user._id) {
-                        return { role: "other", message: message.message };
+                    if (message.userId === user._id) {
+                        console.log("user");
+                        return { role: "user", message: message.message };
                     }
-                    return { role: "user", message: message.message };
+                    if (
+                        message.userId === "system" ||
+                        message.userId === "System"
+                    ) {
+                        console.log("system");
+                        return { role: "system", message: message.message };
+                    }
+                    console.log("other");
+                    return { role: "other", message: message.message };
                 });
                 setChatHistory(fixedMessages);
             }
@@ -110,20 +119,31 @@ const MessagingInterface = ({ room }) => {
                 {room ? (
                     <>
                         <div className="flex flex-col overflow-y-auto px-2 sm:px-10 max-h-155">
-                            {chatHistory.map(({ role, message }, index) => (
-                                <div
-                                    className={`w-fit max-w-[70%] sm:max-w-[60%] mt-2 sm:mt-4 p-3 sm:p-4 break-words ${
-                                        role === "user"
-                                            ? "self-end rounded-l-2xl rounded-tr-2xl bg-blue-500 text-white"
-                                            : "self-start rounded-r-2xl rounded-tl-2xl bg-gray-200 text-black"
-                                    }`}
-                                    key={index}
-                                >
-                                    <h1 className="text-[0.8rem] sm:text-[1.2rem]">
-                                        {message}
-                                    </h1>
-                                </div>
-                            ))}
+                            {chatHistory.map(({ role, message }, index) => {
+                                return role !== "system" ? (
+                                    <div
+                                        className={`w-fit max-w-[70%] sm:max-w-[60%] mt-2 sm:mt-4 p-3 sm:p-4 break-words ${
+                                            role === "user"
+                                                ? "self-end rounded-l-2xl rounded-tr-2xl bg-blue-500 text-white"
+                                                : "self-start rounded-r-2xl rounded-tl-2xl bg-gray-200 text-black"
+                                        }`}
+                                        key={index}
+                                    >
+                                        <h1 className="text-[0.8rem] sm:text-[1.2rem]">
+                                            {message}
+                                        </h1>
+                                    </div>
+                                ) : (
+                                    <div
+                                        className={`w-full break-words flex justify-center`}
+                                        key={index}
+                                    >
+                                        <h1 className=" text-gray-500">
+                                            {message}
+                                        </h1>
+                                    </div>
+                                );
+                            })}
                             <div ref={chatEndRef}></div>
                             {/* <PulseLoader
                         color="#000000"

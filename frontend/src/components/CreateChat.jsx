@@ -176,6 +176,16 @@ const CreateChat = ({ isCreateChatActive }) => {
                             Create new chat
                         </button>
                     </div>
+                    {/* GO BACK BUTTON */}
+                    <div>
+                        <button
+                            className="bg-gray-500 hover:bg-gray-600 hover:cursor-pointer text-white font-bold py-2 px-4 rounded-full w-full focus:outline-none focus:shadow-outline"
+                            type="button"
+                            onClick={() => isCreateChatActive(false)}
+                        >
+                            Go Back
+                        </button>
+                    </div>
                 </form>
             </div>
         </div>

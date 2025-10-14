@@ -38,6 +38,10 @@ class MessageHandler {
                 socket.broadcast
                     .to(message.roomId)
                     .emit(EVENTS.RECEIVE_MESSAGE, result);
+
+                this.io.to(message.roomId).emit(EVENTS.ROOM_REFRESH, {
+                    message: "New message sent please refresh rooms",
+                });
             }
         } catch (error) {
             console.error("handle send message error:", error);

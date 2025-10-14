@@ -90,6 +90,8 @@ export const login = async (user) => {
             };
         }
 
+        await deleteRefreshTokensByUserId(existingUser._id);
+
         const accessToken = generateAccessToken(existingUser);
         const refreshToken = generateRefreshToken(existingUser);
 
