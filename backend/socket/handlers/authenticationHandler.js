@@ -1,10 +1,5 @@
-import EVENTS from "../../../constants/socketEvents.js";
-import {
-    signup,
-    login,
-    logout,
-    refreshToken,
-} from "../../controllers/authenticationController.js";
+import EVENTS from '../../../constants/socketEvents.js';
+import { signup, login, logout, refreshToken } from '../../controllers/authenticationController.js';
 
 class AuthenticationHandler {
     constructor(io, connectionManager) {
@@ -16,9 +11,7 @@ class AuthenticationHandler {
         socket.on(EVENTS.USER_SIGNUP, (user, callback) =>
             this.handleSignup(socket, user, callback)
         );
-        socket.on(EVENTS.USER_LOGIN, (user, callback) =>
-            this.handleLogin(socket, user, callback)
-        );
+        socket.on(EVENTS.USER_LOGIN, (user, callback) => this.handleLogin(socket, user, callback));
         socket.on(EVENTS.USER_LOGOUT, (user, callback) =>
             this.handleLogout(socket, user, callback)
         );
@@ -31,15 +24,12 @@ class AuthenticationHandler {
         try {
             const emailFixed = user.email.trim().toLowerCase();
 
-            console.log("Handel signup for user: ", emailFixed);
+            console.log('Handel signup for user: ', emailFixed);
 
             const result = await signup({ ...user, email: emailFixed });
 
             if (result.success) {
-                this.connectionManager.addUserIDToConnection(
-                    socket,
-                    result.user._id.toString()
-                );
+                this.connectionManager.addUserIDToConnection(socket, result.user._id.toString());
 
                 socket.userId = result.user._id.toString();
                 socket.userEmail = result.user.email;
@@ -48,13 +38,13 @@ class AuthenticationHandler {
             if (callback) {
                 callback(result);
             } else {
-                console.log("No callback provided for signup event");
+                console.log('No callback provided for signup event');
             }
         } catch (error) {
-            console.error("Handle Signup error:", error);
+            console.error('Handle Signup error:', error);
             socket.emit(EVENTS.ERROR, {
                 event: EVENTS.USER_SIGNUP,
-                message: "Server error",
+                message: 'Server error',
             });
         }
     }
@@ -63,7 +53,7 @@ class AuthenticationHandler {
         try {
             const emailFixed = user.email.trim().toLowerCase();
 
-            console.log("Handel login for user: ", emailFixed);
+            console.log('Handel login for user: ', emailFixed);
 
             const result = await login({ ...user, email: emailFixed });
 
@@ -71,21 +61,16 @@ class AuthenticationHandler {
                 if (callback) {
                     callback(result);
                 } else {
-                    console.log("No callback provided for login event");
+                    console.log('No callback provided for login event');
                 }
             }
 
-            this.connectionManager.addUserIDToConnection(
-                socket,
-                result.user._id.toString()
-            );
+            this.connectionManager.addUserIDToConnection(socket, result.user._id.toString());
 
             socket.userId = result.user._id.toString();
             socket.userEmail = result.user.email;
 
-            const userSocket = this.connectionManager.getSocketByUserId(
-                result.user._id.toString()
-            );
+            const userSocket = this.connectionManager.getSocketByUserId(result.user._id.toString());
 
             // Join all existing user rooms on login
             for (const room of result.user.rooms) {
@@ -95,20 +80,20 @@ class AuthenticationHandler {
             if (callback) {
                 callback(result);
             } else {
-                console.log("No callback provided for login event");
+                console.log('No callback provided for login event');
             }
         } catch (error) {
-            console.error("Handle Login error:", error);
+            console.error('Handle Login error:', error);
             socket.emit(EVENTS.ERROR, {
                 event: EVENTS.USER_LOGIN,
-                message: "Server error",
+                message: 'Server error',
             });
         }
     }
 
     async handleLogout(socket, user, callback) {
         try {
-            console.log("Handel logout for user: ", user.email);
+            console.log('Handel logout for user: ', user.email);
 
             const result = await logout(user);
 
@@ -117,27 +102,27 @@ class AuthenticationHandler {
             if (callback) {
                 callback(result);
             } else {
-                console.log("No callback provided for logout event");
+                console.log('No callback provided for logout event');
             }
         } catch (error) {
-            console.error("Handle Logout error:", error);
+            console.error('Handle Logout error:', error);
             socket.emit(EVENTS.ERROR, {
                 event: EVENTS.USER_LOGOUT,
-                message: "Server error",
+                message: 'Server error',
             });
         }
     }
 
     async handleRefreshToken(socket, tokenData, callback) {
         try {
-            console.log("Handle refresh token for: ", socket.userId);
+            console.log('Handle refresh token for: ', socket.userId);
 
             const { token } = tokenData;
 
             if (!token) {
                 return callback({
                     success: false,
-                    message: "Refresh token required",
+                    message: 'Refresh token required',
                 });
             }
 
@@ -146,13 +131,13 @@ class AuthenticationHandler {
             if (callback) {
                 callback(result);
             } else {
-                console.log("No callback provided for refresh token event");
+                console.log('No callback provided for refresh token event');
             }
         } catch (error) {
-            console.error("Handle Refresh Token error:", error);
+            console.error('Handle Refresh Token error:', error);
             socket.emit(EVENTS.ERROR, {
                 event: EVENTS.USER_REFRESH_TOKEN,
-                message: "Server error",
+                message: 'Server error',
             });
         }
     }

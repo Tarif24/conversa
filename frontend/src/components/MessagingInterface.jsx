@@ -1,24 +1,14 @@
-import React, { useState, useEffect, useRef } from "react";
-import {
-    useSocketIO,
-    useSocketIOEvent,
-    useSocketIOState,
-} from "../hooks/useSocketIO";
-import { toast } from "react-toastify";
-import EVENTS from "../../../constants/socketEvents";
+import React, { useState, useEffect, useRef } from 'react';
+import { useSocketIO, useSocketIOEvent, useSocketIOState } from '../hooks/useSocketIO';
+import { toast } from 'react-toastify';
+import EVENTS from '../../../constants/socketEvents';
 
 const MessagingInterface = ({ room }) => {
-    const {
-        isConnected,
-        connectionState,
-        user,
-        sendProtected,
-        sendRefresh,
-        sendLastEmitted,
-    } = useSocketIO();
+    const { isConnected, connectionState, user, sendProtected, sendRefresh, sendLastEmitted } =
+        useSocketIO();
 
     // State to hold the input text and typing status
-    const [inputText, setInputText] = useState("");
+    const [inputText, setInputText] = useState('');
     const [isTyping, setIsTyping] = useState(false);
 
     // State to hold the chat history
@@ -30,46 +20,36 @@ const MessagingInterface = ({ room }) => {
     // Handles what happens on chat switch
     useEffect(() => {
         if (!room) return;
-        sendProtected(
-            EVENTS.GET_MESSAGES_FOR_ROOM,
-            { roomId: room._id },
-            (response) => {
-                if (!response.success) return;
-                const fixedMessages = response.messages.map((message) => {
-                    if (message.userId === user._id) {
-                        console.log("user");
-                        return { role: "user", message: message.message };
-                    }
-                    if (
-                        message.userId === "system" ||
-                        message.userId === "System"
-                    ) {
-                        console.log("system");
-                        return { role: "system", message: message.message };
-                    }
-                    console.log("other");
-                    return { role: "other", message: message.message };
-                });
-                setChatHistory(fixedMessages);
-            }
-        );
+        sendProtected(EVENTS.GET_MESSAGES_FOR_ROOM, { roomId: room._id }, response => {
+            if (!response.success) return;
+            const fixedMessages = response.messages.map(message => {
+                if (message.userId === user._id) {
+                    console.log('user');
+                    return { role: 'user', message: message.message };
+                }
+                if (message.userId === 'system' || message.userId === 'System') {
+                    console.log('system');
+                    return { role: 'system', message: message.message };
+                }
+                console.log('other');
+                return { role: 'other', message: message.message };
+            });
+            setChatHistory(fixedMessages);
+        });
     }, [room]);
 
     // Submit form handler
-    const submitForm = async (e) => {
+    const submitForm = async e => {
         e.preventDefault();
 
-        if (inputText.trim() === "") return;
+        if (inputText.trim() === '') return;
 
-        setInputText((prev) => prev.trim());
+        setInputText(prev => prev.trim());
 
         const input = inputText;
-        setInputText("");
+        setInputText('');
 
-        setChatHistory((prev) => [
-            ...prev,
-            { role: "user", message: `${input}` },
-        ]);
+        setChatHistory(prev => [...prev, { role: 'user', message: `${input}` }]);
 
         const userId = user._id.toString();
 
@@ -85,14 +65,11 @@ const MessagingInterface = ({ room }) => {
     };
 
     // Listen for incoming messages
-    useSocketIOEvent(EVENTS.RECEIVE_MESSAGE, (data) => {
+    useSocketIOEvent(EVENTS.RECEIVE_MESSAGE, data => {
         if (!data.success) return;
 
         if (room._id === data.message.roomId) {
-            setChatHistory((prev) => [
-                ...prev,
-                { role: "other", message: data.message.message },
-            ]);
+            setChatHistory(prev => [...prev, { role: 'other', message: data.message.message }]);
             return;
         }
 
@@ -107,25 +84,25 @@ const MessagingInterface = ({ room }) => {
 
     // Scroll to the bottom of the chat history when a new message is added
     useEffect(() => {
-        chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
+        chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }, [chatHistory]);
 
     return (
-        <div className="w-full h-full flex flex-col items-center justify-center border-2 border-red-600 p-4">
-            <div className={`${room ? "block" : "hidden"} mb-4`}>
+        <div className="flex h-full w-full flex-col items-center justify-center border-2 border-red-600 p-4">
+            <div className={`${room ? 'block' : 'hidden'} mb-4`}>
                 <h1 className="text-3xl font-bold">{room && room.roomName}</h1>
             </div>
-            <div className="flex flex-col justify-end border-2 sm:border-3 rounded-2xl w-full h-full bg-white">
+            <div className="flex h-full w-full flex-col justify-end rounded-2xl border-2 bg-white sm:border-3">
                 {room ? (
                     <>
-                        <div className="flex flex-col overflow-y-auto px-2 sm:px-10 max-h-155">
+                        <div className="flex max-h-155 flex-col overflow-y-auto px-2 sm:px-10">
                             {chatHistory.map(({ role, message }, index) => {
-                                return role !== "system" ? (
+                                return role !== 'system' ? (
                                     <div
-                                        className={`w-fit max-w-[70%] sm:max-w-[60%] mt-2 sm:mt-4 p-3 sm:p-4 break-words ${
-                                            role === "user"
-                                                ? "self-end rounded-l-2xl rounded-tr-2xl bg-blue-500 text-white"
-                                                : "self-start rounded-r-2xl rounded-tl-2xl bg-gray-200 text-black"
+                                        className={`mt-2 w-fit max-w-[70%] p-3 break-words sm:mt-4 sm:max-w-[60%] sm:p-4 ${
+                                            role === 'user'
+                                                ? 'self-end rounded-l-2xl rounded-tr-2xl bg-blue-500 text-white'
+                                                : 'self-start rounded-tl-2xl rounded-r-2xl bg-gray-200 text-black'
                                         }`}
                                         key={index}
                                     >
@@ -135,12 +112,10 @@ const MessagingInterface = ({ room }) => {
                                     </div>
                                 ) : (
                                     <div
-                                        className={`w-full break-words flex justify-center`}
+                                        className={`flex w-full justify-center break-words`}
                                         key={index}
                                     >
-                                        <h1 className=" text-gray-500">
-                                            {message}
-                                        </h1>
+                                        <h1 className="text-gray-500">{message}</h1>
                                     </div>
                                 );
                             })}
@@ -152,22 +127,17 @@ const MessagingInterface = ({ room }) => {
                         speedMultiplier={1}
                     /> */}
                         </div>
-                        <form
-                            className="flex justify-center items-end h-fit"
-                            onSubmit={submitForm}
-                        >
-                            <div className="relative h-[3rem] w-full border-2 border-black rounded-[5rem] m-2 sm:m-4">
+                        <form className="flex h-fit items-end justify-center" onSubmit={submitForm}>
+                            <div className="relative m-2 h-[3rem] w-full rounded-[5rem] border-2 border-black sm:m-4">
                                 <input
                                     type="text"
                                     placeholder="What do you want to know..."
-                                    className="relative h-full px-5 w-full focus:outline-none rounded-[5rem]"
+                                    className="relative h-full w-full rounded-[5rem] px-5 focus:outline-none"
                                     value={inputText}
-                                    onChange={(e) =>
-                                        setInputText(e.target.value)
-                                    }
+                                    onChange={e => setInputText(e.target.value)}
                                 />
                                 <button
-                                    className="absolute right-0 top-0 h-full bg-blue-500 text-white rounded-[5rem] px-4 py-2 hover:cursor-pointer hover:bg-blue-600 transition duration-300 ease-in-out"
+                                    className="absolute top-0 right-0 h-full rounded-[5rem] bg-blue-500 px-4 py-2 text-white transition duration-300 ease-in-out hover:cursor-pointer hover:bg-blue-600"
                                     type="submit"
                                 >
                                     Send
@@ -176,7 +146,7 @@ const MessagingInterface = ({ room }) => {
                         </form>
                     </>
                 ) : (
-                    <div className="w-full h-full flex justify-center items-center">
+                    <div className="flex h-full w-full items-center justify-center">
                         <h1 className="text-4xl font-bold">No Chat Selected</h1>
                     </div>
                 )}

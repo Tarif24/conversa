@@ -1,17 +1,13 @@
-import jwt from "jsonwebtoken";
-import bcrypt from "bcrypt";
+import jwt from 'jsonwebtoken';
+import bcrypt from 'bcrypt';
 
-export const generateAccessToken = (user) => {
-    return jwt.sign(
-        { userId: user._id, email: user.email },
-        process.env.ACCESS_TOKEN_SECRET,
-        {
-            expiresIn: process.env.ACCESS_TOKEN_EXPIRY,
-        }
-    );
+export const generateAccessToken = user => {
+    return jwt.sign({ userId: user._id, email: user.email }, process.env.ACCESS_TOKEN_SECRET, {
+        expiresIn: process.env.ACCESS_TOKEN_EXPIRY,
+    });
 };
 
-export const generateRefreshToken = (user) => {
+export const generateRefreshToken = user => {
     return jwt.sign(
         {
             userId: user._id,
@@ -22,7 +18,7 @@ export const generateRefreshToken = (user) => {
     );
 };
 
-export const verifyAccessToken = (token) => {
+export const verifyAccessToken = token => {
     try {
         return jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
     } catch (error) {
@@ -30,7 +26,7 @@ export const verifyAccessToken = (token) => {
     }
 };
 
-export const verifyRefreshToken = (token) => {
+export const verifyRefreshToken = token => {
     try {
         return jwt.verify(token, process.env.REFRESH_TOKEN_SECRET);
     } catch (error) {
@@ -38,7 +34,7 @@ export const verifyRefreshToken = (token) => {
     }
 };
 
-export const hashPassword = async (password) => {
+export const hashPassword = async password => {
     const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(password, saltRounds);
     return hashedPassword;

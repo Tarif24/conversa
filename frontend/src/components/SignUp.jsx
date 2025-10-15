@@ -1,137 +1,110 @@
-import React, { useState } from "react";
-import {
-    useSocketIO,
-    useSocketIOEvent,
-    useSocketIOState,
-} from "../hooks/useSocketIO";
-import { toast } from "react-toastify";
-import { useNavigate } from "react-router-dom";
+import React, { useState } from 'react';
+import { useSocketIO, useSocketIOEvent, useSocketIOState } from '../hooks/useSocketIO';
+import { toast } from 'react-toastify';
+import { useNavigate } from 'react-router-dom';
 
 const SignUp = () => {
     const { isConnected, connectionState, send, sendSignup } = useSocketIO();
 
     const [user, setUser] = useState({
-        username: "",
-        email: "",
-        password: "",
+        username: '',
+        email: '',
+        password: '',
         profile: {
-            firstName: "",
-            lastName: "",
+            firstName: '',
+            lastName: '',
         },
     });
 
     const navigate = useNavigate();
 
-    const handleSubmit = async (e) => {
+    const handleSubmit = async e => {
         e.preventDefault();
 
-        sendSignup(user, (response) => {
+        sendSignup(user, response => {
             if (response.success) {
-                toast.success("Signup successful!");
-                navigate("/conversa");
+                toast.success('Signup successful!');
+                navigate('/conversa');
                 return;
             } else if (response.exist) {
-                toast.error("User already exists. Please log in.");
+                toast.error('User already exists. Please log in.');
                 return;
             }
 
-            toast.error("Signup failed: Server error");
+            toast.error('Signup failed: Server error');
         });
     };
 
     return (
         <div>
-            <h1 className="block text-gray-700 font-bold mb-2 text-4xl text-center">
-                SIGN UP
-            </h1>
-            <form
-                onSubmit={handleSubmit}
-                className="space-y-4 p-6 w-150 border rounded-lg"
-            >
+            <h1 className="mb-2 block text-center text-4xl font-bold text-gray-700">SIGN UP</h1>
+            <form onSubmit={handleSubmit} className="w-150 space-y-4 rounded-lg border p-6">
                 {/* EMAIL */}
                 <div>
-                    <label
-                        htmlFor="email"
-                        className="block text-gray-700 font-bold mb-2"
-                    >
+                    <label htmlFor="email" className="mb-2 block font-bold text-gray-700">
                         Email
                     </label>
                     <input
                         type="text"
                         id="email"
                         name="email"
-                        className="border rounded w-full py-2 px-3"
+                        className="w-full rounded border px-3 py-2"
                         placeholder="Enter a email address"
                         autoComplete="off"
                         required
                         value={user.email}
-                        onChange={(e) =>
-                            setUser({ ...user, email: e.target.value })
-                        }
+                        onChange={e => setUser({ ...user, email: e.target.value })}
                     />
                 </div>
                 {/* PASSWORD */}
                 <div>
-                    <label
-                        htmlFor="password"
-                        className="block text-gray-700 font-bold mb-2"
-                    >
+                    <label htmlFor="password" className="mb-2 block font-bold text-gray-700">
                         Password
                     </label>
                     <input
                         type="text"
                         id="password"
                         name="password"
-                        className="border rounded w-full py-2 px-3"
+                        className="w-full rounded border px-3 py-2"
                         placeholder="Enter a password"
                         autoComplete="off"
                         required
                         value={user.password}
-                        onChange={(e) =>
-                            setUser({ ...user, password: e.target.value })
-                        }
+                        onChange={e => setUser({ ...user, password: e.target.value })}
                     />
                 </div>
                 {/* USERNAME */}
                 <div>
-                    <label
-                        htmlFor="username"
-                        className="block text-gray-700 font-bold mb-2"
-                    >
+                    <label htmlFor="username" className="mb-2 block font-bold text-gray-700">
                         Username
                     </label>
                     <input
                         type="text"
                         id="username"
                         name="username"
-                        className="border rounded w-full py-2 px-3"
+                        className="w-full rounded border px-3 py-2"
                         placeholder="Enter a username"
                         autoComplete="off"
                         required
                         value={user.username}
-                        onChange={(e) =>
-                            setUser({ ...user, username: e.target.value })
-                        }
+                        onChange={e => setUser({ ...user, username: e.target.value })}
                     />
                 </div>
                 {/* FIRSTNAME */}
                 <div>
-                    <label
-                        htmlFor="firstName"
-                        className="block text-gray-700 font-bold mb-2"
-                    >
+                    <label htmlFor="firstName" className="mb-2 block font-bold text-gray-700">
                         First Name
                     </label>
                     <input
                         type="text"
                         id="firstName"
                         name="firstName"
-                        className="border rounded w-full py-2 px-3"
+                        className="w-full rounded border px-3 py-2"
                         placeholder="Enter your first name"
                         autoComplete="off"
                         required
                         value={user.profile.firstName}
-                        onChange={(e) =>
+                        onChange={e =>
                             setUser({
                                 ...user,
                                 profile: {
@@ -144,22 +117,19 @@ const SignUp = () => {
                 </div>
                 {/* LASTNAME */}
                 <div>
-                    <label
-                        htmlFor="lastName"
-                        className="block text-gray-700 font-bold mb-2"
-                    >
+                    <label htmlFor="lastName" className="mb-2 block font-bold text-gray-700">
                         Last Name
                     </label>
                     <input
                         type="text"
                         id="lastName"
                         name="lastName"
-                        className="border rounded w-full py-2 px-3"
+                        className="w-full rounded border px-3 py-2"
                         placeholder="Enter your last name"
                         autoComplete="off"
                         required
                         value={user.profile.lastName}
-                        onChange={(e) =>
+                        onChange={e =>
                             setUser({
                                 ...user,
                                 profile: {
@@ -173,7 +143,7 @@ const SignUp = () => {
                 {/* SUBMIT BUTTON */}
                 <div>
                     <button
-                        className="bg-gray-500 hover:bg-gray-600 hover:cursor-pointer text-white font-bold py-2 px-4 rounded-full w-full focus:outline-none focus:shadow-outline"
+                        className="focus:shadow-outline w-full rounded-full bg-gray-500 px-4 py-2 font-bold text-white hover:cursor-pointer hover:bg-gray-600 focus:outline-none"
                         type="submit"
                     >
                         Sign Up

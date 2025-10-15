@@ -1,6 +1,6 @@
-import EVENTS from "../../../constants/socketEvents.js";
-import { userSearch } from "../../controllers/userController.js";
-import { authentication } from "../middleware/index.js";
+import EVENTS from '../../../constants/socketEvents.js';
+import { userSearch } from '../../controllers/userController.js';
+import { authentication } from '../middleware/index.js';
 
 class UserHandler {
     constructor(io, connectionManager) {
@@ -23,13 +23,13 @@ class UserHandler {
             if (callback) {
                 callback(result);
             } else {
-                console.log("No callback provided for user_search event");
+                console.log('No callback provided for user_search event');
             }
         } catch (error) {
-            console.error("handle user search error:", error);
+            console.error('handle user search error:', error);
             socket.emit(EVENTS.ERROR, {
                 event: EVENTS.USER_SEARCH,
-                message: "Server error",
+                message: 'Server error',
             });
         }
     }

@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
 const fileSchema = new mongoose.Schema(
     {
@@ -37,18 +37,15 @@ const fileSchema = new mongoose.Schema(
 );
 
 // Compound indexes
-fileSchema.index(
-    { name: 1, roomID: 1, timeStamp: -1 },
-    { name: "FileNameRoomTimeIndex" }
-);
-fileSchema.index({ timeStamp: -1, roomID: 1 }, { name: "FileTimeRoomIndex" });
+fileSchema.index({ name: 1, roomID: 1, timeStamp: -1 }, { name: 'FileNameRoomTimeIndex' });
+fileSchema.index({ timeStamp: -1, roomID: 1 }, { name: 'FileTimeRoomIndex' });
 
 // Text search index
 fileSchema.index(
     {
-        path: "text",
+        path: 'text',
     },
-    { name: "FilePathTextIndex" }
+    { name: 'FilePathTextIndex' }
 );
 
-export default mongoose.model("File", fileSchema);
+export default mongoose.model('File', fileSchema);

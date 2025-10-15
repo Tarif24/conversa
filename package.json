@@ -28,6 +28,7 @@
         "security:audit": "npm audit && npm audit --prefix frontend && npm audit --prefix backend",
         "lint:all": "npm run lint --prefix frontend && npm run lint --prefix backend",
         "format:all": "npm run format --prefix frontend && npm run format --prefix backend",
+        "format": "prettier --config ./config/.prettierrc.js --write .",
         "lint:fix:all": "npm run lint:fix --prefix frontend && npm run lint:fix --prefix backend"
     },
     "devDependencies": {

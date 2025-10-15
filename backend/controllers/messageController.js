@@ -3,16 +3,16 @@ import {
     getRoomByRoomId,
     updateRoomLastMessage,
     getUserByUserId,
-} from "../services/databaseService.js";
+} from '../services/databaseService.js';
 
-export const sendMessage = async (message) => {
+export const sendMessage = async message => {
     try {
         const result = await getUserByUserId(message.userId);
 
         if (!result.exists) {
             return {
                 success: false,
-                message: "User does not exist",
+                message: 'User does not exist',
             };
         }
 
@@ -21,7 +21,7 @@ export const sendMessage = async (message) => {
         if (!room.exists) {
             return {
                 success: false,
-                message: "Room does not exist",
+                message: 'Room does not exist',
                 roomExists: false,
             };
         }
@@ -39,8 +39,8 @@ export const sendMessage = async (message) => {
             sentByUser: result.user.username,
         };
     } catch (error) {
-        console.error("send message error:", error);
-        const message = "Failed to send message: " + error;
+        console.error('send message error:', error);
+        const message = 'Failed to send message: ' + error;
         return { success: false, message: message };
     }
 };

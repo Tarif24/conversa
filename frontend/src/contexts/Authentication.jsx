@@ -1,10 +1,4 @@
-import React, {
-    createContext,
-    useContext,
-    useState,
-    useEffect,
-    useCallback,
-} from "react";
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 
 const AuthContext = createContext();
 
@@ -17,9 +11,9 @@ export const AuthProvider = ({ children }) => {
 
     // Load saved tokens and create authenticated socket
     useEffect(() => {
-        const savedAccessToken = localStorage.getItem("accessToken");
-        const savedRefreshToken = localStorage.getItem("refreshToken");
-        const savedUser = localStorage.getItem("user");
+        const savedAccessToken = localStorage.getItem('accessToken');
+        const savedRefreshToken = localStorage.getItem('refreshToken');
+        const savedUser = localStorage.getItem('user');
 
         if (savedAccessToken && savedRefreshToken && savedUser) {
             const parsedUser = JSON.parse(savedUser);
@@ -34,19 +28,19 @@ export const AuthProvider = ({ children }) => {
 
     // Clear auth helper
     const clearAuth = useCallback(() => {
-        console.log("clearAuth");
+        console.log('clearAuth');
         setUser(null);
         setAccessToken(null);
         setRefreshToken(null);
         setIsAuthenticated(false);
-        localStorage.removeItem("accessToken");
-        localStorage.removeItem("refreshToken");
-        localStorage.removeItem("user");
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken');
+        localStorage.removeItem('user');
     }, []);
 
     // Login function to save auth
-    const login = useCallback(async (response) => {
-        console.log("login");
+    const login = useCallback(async response => {
+        console.log('login');
         setIsLoading(true);
 
         try {
@@ -56,9 +50,9 @@ export const AuthProvider = ({ children }) => {
                 setUser(response.user);
                 setIsAuthenticated(true);
 
-                localStorage.setItem("accessToken", response.accessToken);
-                localStorage.setItem("refreshToken", response.refreshToken);
-                localStorage.setItem("user", JSON.stringify(response.user));
+                localStorage.setItem('accessToken', response.accessToken);
+                localStorage.setItem('refreshToken', response.refreshToken);
+                localStorage.setItem('user', JSON.stringify(response.user));
 
                 setIsLoading(false);
             }
@@ -69,8 +63,8 @@ export const AuthProvider = ({ children }) => {
     }, []);
 
     // Signup function to save auth
-    const signup = useCallback(async (response) => {
-        console.log("signup");
+    const signup = useCallback(async response => {
+        console.log('signup');
         setIsLoading(true);
 
         try {
@@ -80,9 +74,9 @@ export const AuthProvider = ({ children }) => {
                 setUser(response.user);
                 setIsAuthenticated(true);
 
-                localStorage.setItem("accessToken", response.accessToken);
-                localStorage.setItem("refreshToken", response.refreshToken);
-                localStorage.setItem("user", JSON.stringify(response.user));
+                localStorage.setItem('accessToken', response.accessToken);
+                localStorage.setItem('refreshToken', response.refreshToken);
+                localStorage.setItem('user', JSON.stringify(response.user));
 
                 setIsLoading(false);
             }
@@ -105,12 +99,12 @@ export const AuthProvider = ({ children }) => {
             try {
                 if (response.success) {
                     setAccessToken(response.accessToken);
-                    localStorage.setItem("accessToken", response.accessToken);
+                    localStorage.setItem('accessToken', response.accessToken);
                 }
 
                 return response.accessToken;
             } catch (error) {
-                console.error("Token refresh failed:", error);
+                console.error('Token refresh failed:', error);
                 logout();
                 logoutEmit();
                 throw error;
@@ -132,16 +126,14 @@ export const AuthProvider = ({ children }) => {
         refreshToken,
     };
 
-    return (
-        <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
-    );
+    return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
 // Simple hook to use auth
 export const useAuth = () => {
     const context = useContext(AuthContext);
     if (!context) {
-        throw new Error("useAuth must be used within AuthProvider");
+        throw new Error('useAuth must be used within AuthProvider');
     }
     return context;
 };

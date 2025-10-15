@@ -64,6 +64,8 @@ jspm_packages/
 
 # IDE files
 .vscode/*
+frontend/.vscode/*
+backend/.vscode/*
 !.vscode/extensions.json
 .idea/
 *.swp

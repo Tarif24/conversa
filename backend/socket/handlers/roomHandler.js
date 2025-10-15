@@ -1,10 +1,10 @@
-import EVENTS from "../../../constants/socketEvents.js";
+import EVENTS from '../../../constants/socketEvents.js';
 import {
     createChatRoom,
     getUserChats,
     getMessagesForChat,
-} from "../../controllers/roomController.js";
-import { authentication } from "../middleware/index.js";
+} from '../../controllers/roomController.js';
+import { authentication } from '../middleware/index.js';
 
 class RoomHandler {
     constructor(io, connectionManager) {
@@ -34,7 +34,7 @@ class RoomHandler {
 
     async handleCreateRoom(socket, room, callback) {
         try {
-            const cleanedUserIds = room.users.map((user) => user.userId);
+            const cleanedUserIds = room.users.map(user => user.userId);
 
             const finalRoom = {
                 ...room,
@@ -44,9 +44,8 @@ class RoomHandler {
 
             if (result.success) {
                 // Wait for all users to join the room
-                const joinPromises = finalRoom.users.map(async (userId) => {
-                    const userSocket =
-                        this.connectionManager.getSocketByUserId(userId);
+                const joinPromises = finalRoom.users.map(async userId => {
+                    const userSocket = this.connectionManager.getSocketByUserId(userId);
 
                     if (userSocket) {
                         await userSocket.join(result.roomId);
@@ -59,20 +58,20 @@ class RoomHandler {
                 await Promise.all(joinPromises);
 
                 this.io.to(result.roomId).emit(EVENTS.ROOM_REFRESH, {
-                    message: "New room available please refresh rooms",
+                    message: 'New room available please refresh rooms',
                 });
             }
 
             if (callback) {
                 callback(result);
             } else {
-                console.log("No callback provided for user_search event");
+                console.log('No callback provided for user_search event');
             }
         } catch (error) {
-            console.error("handle create room error:", error);
+            console.error('handle create room error:', error);
             socket.emit(EVENTS.ERROR, {
                 event: EVENTS.CREATE_ROOM,
-                message: "Server error",
+                message: 'Server error',
             });
         }
     }
@@ -85,13 +84,13 @@ class RoomHandler {
             if (callback) {
                 callback(result);
             } else {
-                console.log("No callback provided for user_search event");
+                console.log('No callback provided for user_search event');
             }
         } catch (error) {
-            console.error("handle get user rooms:", error);
+            console.error('handle get user rooms:', error);
             socket.emit(EVENTS.ERROR, {
                 event: EVENTS.GET_USER_ROOMS,
-                message: "Server error",
+                message: 'Server error',
             });
         }
     }
@@ -99,7 +98,7 @@ class RoomHandler {
     async handleSetActiveRoom(socket, room, callback) {
         try {
             if (room.roomId) {
-                callback({ success: false, message: "No roomId provided" });
+                callback({ success: false, message: 'No roomId provided' });
                 return;
             }
 
@@ -111,13 +110,13 @@ class RoomHandler {
                     message: `Active roomId set to ${room.roomId}`,
                 });
             } else {
-                console.log("No callback provided for user_search event");
+                console.log('No callback provided for user_search event');
             }
         } catch (error) {
-            console.error("handle get user rooms:", error);
+            console.error('handle get user rooms:', error);
             socket.emit(EVENTS.ERROR, {
                 event: EVENTS.GET_USER_ROOMS,
-                message: "Server error",
+                message: 'Server error',
             });
         }
     }
@@ -125,7 +124,7 @@ class RoomHandler {
     async handleGetMessagesForRoom(socket, room, callback) {
         try {
             if (!room.roomId) {
-                callback({ success: false, message: "No roomId provided" });
+                callback({ success: false, message: 'No roomId provided' });
                 return;
             }
 
@@ -134,13 +133,13 @@ class RoomHandler {
             if (callback) {
                 callback(result);
             } else {
-                console.log("No callback provided for user_search event");
+                console.log('No callback provided for user_search event');
             }
         } catch (error) {
-            console.error("handle get messages for room:", error);
+            console.error('handle get messages for room:', error);
             socket.emit(EVENTS.ERROR, {
                 event: EVENTS.GET_MESSAGES_FOR_ROOM,
-                message: "Server error",
+                message: 'Server error',
             });
         }
     }

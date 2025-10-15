@@ -1,6 +1,6 @@
 // api/socketio.js
-import { io } from "socket.io-client";
-import EVENTS from "../../../constants/socketEvents.js";
+import { io } from 'socket.io-client';
+import EVENTS from '../../../constants/socketEvents.js';
 
 class SocketIOManager {
     constructor() {
@@ -26,33 +26,27 @@ class SocketIOManager {
             });
 
             // Connection successful
-            this.socket.on("connect", () => {
-                console.log("Socket.IO connected");
+            this.socket.on('connect', () => {
+                console.log('Socket.IO connected');
                 resolve();
             });
 
             // Connection error
-            this.socket.on("connect_error", (error) => {
-                console.error("Socket.IO connection error:", error);
+            this.socket.on('connect_error', error => {
+                console.error('Socket.IO connection error:', error);
                 reject(error);
             });
 
             // Disconnection
-            this.socket.on("disconnect", (reason) => {
-                console.log("Socket.IO disconnected:", reason);
+            this.socket.on('disconnect', reason => {
+                console.log('Socket.IO disconnected:', reason);
             });
 
             // onAny receives all events and forwards the events to our listeners
             this.socket.onAny((eventType, ...args) => {
                 // Skip internal socket.io events
-                if (
-                    !eventType.startsWith("connect") &&
-                    !eventType.startsWith("disconnect")
-                ) {
-                    this.notifyListeners(
-                        eventType,
-                        args.length === 1 ? args[0] : args
-                    );
+                if (!eventType.startsWith('connect') && !eventType.startsWith('disconnect')) {
+                    this.notifyListeners(eventType, args.length === 1 ? args[0] : args);
                 }
             });
 
@@ -79,7 +73,7 @@ class SocketIOManager {
         }
 
         if (!this.isConnected()) {
-            console.warn("Socket.IO not connected");
+            console.warn('Socket.IO not connected');
             return;
         }
 
@@ -115,7 +109,7 @@ class SocketIOManager {
     notifyListeners(eventType, payload) {
         const callbacks = this.listeners.get(eventType);
         if (callbacks) {
-            callbacks.forEach((callback) => {
+            callbacks.forEach(callback => {
                 try {
                     callback(payload);
                 } catch (error) {
@@ -132,18 +126,18 @@ class SocketIOManager {
 
     // Get connection status
     getConnectionState() {
-        if (!this.socket) return "DISCONNECTED";
-        return this.socket.connected ? "CONNECTED" : "DISCONNECTED";
+        if (!this.socket) return 'DISCONNECTED';
+        return this.socket.connected ? 'CONNECTED' : 'DISCONNECTED';
     }
 
     // Join a room (Socket.IO specific)
     joinRoom(roomName) {
-        this.socket.emit("join", roomName);
+        this.socket.emit('join', roomName);
     }
 
     // Leave a room (Socket.IO specific)
     leaveRoom(roomName) {
-        this.socket.emit("leave", roomName);
+        this.socket.emit('leave', roomName);
     }
 
     // Disconnect

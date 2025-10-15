@@ -1,75 +1,57 @@
-import React, { useState } from "react";
-import UserSearch from "./UserSearch";
-import {
-    useSocketIO,
-    useSocketIOEvent,
-    useSocketIOState,
-} from "../hooks/useSocketIO";
-import EVENTS from "../../../constants/socketEvents";
-import { X } from "lucide-react";
+import React, { useState } from 'react';
+import UserSearch from './UserSearch';
+import { useSocketIO, useSocketIOEvent, useSocketIOState } from '../hooks/useSocketIO';
+import EVENTS from '../../../constants/socketEvents';
+import { X } from 'lucide-react';
 
 const CreateChat = ({ isCreateChatActive }) => {
-    const {
-        isConnected,
-        connectionState,
-        user,
-        sendProtected,
-        sendRefresh,
-        sendLastEmitted,
-    } = useSocketIO();
+    const { isConnected, connectionState, user, sendProtected, sendRefresh, sendLastEmitted } =
+        useSocketIO();
 
     const [newChat, setNewChat] = useState({
-        roomName: "",
+        roomName: '',
         users: [],
-        type: "",
+        type: '',
     });
 
-    const handleOnUserClicked = (user) => {
+    const handleOnUserClicked = user => {
         setNewChat({ ...newChat, users: [...newChat.users, user] });
     };
 
-    const handleSubmitForm = async (e) => {
+    const handleSubmitForm = async e => {
         e.preventDefault();
 
-        sendProtected(EVENTS.CREATE_CHAT_ROOM, newChat, (result) => {});
+        sendProtected(EVENTS.CREATE_CHAT_ROOM, newChat, result => {});
 
         isCreateChatActive(false);
     };
 
-    const handleRemoveUser = (userId) => {
-        const updatedUsers = newChat.users.filter(
-            (user) => user.userId !== userId
-        );
+    const handleRemoveUser = userId => {
+        const updatedUsers = newChat.users.filter(user => user.userId !== userId);
 
         setNewChat({ ...newChat, users: updatedUsers });
     };
 
     return (
-        <div className="w-full h-full flex flex-col items-center justify-center border-2 border-red-600 p-4">
-            <div className="flex flex-col justify-center items-center border-2 sm:border-3 rounded-2xl w-full h-full bg-white">
+        <div className="flex h-full w-full flex-col items-center justify-center border-2 border-red-600 p-4">
+            <div className="flex h-full w-full flex-col items-center justify-center rounded-2xl border-2 bg-white sm:border-3">
                 <h1 className="text-3xl font-bold">New Chat</h1>
-                <form
-                    onSubmit={handleSubmitForm}
-                    className="space-y-4 p-6 w-150 rounded-lg"
-                >
+                <form onSubmit={handleSubmitForm} className="w-150 space-y-4 rounded-lg p-6">
                     {/* CHAT NAME */}
                     <div>
-                        <label
-                            htmlFor="chatName"
-                            className="block text-gray-700 font-bold mb-2"
-                        >
+                        <label htmlFor="chatName" className="mb-2 block font-bold text-gray-700">
                             Chat Name
                         </label>
                         <input
                             type="text"
                             id="chatName"
                             name="chatName"
-                            className="border rounded w-full py-2 px-3"
+                            className="w-full rounded border px-3 py-2"
                             placeholder="Enter a chat name"
                             autoComplete="off"
                             required
                             value={newChat.roomName}
-                            onChange={(e) =>
+                            onChange={e =>
                                 setNewChat({
                                     ...newChat,
                                     roomName: e.target.value,
@@ -80,19 +62,16 @@ const CreateChat = ({ isCreateChatActive }) => {
 
                     {/* CHAT TYPE */}
                     <div>
-                        <label
-                            htmlFor="chatType"
-                            className="block text-gray-700 font-bold mb-2"
-                        >
+                        <label htmlFor="chatType" className="mb-2 block font-bold text-gray-700">
                             Chat Type
                         </label>
                         <select
                             id="chatType"
                             name="chatType"
-                            className="border rounded w-full py-2 px-3"
+                            className="w-full rounded border px-3 py-2"
                             required
                             value={newChat.type}
-                            onChange={(e) =>
+                            onChange={e =>
                                 setNewChat({
                                     ...newChat,
                                     type: e.target.value,
@@ -103,19 +82,14 @@ const CreateChat = ({ isCreateChatActive }) => {
                             <option value="" disabled>
                                 Select a collection
                             </option>
-                            <option value="directMessage">
-                                Direct Message
-                            </option>
+                            <option value="directMessage">Direct Message</option>
                             <option value="group">Group</option>
                         </select>
                     </div>
 
                     {/* SELECT USERS */}
                     <div>
-                        <label
-                            htmlFor="selectUsers"
-                            className="block text-gray-700 font-bold mb-2"
-                        >
+                        <label htmlFor="selectUsers" className="mb-2 block font-bold text-gray-700">
                             Select Users
                         </label>
                         <UserSearch handleOnUserClicked={handleOnUserClicked} />
@@ -126,19 +100,19 @@ const CreateChat = ({ isCreateChatActive }) => {
                         <div className="mb-6">
                             <label
                                 htmlFor="selectedUsers"
-                                className="block text-gray-700 font-bold mb-2"
+                                className="mb-2 block font-bold text-gray-700"
                             >
                                 Selected Users ({newChat.users.length})
                             </label>
                             <div
-                                className="space-y-2 max-h-36 overflow-x-hidden"
+                                className="max-h-36 space-y-2 overflow-x-hidden"
                                 id="selectedUsers"
                                 name="selectedUsers"
                             >
-                                {newChat.users.map((user) => (
+                                {newChat.users.map(user => (
                                     <div
                                         key={user.userId}
-                                        className="flex flex-row justify-between px-5 py-0 w-full bg-gray-100 border-1 border-gray-400 rounded-xl hover:cursor-pointer"
+                                        className="flex w-full flex-row justify-between rounded-xl border-1 border-gray-400 bg-gray-100 px-5 py-0 hover:cursor-pointer"
                                     >
                                         <div className="flex items-center space-x-3 text-red-400">
                                             <div>
@@ -149,12 +123,8 @@ const CreateChat = ({ isCreateChatActive }) => {
                                         </div>
                                         <div className="flex items-center">
                                             <button
-                                                onClick={() =>
-                                                    handleRemoveUser(
-                                                        user.userId
-                                                    )
-                                                }
-                                                className="p-2 text-red-400 hover:bg-red-100 rounded-full transition-colors hover:cursor-pointer"
+                                                onClick={() => handleRemoveUser(user.userId)}
+                                                className="rounded-full p-2 text-red-400 transition-colors hover:cursor-pointer hover:bg-red-100"
                                                 title="Remove"
                                                 type="button"
                                             >
@@ -170,7 +140,7 @@ const CreateChat = ({ isCreateChatActive }) => {
                     {/* SUBMIT BUTTON */}
                     <div>
                         <button
-                            className="bg-gray-500 hover:bg-gray-600 hover:cursor-pointer text-white font-bold py-2 px-4 rounded-full w-full focus:outline-none focus:shadow-outline"
+                            className="focus:shadow-outline w-full rounded-full bg-gray-500 px-4 py-2 font-bold text-white hover:cursor-pointer hover:bg-gray-600 focus:outline-none"
                             type="submit"
                         >
                             Create new chat
@@ -179,7 +149,7 @@ const CreateChat = ({ isCreateChatActive }) => {
                     {/* GO BACK BUTTON */}
                     <div>
                         <button
-                            className="bg-gray-500 hover:bg-gray-600 hover:cursor-pointer text-white font-bold py-2 px-4 rounded-full w-full focus:outline-none focus:shadow-outline"
+                            className="focus:shadow-outline w-full rounded-full bg-gray-500 px-4 py-2 font-bold text-white hover:cursor-pointer hover:bg-gray-600 focus:outline-none"
                             type="button"
                             onClick={() => isCreateChatActive(false)}
                         >

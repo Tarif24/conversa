@@ -6,18 +6,18 @@ import {
     getRefreshToken,
     deleteRefreshToken,
     deleteRefreshTokensByUserId,
-} from "../services/databaseService.js";
+} from '../services/databaseService.js';
 import {
     generateAccessToken,
     generateRefreshToken,
     hashPassword,
     validatePassword,
     verifyRefreshToken,
-} from "../services/authenticationService.js";
+} from '../services/authenticationService.js';
 
-export const signup = async (user) => {
+export const signup = async user => {
     try {
-        console.log("Signup attempt for user: ", user.email);
+        console.log('Signup attempt for user: ', user.email);
 
         const emailExists = await getUserByEmail(user.email);
         const usernameExists = await getUserByUsername(user.username);
@@ -25,7 +25,7 @@ export const signup = async (user) => {
         if (emailExists.exists || usernameExists.exists) {
             return {
                 success: false,
-                message: "User already exists signup failed",
+                message: 'User already exists signup failed',
                 exists: true,
             };
         }
@@ -52,18 +52,18 @@ export const signup = async (user) => {
             accessToken: accessToken,
             refreshToken: refreshToken,
             user: newUser,
-            message: "Signup successful",
+            message: 'Signup successful',
         };
     } catch (error) {
-        console.error("Controller Sign up error:", error);
-        const message = "Failed to sign up user: " + error;
+        console.error('Controller Sign up error:', error);
+        const message = 'Failed to sign up user: ' + error;
         return { success: false, message: message };
     }
 };
 
-export const login = async (user) => {
+export const login = async user => {
     try {
-        console.log("Login attempt for user: ", user.email);
+        console.log('Login attempt for user: ', user.email);
 
         const emailExists = await getUserByEmail(user.email);
         if (!emailExists.exists) {
@@ -71,21 +71,18 @@ export const login = async (user) => {
                 success: false,
                 user: emailExists.user,
                 exists: false,
-                message: "Login failed user does not exist",
+                message: 'Login failed user does not exist',
             };
         }
 
         const existingUser = (await getUserByEmail(user.email)).user;
 
-        const validPassword = await validatePassword(
-            user.password,
-            existingUser.password
-        );
+        const validPassword = await validatePassword(user.password, existingUser.password);
 
         if (!validPassword) {
             return {
                 success: false,
-                message: "password incorrect login failed",
+                message: 'password incorrect login failed',
                 exists: true,
             };
         }
@@ -105,37 +102,37 @@ export const login = async (user) => {
             accessToken: accessToken,
             refreshToken: refreshToken,
             user: existingUser,
-            message: "Login successful",
+            message: 'Login successful',
             exists: true,
         };
     } catch (error) {
-        console.error("Controller Login error:", error);
-        const message = "Failed to login user: " + error;
+        console.error('Controller Login error:', error);
+        const message = 'Failed to login user: ' + error;
         return { success: false, message: message };
     }
 };
 
-export const logout = async (tokenData) => {
+export const logout = async tokenData => {
     try {
         const token = await getRefreshToken(tokenData.token);
         await deleteRefreshTokensByUserId(token.userId);
 
-        return { success: true, message: "Logout successful" };
+        return { success: true, message: 'Logout successful' };
     } catch (error) {
-        console.error("Controller Logout error:", error);
-        const message = "Failed to logout: " + error;
+        console.error('Controller Logout error:', error);
+        const message = 'Failed to logout: ' + error;
         return { success: false, message: message };
     }
 };
 
-export const refreshToken = async (tokenData) => {
+export const refreshToken = async tokenData => {
     try {
         const existingToken = await getRefreshToken(tokenData.token);
 
         if (!existingToken.exists) {
             return {
                 success: false,
-                message: "Refresh token not found",
+                message: 'Refresh token not found',
             };
         }
 
@@ -145,7 +142,7 @@ export const refreshToken = async (tokenData) => {
             await deleteRefreshToken(tokenData.token);
             return callback({
                 success: false,
-                message: "Invalid refresh token",
+                message: 'Invalid refresh token',
             });
         }
 
@@ -158,11 +155,11 @@ export const refreshToken = async (tokenData) => {
         return {
             success: true,
             accessToken: newAccessToken,
-            message: "Token refreshed successfully",
+            message: 'Token refreshed successfully',
         };
     } catch (error) {
-        console.error("Controller Refresh Token error:", error);
-        const message = "Failed to Refresh Token: " + error;
+        console.error('Controller Refresh Token error:', error);
+        const message = 'Failed to Refresh Token: ' + error;
         return { success: false, message: message };
     }
 };

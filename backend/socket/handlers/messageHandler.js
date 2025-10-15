@@ -1,6 +1,6 @@
-import EVENTS from "../../../constants/socketEvents.js";
-import { sendMessage } from "../../controllers/messageController.js";
-import { authentication } from "../middleware/index.js";
+import EVENTS from '../../../constants/socketEvents.js';
+import { sendMessage } from '../../controllers/messageController.js';
+import { authentication } from '../middleware/index.js';
 
 class MessageHandler {
     constructor(io, connectionManager) {
@@ -11,18 +11,12 @@ class MessageHandler {
     handleConnection(socket) {
         socket.use(authentication(socket));
 
-        socket.on(EVENTS.SEND_MESSAGE, (message) =>
-            this.handleSendMessage(socket, message)
-        );
+        socket.on(EVENTS.SEND_MESSAGE, message => this.handleSendMessage(socket, message));
     }
 
     async handleSendMessage(socket, message) {
         try {
-            console.log(
-                "user with socket ID:",
-                socket.userId,
-                "sent a message"
-            );
+            console.log('user with socket ID:', socket.userId, 'sent a message');
 
             const result = await sendMessage(message);
 
@@ -35,19 +29,17 @@ class MessageHandler {
             }
 
             if (result.roomExists) {
-                socket.broadcast
-                    .to(message.roomId)
-                    .emit(EVENTS.RECEIVE_MESSAGE, result);
+                socket.broadcast.to(message.roomId).emit(EVENTS.RECEIVE_MESSAGE, result);
 
                 this.io.to(message.roomId).emit(EVENTS.ROOM_REFRESH, {
-                    message: "New message sent please refresh rooms",
+                    message: 'New message sent please refresh rooms',
                 });
             }
         } catch (error) {
-            console.error("handle send message error:", error);
+            console.error('handle send message error:', error);
             socket.emit(EVENTS.ERROR, {
                 event: EVENTS.SEND_MESSAGE,
-                message: "Server error",
+                message: 'Server error',
             });
         }
     }

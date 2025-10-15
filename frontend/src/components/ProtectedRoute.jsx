@@ -1,5 +1,5 @@
-import { Navigate } from "react-router-dom";
-import { useAuth } from "../contexts/Authentication";
+import { Navigate } from 'react-router-dom';
+import { useAuth } from '../contexts/Authentication';
 
 const ProtectedRoute = ({ children }) => {
     const { isAuthenticated, isLoading, isConnected } = useAuth();
@@ -7,7 +7,7 @@ const ProtectedRoute = ({ children }) => {
     // Wait for auth to finish loading
     if (isLoading) {
         return (
-            <div className="w-full h-screen flex items-center justify-center">
+            <div className="flex h-screen w-full items-center justify-center">
                 <div className="text-2xl">Loading...</div>
             </div>
         );

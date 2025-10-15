@@ -1,39 +1,26 @@
-import React, { useState } from "react";
-import {
-    useSocketIO,
-    useSocketIOEvent,
-    useSocketIOState,
-} from "../hooks/useSocketIO";
-import EVENTS from "../../../constants/socketEvents";
+import React, { useState } from 'react';
+import { useSocketIO, useSocketIOEvent, useSocketIOState } from '../hooks/useSocketIO';
+import EVENTS from '../../../constants/socketEvents';
 
 const UserSearch = ({ handleOnUserClicked }) => {
-    const {
-        isConnected,
-        connectionState,
-        user,
-        sendProtected,
-        sendRefresh,
-        sendLastEmitted,
-    } = useSocketIO();
+    const { isConnected, connectionState, user, sendProtected, sendRefresh, sendLastEmitted } =
+        useSocketIO();
 
-    const [inputText, setInputText] = useState("");
+    const [inputText, setInputText] = useState('');
     const [searchResult, setSearchResult] = useState([]);
 
     // Submit form handler
-    const submitForm = async (e) => {
+    const submitForm = async e => {
         e.preventDefault();
 
-        if (inputText.trim() === "") return;
+        if (inputText.trim() === '') return;
 
-        setInputText((prev) => prev.trim());
+        setInputText(prev => prev.trim());
 
         const input = inputText;
-        setInputText("");
+        setInputText('');
 
-        setChatHistory((prev) => [
-            ...prev,
-            { role: "user", content: `${input}` },
-        ]);
+        setChatHistory(prev => [...prev, { role: 'user', content: `${input}` }]);
 
         const userId = user._id.toString();
 
@@ -41,22 +28,22 @@ const UserSearch = ({ handleOnUserClicked }) => {
             setIsTyping(true);
 
             sendProtected(EVENTS.USER_SEARCH, {
-                text: "",
+                text: '',
             });
         } catch (error) {
-            console.error("Error fetching data", error);
+            console.error('Error fetching data', error);
         } finally {
             setIsTyping(false);
         }
     };
 
-    const textOnChange = (e) => {
+    const textOnChange = e => {
         setInputText(e.target.value);
 
         const userId = user._id.toString();
         const input = e.target.value.trim();
 
-        if (input === "") {
+        if (input === '') {
             setSearchResult([]);
             return;
         }
@@ -68,34 +55,34 @@ const UserSearch = ({ handleOnUserClicked }) => {
                     text: input,
                     userId: userId,
                 },
-                (response) => {
+                response => {
                     setSearchResult(response.userList);
                 }
             );
         } catch (error) {
-            console.error("Error fetching data", error);
+            console.error('Error fetching data', error);
         }
     };
 
-    const userResultOnClick = (user) => {
+    const userResultOnClick = user => {
         handleOnUserClicked(user);
     };
 
     return (
-        <div className="w-full flex flex-col justify-center h-fit">
-            <div className="w-full border-1 border-black rounded-xl p-0 overflow-hidden">
+        <div className="flex h-fit w-full flex-col justify-center">
+            <div className="w-full overflow-hidden rounded-xl border-1 border-black p-0">
                 <input
                     type="text"
                     placeholder="Search for users here"
-                    className="h-12 px-5 w-full focus:outline-none rounded-[5rem]"
+                    className="h-12 w-full rounded-[5rem] px-5 focus:outline-none"
                     value={inputText}
                     onChange={textOnChange}
                 />
                 {searchResult && searchResult.length > 0 && (
-                    <div className="flex flex-col w-full gap-2 max-h-36 overflow-x-hidden px-2 ">
-                        {searchResult.map((result) => (
+                    <div className="flex max-h-36 w-full flex-col gap-2 overflow-x-hidden px-2">
+                        {searchResult.map(result => (
                             <div
-                                className="px-5 py-1 w-full bg-gray-100 border-1 border-gray-400 rounded-xl hover:cursor-pointer"
+                                className="w-full rounded-xl border-1 border-gray-400 bg-gray-100 px-5 py-1 hover:cursor-pointer"
                                 key={result.userId}
                                 onClick={() => {
                                     userResultOnClick(result);

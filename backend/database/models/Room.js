@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
 const roomSchema = new mongoose.Schema(
     {
@@ -27,4 +27,4 @@ const roomSchema = new mongoose.Schema(
     }
 );
 
-export default mongoose.model("Room", roomSchema);
+export default mongoose.model('Room', roomSchema);

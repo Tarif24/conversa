@@ -1,4 +1,4 @@
-import EVENTS from "../../../constants/socketEvents.js";
+import EVENTS from '../../../constants/socketEvents.js';
 
 class ConnectionHandler {
     constructor(io, connectionManager) {
@@ -6,24 +6,22 @@ class ConnectionHandler {
         this.connectionManager = connectionManager;
     }
     handleConnection(socket) {
-        socket.on(EVENTS.DISCONNECT, (user) =>
-            this.handleDisconnect(socket, user)
-        );
+        socket.on(EVENTS.DISCONNECT, user => this.handleDisconnect(socket, user));
 
-        socket.on(EVENTS.ERROR, (error) => {
-            console.error("Socket error for", socket.id, ":", error);
+        socket.on(EVENTS.ERROR, error => {
+            console.error('Socket error for', socket.id, ':', error);
         });
     }
 
     async handleDisconnect(socket, user) {
         try {
-            console.log("user with socket ID:", socket.id, "disconnected");
+            console.log('user with socket ID:', socket.id, 'disconnected');
 
             this.connectionManager.removeConnection(socket.id);
         } catch (error) {
             socket.emit(EVENTS.ERROR, {
                 event: EVENTS.DISCONNECT,
-                message: "Server error",
+                message: 'Server error',
             });
         }
     }

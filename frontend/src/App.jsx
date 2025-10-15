@@ -3,19 +3,19 @@ import {
     createBrowserRouter,
     createRoutesFromElements,
     RouterProvider,
-} from "react-router-dom";
+} from 'react-router-dom';
 
-import { AuthProvider } from "./contexts/Authentication";
+import { AuthProvider } from './contexts/Authentication';
 
-import MainLayout from "./layouts/MainLayout";
-import AuthenticationLayout from "./layouts/AuthenticationLayout";
-import AppLayout from "./layouts/AppLayout";
+import MainLayout from './layouts/MainLayout';
+import AuthenticationLayout from './layouts/AuthenticationLayout';
+import AppLayout from './layouts/AppLayout';
 
-import AuthenticationPage from "./pages/AuthenticationPage";
-import HomePage from "./pages/HomePage";
-import NotFoundPage from "./pages/NotFoundPage";
+import AuthenticationPage from './pages/AuthenticationPage';
+import HomePage from './pages/HomePage';
+import NotFoundPage from './pages/NotFoundPage';
 
-import ProtectedRoute from "./components/ProtectedRoute";
+import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
     const router = createBrowserRouter(

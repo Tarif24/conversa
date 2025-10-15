@@ -1,6 +1,6 @@
 // For the status check out enums
 
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
 const userSchema = new mongoose.Schema(
     {
@@ -30,11 +30,11 @@ const userSchema = new mongoose.Schema(
         profile: {
             firstName: {
                 type: String,
-                default: "John",
+                default: 'John',
             },
             lastName: {
                 type: String,
-                default: "Doe",
+                default: 'Doe',
             },
         },
         createdAt: {
@@ -49,23 +49,20 @@ const userSchema = new mongoose.Schema(
 
 // Compound indexes
 userSchema.index(
-    { "profile.firstName": 1, "profile.lastName": 1 },
-    { name: "UserProfileNameIndex" }
+    { 'profile.firstName': 1, 'profile.lastName': 1 },
+    { name: 'UserProfileNameIndex' }
 );
-userSchema.index(
-    { email: 1, createdAt: -1 },
-    { name: "UserEmailCreatedAtIndex" }
-);
+userSchema.index({ email: 1, createdAt: -1 }, { name: 'UserEmailCreatedAtIndex' });
 
 // Text search index
 userSchema.index(
     {
-        username: "text",
-        "profile.firstName": "text",
-        "profile.lastName": "text",
-        email: "text",
+        username: 'text',
+        'profile.firstName': 'text',
+        'profile.lastName': 'text',
+        email: 'text',
     },
-    { name: "UserTextIndex" }
+    { name: 'UserTextIndex' }
 );
 
-export default mongoose.model("User", userSchema);
+export default mongoose.model('User', userSchema);

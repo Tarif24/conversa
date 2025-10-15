@@ -5,7 +5,7 @@ services:
             dockerfile: ./frontend/Dockerfile
         container_name: vite_frontend
         ports:
-            - "3000:3000" # Serve frontend on localhost:3000
+            - '3000:3000' # Serve frontend on localhost:3000
         env_file:
             - ./frontend/.env # Load environment variables from frontend .env file
         develop:
@@ -24,7 +24,7 @@ services:
             dockerfile: ./backend/Dockerfile
         container_name: socket_backend
         ports:
-            - "5000:5000" # Backend runs on port 5000
+            - '5000:5000' # Backend runs on port 5000
         env_file:
             - ./backend/.env # Load environment variables from backend .env file
         develop:
@@ -41,8 +41,8 @@ services:
         container_name: mongo_database
         restart: unless-stopped
         ports:
-            - "27017:27017"
-        command: ["mongod", "--config", "/etc/mongod.conf"]
+            - '27017:27017'
+        command: ['mongod', '--config', '/etc/mongod.conf']
         env_file:
             - ./database/.env # Load environment variables from database .env file
         volumes:

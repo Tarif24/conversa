@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
 const refreshTokenSchema = new mongoose.Schema(
     {
@@ -16,4 +16,4 @@ const refreshTokenSchema = new mongoose.Schema(
     }
 );
 
-export default mongoose.model("RefreshToken", refreshTokenSchema);
+export default mongoose.model('RefreshToken', refreshTokenSchema);

@@ -1,13 +1,13 @@
 // hooks/useSocketIO.js
-import { useEffect, useState, useCallback } from "react";
-import socketManager from "../api/socketio";
-import { useAuth } from "../contexts/Authentication";
-import EVENTS from "../../../constants/socketEvents";
+import { useEffect, useState, useCallback } from 'react';
+import socketManager from '../api/socketio';
+import { useAuth } from '../contexts/Authentication';
+import EVENTS from '../../../constants/socketEvents';
 
 // Hook to establish Socket.IO connection and give any file using it functions to work with the api
 export const useSocketIO = (options = {}) => {
     const [isConnected, setIsConnected] = useState(false);
-    const [connectionState, setConnectionState] = useState("DISCONNECTED");
+    const [connectionState, setConnectionState] = useState('DISCONNECTED');
 
     // The auth context
     const {
@@ -28,11 +28,11 @@ export const useSocketIO = (options = {}) => {
             .connect({ auth: { token: accessToken }, ...options })
             .then(() => {
                 setIsConnected(true);
-                setConnectionState("CONNECTED");
+                setConnectionState('CONNECTED');
             })
             .catch(() => {
                 setIsConnected(false);
-                setConnectionState("DISCONNECTED");
+                setConnectionState('DISCONNECTED');
             });
 
         // Check connection status periodically
@@ -58,19 +58,19 @@ export const useSocketIO = (options = {}) => {
     );
 
     // Join room function
-    const joinRoom = useCallback((roomName) => {
+    const joinRoom = useCallback(roomName => {
         socketManager.joinRoom(roomName);
     }, []);
 
     // Leave room function
-    const leaveRoom = useCallback((roomName) => {
+    const leaveRoom = useCallback(roomName => {
         socketManager.leaveRoom(roomName);
     }, []);
 
     // Login
     const sendLogin = useCallback(
         (payload, callback) => {
-            socketManager.send(EVENTS.USER_LOGIN, payload, (response) => {
+            socketManager.send(EVENTS.USER_LOGIN, payload, response => {
                 login(response);
                 callback(response);
             });
@@ -81,7 +81,7 @@ export const useSocketIO = (options = {}) => {
     // Signup
     const sendSignup = useCallback(
         (payload, callback) => {
-            socketManager.send(EVENTS.USER_SIGNUP, payload, (response) => {
+            socketManager.send(EVENTS.USER_SIGNUP, payload, response => {
                 signup(response);
                 callback(response);
             });
@@ -92,7 +92,7 @@ export const useSocketIO = (options = {}) => {
     // Logout
     const sendLogout = useCallback(
         (payload, callback) => {
-            socketManager.send(EVENTS.USER_LOGOUT, payload, (response) => {
+            socketManager.send(EVENTS.USER_LOGOUT, payload, response => {
                 logout();
                 if (callback) callback(response);
             });
@@ -102,11 +102,11 @@ export const useSocketIO = (options = {}) => {
 
     // Refresh Token
     const sendRefresh = useCallback(
-        (callback) => {
+        callback => {
             socketManager.send(
                 EVENTS.USER_REFRESH_TOKEN,
                 {},
-                (response) => {
+                response => {
                     refreshAccessToken(response, () => {
                         send(EVENTS.USER_LOGOUT, {
                             token: refreshToken,
@@ -137,7 +137,7 @@ export const useSocketIO = (options = {}) => {
                 socketManager.send(
                     EVENTS.USER_REFRESH_TOKEN,
                     {},
-                    (response) => {
+                    response => {
                         refreshAccessToken(response, () => {
                             send(EVENTS.USER_LOGOUT, {
                                 token: refreshToken,
@@ -189,7 +189,7 @@ export const useSocketIOState = (eventType, initialValue = null) => {
 
     useSocketIOEvent(
         eventType,
-        useCallback((payload) => {
+        useCallback(payload => {
             setData(payload);
         }, [])
     );

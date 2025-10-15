@@ -1,3 +1,3 @@
-import authentication from "./authentication.js";
+import authentication from './authentication.js';
 
 export { authentication };
