@@ -70,7 +70,7 @@ const UserSearch = ({ handleOnUserClicked }) => {
 
     return (
         <div className="flex h-fit w-full flex-col justify-center">
-            <div className="w-full overflow-hidden rounded-xl border-1 border-black p-0">
+            <div className="border-1 w-full overflow-hidden rounded-xl border-black p-0">
                 <input
                     type="text"
                     placeholder="Search for users here"
@@ -82,7 +82,7 @@ const UserSearch = ({ handleOnUserClicked }) => {
                     <div className="flex max-h-36 w-full flex-col gap-2 overflow-x-hidden px-2">
                         {searchResult.map(result => (
                             <div
-                                className="w-full rounded-xl border-1 border-gray-400 bg-gray-100 px-5 py-1 hover:cursor-pointer"
+                                className="border-1 w-full rounded-xl border-gray-400 bg-gray-100 px-5 py-1 hover:cursor-pointer"
                                 key={result.userId}
                                 onClick={() => {
                                     userResultOnClick(result);

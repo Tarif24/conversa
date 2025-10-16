@@ -92,17 +92,17 @@ const MessagingInterface = ({ room }) => {
             <div className={`${room ? 'block' : 'hidden'} mb-4`}>
                 <h1 className="text-3xl font-bold">{room && room.roomName}</h1>
             </div>
-            <div className="flex h-full w-full flex-col justify-end rounded-2xl border-2 bg-white sm:border-3">
+            <div className="sm:border-3 flex h-full w-full flex-col justify-end rounded-2xl border-2 bg-white">
                 {room ? (
                     <>
-                        <div className="flex max-h-155 flex-col overflow-y-auto px-2 sm:px-10">
+                        <div className="max-h-155 flex flex-col overflow-y-auto px-2 sm:px-10">
                             {chatHistory.map(({ role, message }, index) => {
                                 return role !== 'system' ? (
                                     <div
-                                        className={`mt-2 w-fit max-w-[70%] p-3 break-words sm:mt-4 sm:max-w-[60%] sm:p-4 ${
+                                        className={`mt-2 w-fit max-w-[70%] break-words p-3 sm:mt-4 sm:max-w-[60%] sm:p-4 ${
                                             role === 'user'
                                                 ? 'self-end rounded-l-2xl rounded-tr-2xl bg-blue-500 text-white'
-                                                : 'self-start rounded-tl-2xl rounded-r-2xl bg-gray-200 text-black'
+                                                : 'self-start rounded-r-2xl rounded-tl-2xl bg-gray-200 text-black'
                                         }`}
                                         key={index}
                                     >
@@ -137,7 +137,7 @@ const MessagingInterface = ({ room }) => {
                                     onChange={e => setInputText(e.target.value)}
                                 />
                                 <button
-                                    className="absolute top-0 right-0 h-full rounded-[5rem] bg-blue-500 px-4 py-2 text-white transition duration-300 ease-in-out hover:cursor-pointer hover:bg-blue-600"
+                                    className="absolute right-0 top-0 h-full rounded-[5rem] bg-blue-500 px-4 py-2 text-white transition duration-300 ease-in-out hover:cursor-pointer hover:bg-blue-600"
                                     type="submit"
                                 >
                                     Send

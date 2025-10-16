@@ -34,7 +34,7 @@ const CreateChat = ({ isCreateChatActive }) => {
 
     return (
         <div className="flex h-full w-full flex-col items-center justify-center border-2 border-red-600 p-4">
-            <div className="flex h-full w-full flex-col items-center justify-center rounded-2xl border-2 bg-white sm:border-3">
+            <div className="sm:border-3 flex h-full w-full flex-col items-center justify-center rounded-2xl border-2 bg-white">
                 <h1 className="text-3xl font-bold">New Chat</h1>
                 <form onSubmit={handleSubmitForm} className="w-150 space-y-4 rounded-lg p-6">
                     {/* CHAT NAME */}
@@ -112,7 +112,7 @@ const CreateChat = ({ isCreateChatActive }) => {
                                 {newChat.users.map(user => (
                                     <div
                                         key={user.userId}
-                                        className="flex w-full flex-row justify-between rounded-xl border-1 border-gray-400 bg-gray-100 px-5 py-0 hover:cursor-pointer"
+                                        className="border-1 flex w-full flex-row justify-between rounded-xl border-gray-400 bg-gray-100 px-5 py-0 hover:cursor-pointer"
                                     >
                                         <div className="flex items-center space-x-3 text-red-400">
                                             <div>
