@@ -1,1 +1,27 @@
+/* eslint-disable */
 @import 'tailwindcss';
+
+@theme {
+    --color-background: rgb(14 11 31);
+    --color-card: rgb(26 21 52);
+    --color-accent: rgb(124 77 255);
+    --color-accent-hover: rgb(155 109 255);
+    --color-secondary: rgb(49 40 90);
+    --color-text-primary: rgb(234 230 255);
+    --color-text-secondary: rgb(182 177 217);
+    --color-input-bg: rgb(36 30 69);
+    --color-input-border: rgb(60 51 106);
+    --color-input-focus: rgb(124 77 255);
+    --color-error: rgb(255 94 135);
+    --color-success: rgb(74 222 128);
+    --shadow-glow: 0 0 25px rgb(124 77 255 / 0.15);
+    --shadow-focus: 0 0 8px rgb(124 77 255 / 0.3);
+}
+
+@utility bg-gradient-dark {
+    background-image: linear-gradient(160deg, rgb(14 11 31) 0%, rgb(28 20 64) 100%);
+}
+
+@utility bg-button-gradient {
+    background-image: linear-gradient(90deg, rgb(124 77 255) 0%, rgb(155 109 255) 100%);
+}

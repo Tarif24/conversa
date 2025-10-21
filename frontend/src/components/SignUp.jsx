@@ -18,6 +18,9 @@ const SignUp = () => {
 
     const navigate = useNavigate();
 
+    const textInputStyle =
+        'w-full rounded bg-[rgb(59,54,76)] px-3 py-2 text-white shadow-sm placeholder:text-[rgb(97,91,110)] focus:ring-2 focus:ring-[rgb(184,169,233)] focus:outline-none';
+
     const handleSubmit = async e => {
         e.preventDefault();
 
@@ -37,70 +40,18 @@ const SignUp = () => {
 
     return (
         <div>
-            <h1 className="mb-2 block text-center text-4xl font-bold text-gray-700">SIGN UP</h1>
-            <form onSubmit={handleSubmit} className="w-150 space-y-4 rounded-lg border p-6">
-                {/* EMAIL */}
-                <div>
-                    <label htmlFor="email" className="mb-2 block font-bold text-gray-700">
-                        Email
-                    </label>
-                    <input
-                        type="text"
-                        id="email"
-                        name="email"
-                        className="w-full rounded border px-3 py-2"
-                        placeholder="Enter a email address"
-                        autoComplete="off"
-                        required
-                        value={user.email}
-                        onChange={e => setUser({ ...user, email: e.target.value })}
-                    />
-                </div>
-                {/* PASSWORD */}
-                <div>
-                    <label htmlFor="password" className="mb-2 block font-bold text-gray-700">
-                        Password
-                    </label>
-                    <input
-                        type="text"
-                        id="password"
-                        name="password"
-                        className="w-full rounded border px-3 py-2"
-                        placeholder="Enter a password"
-                        autoComplete="off"
-                        required
-                        value={user.password}
-                        onChange={e => setUser({ ...user, password: e.target.value })}
-                    />
-                </div>
-                {/* USERNAME */}
-                <div>
-                    <label htmlFor="username" className="mb-2 block font-bold text-gray-700">
-                        Username
-                    </label>
-                    <input
-                        type="text"
-                        id="username"
-                        name="username"
-                        className="w-full rounded border px-3 py-2"
-                        placeholder="Enter a username"
-                        autoComplete="off"
-                        required
-                        value={user.username}
-                        onChange={e => setUser({ ...user, username: e.target.value })}
-                    />
-                </div>
-                {/* FIRSTNAME */}
-                <div>
-                    <label htmlFor="firstName" className="mb-2 block font-bold text-gray-700">
-                        First Name
-                    </label>
+            <h1 className="mb-25 block text-center text-6xl font-medium text-white">
+                Create an account
+            </h1>
+            <form onSubmit={handleSubmit} className="w-150 space-y-6">
+                {/* NAME */}
+                <div className="flex gap-8">
                     <input
                         type="text"
                         id="firstName"
                         name="firstName"
-                        className="w-full rounded border px-3 py-2"
-                        placeholder="Enter your first name"
+                        className={textInputStyle}
+                        placeholder="First name"
                         autoComplete="off"
                         required
                         value={user.profile.firstName}
@@ -114,18 +65,13 @@ const SignUp = () => {
                             })
                         }
                     />
-                </div>
-                {/* LASTNAME */}
-                <div>
-                    <label htmlFor="lastName" className="mb-2 block font-bold text-gray-700">
-                        Last Name
-                    </label>
+
                     <input
                         type="text"
                         id="lastName"
                         name="lastName"
-                        className="w-full rounded border px-3 py-2"
-                        placeholder="Enter your last name"
+                        className={textInputStyle}
+                        placeholder="Last name"
                         autoComplete="off"
                         required
                         value={user.profile.lastName}
@@ -140,15 +86,53 @@ const SignUp = () => {
                         }
                     />
                 </div>
+
+                {/* USERNAME */}
+                <input
+                    type="text"
+                    id="username"
+                    name="username"
+                    className={textInputStyle}
+                    placeholder="Username"
+                    autoComplete="off"
+                    required
+                    value={user.username}
+                    onChange={e => setUser({ ...user, username: e.target.value })}
+                />
+
+                {/* EMAIL */}
+                <input
+                    type="text"
+                    id="email"
+                    name="email"
+                    className={textInputStyle}
+                    placeholder="Email"
+                    autoComplete="off"
+                    required
+                    value={user.email}
+                    onChange={e => setUser({ ...user, email: e.target.value })}
+                />
+
+                {/* PASSWORD */}
+                <input
+                    type="text"
+                    id="password"
+                    name="password"
+                    className={textInputStyle}
+                    placeholder="Enter your password"
+                    autoComplete="off"
+                    required
+                    value={user.password}
+                    onChange={e => setUser({ ...user, password: e.target.value })}
+                />
+
                 {/* SUBMIT BUTTON */}
-                <div>
-                    <button
-                        className="focus:shadow-outline w-full rounded-full bg-gray-500 px-4 py-2 font-bold text-white hover:cursor-pointer hover:bg-gray-600 focus:outline-none"
-                        type="submit"
-                    >
-                        Sign Up
-                    </button>
-                </div>
+                <button
+                    className="focus:shadow-outline mt-15 w-full rounded-md bg-[rgb(110,84,181)] px-4 py-2 font-bold text-white transition duration-300 ease-in-out hover:cursor-pointer hover:bg-[rgb(81,63,131)]"
+                    type="submit"
+                >
+                    Sign Up
+                </button>
             </form>
         </div>
     );
