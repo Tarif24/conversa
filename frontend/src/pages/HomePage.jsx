@@ -4,6 +4,8 @@ import EVENTS from '../../../constants/socketEvents';
 import MessagingInterface from '../components/MessagingInterface';
 import ChatsSidebar from '../components/ChatsSidebar';
 import CreateChat from '../components/CreateChat';
+import Navbar from '../components/Navbar';
+import { useNavigate } from 'react-router-dom';
 
 const HomePage = () => {
     const { isConnected, connectionState, user, sendProtected, sendRefresh, sendLastEmitted } =
@@ -11,6 +13,8 @@ const HomePage = () => {
 
     const [isCreateChatActive, setIsCreateChatActive] = useState(false);
     const [activeRoom, setActiveRoom] = useState(null);
+
+    const navigate = useNavigate();
 
     // Listen for incoming messages
     useSocketIOEvent(EVENTS.ERROR, error => {
@@ -20,6 +24,7 @@ const HomePage = () => {
                     sendLastEmitted();
                 } else {
                     console.error('Token refresh failed:', response.message);
+                    navigate('/');
                 }
             });
         }
@@ -28,8 +33,8 @@ const HomePage = () => {
     // Wait for both user and socket connection
     if (!user || !isConnected) {
         return (
-            <div className="flex h-full w-full items-center justify-center">
-                <div className="text-xl">
+            <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-[#363163] via-[#695ce0] to-[#595C8A]">
+                <div className="text-4xl text-[rgb(255,255,255)]">
                     {!user ? 'Loading user...' : 'Connecting to server...'}
                 </div>
             </div>
@@ -41,12 +46,13 @@ const HomePage = () => {
     };
 
     return (
-        <div className="flex h-full w-full items-center justify-center">
-            <ChatsSidebar isCreateChatActive={setIsCreateChatActive} onRoomClicked={roomClicked} />
+        <div className="flex h-full w-full items-center justify-center gap-2 bg-gradient-to-br from-[#363163] via-[#695ce0] to-[#595C8A] p-5">
+            <Navbar isCreateChatActive={setIsCreateChatActive} setActiveRoom={setActiveRoom} />
+            <ChatsSidebar onRoomClicked={roomClicked} isCreateChatActive={setIsCreateChatActive} />
             {isCreateChatActive ? (
                 <CreateChat isCreateChatActive={setIsCreateChatActive} />
             ) : (
-                <MessagingInterface room={activeRoom} />
+                <MessagingInterface room={activeRoom} isCreateChatActive={setIsCreateChatActive} />
             )}
         </div>
     );

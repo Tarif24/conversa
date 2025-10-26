@@ -29,7 +29,7 @@ const SignUp = () => {
                 toast.success('Signup successful!');
                 navigate('/conversa');
                 return;
-            } else if (response.exist) {
+            } else if (response.exists) {
                 toast.error('User already exists. Please log in.');
                 return;
             }

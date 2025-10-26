@@ -40,7 +40,7 @@ class RoomHandler {
                 ...room,
                 users: [...cleanedUserIds, socket.userId],
             };
-            const result = await createChatRoom(finalRoom);
+            const result = await createChatRoom(finalRoom, socket.userId);
 
             if (result.success) {
                 // Wait for all users to join the room

@@ -66,23 +66,26 @@ const UserSearch = ({ handleOnUserClicked }) => {
 
     const userResultOnClick = user => {
         handleOnUserClicked(user);
+        setInputText('');
+        setSearchResult([]);
     };
 
     return (
         <div className="flex h-fit w-full flex-col justify-center">
-            <div className="border-1 w-full overflow-hidden rounded-xl border-black p-0">
+            <div className="w-full overflow-hidden rounded-md border-1 border-[rgb(103,67,221)] bg-white/80 p-2 focus:ring-0">
                 <input
                     type="text"
-                    placeholder="Search for users here"
-                    className="h-12 w-full rounded-[5rem] px-5 focus:outline-none"
+                    placeholder="Search for users"
+                    className="h-7 w-full rounded-[5rem] px-1 text-[rgb(103,67,221)] focus:outline-none"
                     value={inputText}
                     onChange={textOnChange}
                 />
                 {searchResult && searchResult.length > 0 && (
-                    <div className="flex max-h-36 w-full flex-col gap-2 overflow-x-hidden px-2">
+                    <div className="flex max-h-36 w-full flex-col items-center gap-2 overflow-x-hidden">
+                        <span className="w-[75%] border-1 border-[rgb(164,146,224)]"></span>
                         {searchResult.map(result => (
                             <div
-                                className="border-1 w-full rounded-xl border-gray-400 bg-gray-100 px-5 py-1 hover:cursor-pointer"
+                                className="w-full rounded-xl border-1 border-[rgb(103,67,221)] bg-gray-100 px-5 py-1 text-[rgb(103,67,221)] hover:cursor-pointer"
                                 key={result.userId}
                                 onClick={() => {
                                     userResultOnClick(result);

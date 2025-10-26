@@ -23,6 +23,8 @@ class ConnectionManager {
         if (conn && userId) {
             this.connections.set(socket.id, { ...conn, userId });
             this.userSockets.set(userId, socket.id);
+        } else {
+            this.addConnection(socket, userId);
         }
     }
 

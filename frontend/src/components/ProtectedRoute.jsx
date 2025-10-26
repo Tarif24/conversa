@@ -7,8 +7,8 @@ const ProtectedRoute = ({ children }) => {
     // Wait for auth to finish loading
     if (isLoading) {
         return (
-            <div className="flex h-screen w-full items-center justify-center">
-                <div className="text-2xl">Loading...</div>
+            <div className="flex h-screen w-full items-center justify-center bg-gradient-to-br from-[#363163] via-[#695ce0] to-[#595C8A]">
+                <div className="text-4xl text-white">Loading...</div>
             </div>
         );
     }

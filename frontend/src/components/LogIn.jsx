@@ -1,14 +1,20 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, use } from 'react';
 import { useSocketIO, useSocketIOEvent, useSocketIOState } from '../hooks/useSocketIO';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 
 const LogIn = () => {
-    const { isConnected, connectionState, send, sendLogin } = useSocketIO();
+    const { isConnected, connectionState, send, user, sendLogin } = useSocketIO();
 
     const [login, setLogin] = useState({ email: '', password: '' });
 
     const navigate = useNavigate();
+
+    useEffect(() => {
+        if (user) {
+            navigate('/conversa');
+        }
+    }, [user]);
 
     const textInputStyle =
         'w-full rounded bg-[rgb(59,54,76)] px-3 py-2 text-white shadow-md placeholder:text-[rgb(97,91,110)] focus:ring-2 focus:ring-[rgb(184,169,233)] focus:outline-none';

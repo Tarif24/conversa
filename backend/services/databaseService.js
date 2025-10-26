@@ -52,6 +52,14 @@ export const addRoomToUsers = async (roomId, userIds = []) => {
     return result;
 };
 
+export const getUsernameByUserId = async userId => {
+    const user = await User.findById(userId);
+    if (user) {
+        return { success: true, exists: true, username: user.username };
+    }
+    return { success: true, exists: false };
+};
+
 // Message Services
 export const createMessage = async messageData => {
     const message = await Message.create(messageData);

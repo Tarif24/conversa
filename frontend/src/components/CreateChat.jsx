@@ -3,6 +3,7 @@ import UserSearch from './UserSearch';
 import { useSocketIO, useSocketIOEvent, useSocketIOState } from '../hooks/useSocketIO';
 import EVENTS from '../../../constants/socketEvents';
 import { X } from 'lucide-react';
+import { toast } from 'react-toastify';
 
 const CreateChat = ({ isCreateChatActive }) => {
     const { isConnected, connectionState, user, sendProtected, sendRefresh, sendLastEmitted } =
@@ -11,7 +12,6 @@ const CreateChat = ({ isCreateChatActive }) => {
     const [newChat, setNewChat] = useState({
         roomName: '',
         users: [],
-        type: '',
     });
 
     const handleOnUserClicked = user => {
@@ -20,6 +20,30 @@ const CreateChat = ({ isCreateChatActive }) => {
 
     const handleSubmitForm = async e => {
         e.preventDefault();
+
+        if (newChat.users.length === 0) {
+            return;
+        }
+
+        if (newChat.users.length > 1 && newChat.roomName === '') {
+            toast.error('Room name is required for group chats');
+            return;
+        }
+
+        if (newChat.roomName === '') {
+            sendProtected(EVENTS.CREATE_CHAT_ROOM, { ...newChat, roomName: 'DEFAULT' }, result => {
+                if (result.doesDirectExist) {
+                    toast.error('Direct chat already exists');
+                    setNewChat({
+                        ...newChat,
+                        users: [],
+                    });
+                } else {
+                    isCreateChatActive(false);
+                }
+            });
+            return;
+        }
 
         sendProtected(EVENTS.CREATE_CHAT_ROOM, newChat, result => {});
 
@@ -33,74 +57,46 @@ const CreateChat = ({ isCreateChatActive }) => {
     };
 
     return (
-        <div className="flex h-full w-full flex-col items-center justify-center border-2 border-red-600 p-4">
-            <div className="sm:border-3 flex h-full w-full flex-col items-center justify-center rounded-2xl border-2 bg-white">
-                <h1 className="text-3xl font-bold">New Chat</h1>
+        <div className="flex h-full flex-1 flex-col items-center justify-center rounded-2xl">
+            <div className="flex h-full w-full flex-col items-center justify-center rounded-2xl bg-white/65 backdrop-blur-2xl">
+                <h1 className="text-3xl font-bold text-[rgb(110,84,181)]">New Chat</h1>
                 <form onSubmit={handleSubmitForm} className="w-150 space-y-4 rounded-lg p-6">
                     {/* CHAT NAME */}
-                    <div>
-                        <label htmlFor="chatName" className="mb-2 block font-bold text-gray-700">
-                            Chat Name
-                        </label>
+                    <div className={newChat.users.length < 2 ? 'hidden' : 'block'}>
                         <input
                             type="text"
                             id="chatName"
                             name="chatName"
-                            className="w-full rounded border px-3 py-2"
-                            placeholder="Enter a chat name"
+                            className="w-full rounded border-1 border-[rgb(103,67,221)] bg-white/80 px-3 py-2 text-[rgb(103,67,221)] focus:ring-0 focus:outline-none"
+                            placeholder="Group chat name"
                             autoComplete="off"
-                            required
                             value={newChat.roomName}
-                            onChange={e =>
+                            onChange={e => {
                                 setNewChat({
                                     ...newChat,
                                     roomName: e.target.value,
-                                })
-                            }
+                                });
+                                if (newChat.roomName === '') {
+                                    setNewChat({
+                                        ...newChat,
+                                        roomName: null,
+                                    });
+                                }
+                            }}
                         />
-                    </div>
-
-                    {/* CHAT TYPE */}
-                    <div>
-                        <label htmlFor="chatType" className="mb-2 block font-bold text-gray-700">
-                            Chat Type
-                        </label>
-                        <select
-                            id="chatType"
-                            name="chatType"
-                            className="w-full rounded border px-3 py-2"
-                            required
-                            value={newChat.type}
-                            onChange={e =>
-                                setNewChat({
-                                    ...newChat,
-                                    type: e.target.value,
-                                })
-                            }
-                        >
-                            {/* fill options with collection names from the database */}
-                            <option value="" disabled>
-                                Select a collection
-                            </option>
-                            <option value="directMessage">Direct Message</option>
-                            <option value="group">Group</option>
-                        </select>
                     </div>
 
                     {/* SELECT USERS */}
                     <div>
-                        <label htmlFor="selectUsers" className="mb-2 block font-bold text-gray-700">
-                            Select Users
-                        </label>
                         <UserSearch handleOnUserClicked={handleOnUserClicked} />
                     </div>
 
                     {/* SELECTED USERS LIST */}
-                    {newChat.users && newChat.users.length > 0 && (
+                    {true && (
                         <div className="mb-6">
                             <label
                                 htmlFor="selectedUsers"
-                                className="mb-2 block font-bold text-gray-700"
+                                className="mb-2 block font-bold text-[rgb(110,84,181)]"
                             >
                                 Selected Users ({newChat.users.length})
                             </label>
@@ -112,11 +108,11 @@ const CreateChat = ({ isCreateChatActive }) => {
                                 {newChat.users.map(user => (
                                     <div
                                         key={user.userId}
-                                        className="border-1 flex w-full flex-row justify-between rounded-xl border-gray-400 bg-gray-100 px-5 py-0 hover:cursor-pointer"
+                                        className="flex w-full flex-row justify-between rounded-xl border-1 border-[rgb(103,67,221)] bg-gray-100 px-5 py-0 hover:cursor-pointer"
                                     >
                                         <div className="flex items-center space-x-3 text-red-400">
                                             <div>
-                                                <p className="font-medium text-gray-600">
+                                                <p className="font-medium text-[rgb(103,67,221)]">
                                                     {user.username}
                                                 </p>
                                             </div>
@@ -140,7 +136,7 @@ const CreateChat = ({ isCreateChatActive }) => {
                     {/* SUBMIT BUTTON */}
                     <div>
                         <button
-                            className="focus:shadow-outline w-full rounded-full bg-gray-500 px-4 py-2 font-bold text-white hover:cursor-pointer hover:bg-gray-600 focus:outline-none"
+                            className="focus:shadow-outline w-full rounded-full bg-[rgb(110,84,181)] px-4 py-2 font-bold text-white transition-all duration-300 ease-in-out hover:cursor-pointer hover:bg-[rgb(81,63,131)] focus:outline-none"
                             type="submit"
                         >
                             Create new chat
@@ -149,7 +145,7 @@ const CreateChat = ({ isCreateChatActive }) => {
                     {/* GO BACK BUTTON */}
                     <div>
                         <button
-                            className="focus:shadow-outline w-full rounded-full bg-gray-500 px-4 py-2 font-bold text-white hover:cursor-pointer hover:bg-gray-600 focus:outline-none"
+                            className="focus:shadow-outline w-full rounded-full bg-[rgb(110,84,181)] px-4 py-2 font-bold text-white transition-all duration-300 ease-in-out hover:cursor-pointer hover:bg-[rgb(81,63,131)] focus:outline-none"
                             type="button"
                             onClick={() => isCreateChatActive(false)}
                         >

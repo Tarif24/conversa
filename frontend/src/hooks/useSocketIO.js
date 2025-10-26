@@ -92,7 +92,7 @@ export const useSocketIO = (options = {}) => {
     // Logout
     const sendLogout = useCallback(
         (payload, callback) => {
-            socketManager.send(EVENTS.USER_LOGOUT, payload, response => {
+            sendProtected(EVENTS.USER_LOGOUT, payload, response => {
                 logout();
                 if (callback) callback(response);
             });

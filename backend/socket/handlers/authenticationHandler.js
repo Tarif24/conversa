@@ -24,7 +24,7 @@ class AuthenticationHandler {
         try {
             const emailFixed = user.email.trim().toLowerCase();
 
-            console.log('Handel signup for user: ', emailFixed);
+            console.log('Handel signup for user email: ', emailFixed);
 
             const result = await signup({ ...user, email: emailFixed });
 
@@ -53,24 +53,23 @@ class AuthenticationHandler {
         try {
             const emailFixed = user.email.trim().toLowerCase();
 
-            console.log('Handel login for user: ', emailFixed);
+            console.log('Handel login for user email: ', emailFixed);
 
             const result = await login({ ...user, email: emailFixed });
 
-            if (!result.success && !result.exists) {
+            if (!result.success) {
                 if (callback) {
                     callback(result);
                 } else {
                     console.log('No callback provided for login event');
                 }
+                return;
             }
 
             this.connectionManager.addUserIDToConnection(socket, result.user._id.toString());
 
             socket.userId = result.user._id.toString();
             socket.userEmail = result.user.email;
-
-            const userSocket = this.connectionManager.getSocketByUserId(result.user._id.toString());
 
             // Join all existing user rooms on login
             for (const room of result.user.rooms) {
@@ -93,7 +92,7 @@ class AuthenticationHandler {
 
     async handleLogout(socket, user, callback) {
         try {
-            console.log('Handel logout for user: ', user.email);
+            console.log('Handel logout for user email: ', socket.userEmail);
 
             const result = await logout(user);
 

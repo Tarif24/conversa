@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useSocketIO, useSocketIOEvent, useSocketIOState } from '../hooks/useSocketIO';
 import EVENTS from '../../../constants/socketEvents';
+import { Search } from 'lucide-react';
+import { Users } from 'lucide-react';
 
-const MessagesSidebar = ({ isCreateChatActive, onRoomClicked }) => {
+const MessagesSidebar = ({ onRoomClicked, isCreateChatActive }) => {
     const { isConnected, connectionState, user, sendProtected, sendRefresh, sendLastEmitted } =
         useSocketIO();
 
@@ -11,27 +13,24 @@ const MessagesSidebar = ({ isCreateChatActive, onRoomClicked }) => {
     const [inputText, setInputText] = useState('');
 
     useEffect(() => {
-        sendProtected(EVENTS.GET_USER_ROOMS, { userId: user._id }, response => {
+        sendProtected(EVENTS.GET_USER_ROOMS, { userId: user._id }, async response => {
             setRooms(response.rooms);
             setFilteredRooms(response.rooms);
         });
     }, [user, isConnected]);
 
     useSocketIOEvent(EVENTS.ROOM_REFRESH, data => {
-        console.log('here');
-        sendProtected(EVENTS.GET_USER_ROOMS, { userId: user._id }, response => {
+        sendProtected(EVENTS.GET_USER_ROOMS, { userId: user._id }, async response => {
             setRooms(response.rooms);
             setFilteredRooms(response.rooms);
         });
     });
 
-    const handleOnNewChatClicked = () => {
-        isCreateChatActive(true);
-    };
-
     const handleOnRoomClicked = room => {
+        console.log('Room clicked: ', room);
         sendProtected(EVENTS.SET_ACTIVE_ROOM, { roomId: room._id }, response => {});
         onRoomClicked(room);
+        isCreateChatActive(false);
     };
 
     const handleTextOnChange = input => {
@@ -51,42 +50,54 @@ const MessagesSidebar = ({ isCreateChatActive, onRoomClicked }) => {
     };
 
     return (
-        <div className="flex h-full w-100 flex-col justify-around gap-4 border-2 border-red-600 px-3 pt-3">
-            <div className="flex items-center justify-between">
-                <h1 className="text-3xl font-bold">Chats</h1>
-                <button
-                    className="rounded-[5rem] bg-gray-500 px-4 py-2 text-white transition duration-300 ease-in-out hover:cursor-pointer hover:bg-gray-600"
-                    onClick={() => handleOnNewChatClicked()}
-                >
-                    New Chat
-                </button>
-            </div>
-            <div className="rounded-3xl border-1">
+        <div className="flex h-full w-100 flex-col gap-1">
+            <div className="flex items-center gap-2 rounded-2xl bg-white/50 px-4 backdrop-blur-2xl">
+                <Search color="rgb(59,37,119)" />
                 <input
                     type="text"
                     placeholder="Search for chats"
-                    className="h-12 w-full rounded-[5rem] px-5 focus:outline-none"
+                    className="h-12 w-full rounded-2xl text-[rgb(81,46,177)] focus:outline-none"
                     value={inputText}
                     onChange={e => handleTextOnChange(e.target.value)}
                 />
             </div>
-            <div className="flex h-full max-h-170 flex-col gap-6 overflow-x-hidden py-2">
-                {filteredRooms && filteredRooms.length > 0 ? (
-                    filteredRooms.map(room => (
-                        <div
-                            key={room._id}
-                            className="flex h-fit w-full flex-col gap-1 rounded-xl border-1 p-4 transition duration-300 ease-in-out hover:cursor-pointer hover:bg-gray-200"
-                            onClick={() => handleOnRoomClicked(room)}
-                        >
-                            <h1 className="text-3xl font-bold">{room.roomName}</h1>
-                            <h1>{room.message.message}</h1>
+            <div className="flex h-full w-full flex-1 flex-col justify-between rounded-2xl bg-white/50 pt-4 pr-1 pl-4 backdrop-blur-2xl">
+                <div className="flex items-center">
+                    <h1 className="text-3xl font-medium text-[rgb(59,37,119)]">Chats</h1>
+                </div>
+                <div className="custom-scrollbar flex h-189 flex-col gap-6 overflow-x-hidden py-2 pr-1">
+                    {filteredRooms && filteredRooms.length > 0 ? (
+                        filteredRooms.map(room => (
+                            <div
+                                key={room._id}
+                                className="flex h-fit w-full gap-3 rounded-xl p-4 transition duration-300 ease-in-out hover:cursor-pointer hover:bg-white/30"
+                                onClick={() => handleOnRoomClicked(room)}
+                            >
+                                <div className="flex size-15 items-center justify-center rounded-full bg-white/30 p-2 backdrop-blur-2xl">
+                                    <h1 className="text-2xl font-bold text-[rgb(80,53,168)]">
+                                        {room.type === 'direct' ? (
+                                            room.otherUser[0].toUpperCase()
+                                        ) : (
+                                            <Users />
+                                        )}
+                                    </h1>
+                                </div>
+                                <div>
+                                    <h1 className="text-3xl font-medium text-[rgb(80,53,168)]">
+                                        {room.type === 'direct' ? room.otherUser : room.roomName}
+                                    </h1>
+                                    <h1 className="text-[rgb(80,53,168)]">
+                                        {room.message.message}
+                                    </h1>
+                                </div>
+                            </div>
+                        ))
+                    ) : (
+                        <div className="flex h-full w-full items-center justify-center">
+                            <h1 className="text-3xl font-bold text-[rgb(96,82,143)]">No Rooms</h1>
                         </div>
-                    ))
-                ) : (
-                    <div className="flex h-full w-full items-center justify-center">
-                        <h1 className="text-3xl font-bold">No Rooms</h1>
-                    </div>
-                )}
+                    )}
+                </div>
             </div>
         </div>
     );
