@@ -11,7 +11,7 @@ class SocketIOManager {
     }
 
     // Connect to Socket.IO server
-    connect(options = {}) {
+    connect(options = {}, accessToken = null, isAuthenticated = false, userId = null) {
         if (this.socket?.connected) {
             return Promise.resolve();
         }
@@ -28,6 +28,11 @@ class SocketIOManager {
             // Connection successful
             this.socket.on('connect', () => {
                 console.log('Socket.IO connected');
+                // If authenticated, send a reconnect event with the user ID and token so that it can re join any rooms or sessions
+                if (isAuthenticated) {
+                    this.send(EVENTS.USER_RECONNECT, { userId: userId }, () => {}, accessToken);
+                }
+
                 resolve();
             });
 
@@ -40,6 +45,9 @@ class SocketIOManager {
             // Disconnection
             this.socket.on('disconnect', reason => {
                 console.log('Socket.IO disconnected:', reason);
+                // Clean up on disconnect
+                this.socket.removeAllListeners();
+                this.socket = null;
             });
 
             // onAny receives all events and forwards the events to our listeners

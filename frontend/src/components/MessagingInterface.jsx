@@ -68,10 +68,15 @@ const MessagingInterface = ({ room, isCreateChatActive }) => {
     useSocketIOEvent(EVENTS.RECEIVE_MESSAGE, data => {
         if (!data.success) return;
         if (!room || room._id !== data.message.roomId) {
-            const message = `${data.sentByUser}: ${data.message.message}`;
+            const message =
+                data.type === 'direct'
+                    ? data.message.message
+                    : `${data.sentByUser}: ${data.message.message}`;
             toast(
                 <div className="flex flex-col gap-1">
-                    <h1 className="text-2xl font-bold">{data.roomName}</h1>
+                    <h1 className="text-2xl font-bold">
+                        {data.type === 'direct' ? data.otherUser : data.roomName}
+                    </h1>
                     <h1>{message}</h1>
                 </div>
             );

@@ -1,8 +1,11 @@
+import React, { useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '../contexts/Authentication';
+import { toast } from 'react-toastify';
 
 const ProtectedRoute = ({ children }) => {
     const { isAuthenticated, isLoading, isConnected } = useAuth();
+    const [didRedirect, setDidRedirect] = useState(false);
 
     // Wait for auth to finish loading
     if (isLoading) {
@@ -15,6 +18,11 @@ const ProtectedRoute = ({ children }) => {
 
     // If not authenticated after loading, redirect to login
     if (!isAuthenticated) {
+        if (!didRedirect) {
+            toast.info('Not logged in. Redirecting to authentication page...');
+            setDidRedirect(true);
+        }
+
         return <Navigate to="/" replace />;
     }
 

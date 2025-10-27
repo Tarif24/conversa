@@ -19,6 +19,7 @@ const SOCKET_EVENTS = {
     USER_SEARCH: 'user_search',
     USER_SET_ACTIVE_ROOM: 'user_set_active_room',
     GET_USERNAME: 'get_username',
+    USER_RECONNECT: 'user_reconnect',
 
     // Authentication events
     USER_SIGNUP: 'user_signup',

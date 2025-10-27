@@ -25,7 +25,12 @@ export const useSocketIO = (options = {}) => {
     useEffect(() => {
         // Connect on mount
         socketManager
-            .connect({ auth: { token: accessToken }, ...options })
+            .connect(
+                { auth: { token: accessToken }, ...options },
+                accessToken,
+                isAuthenticated,
+                user?._id
+            )
             .then(() => {
                 setIsConnected(true);
                 setConnectionState('CONNECTED');

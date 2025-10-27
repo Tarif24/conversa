@@ -3,10 +3,12 @@ import {
     getRoomByRoomId,
     updateRoomLastMessage,
     getUserByUserId,
+    getUsernameByUserId,
 } from '../services/databaseService.js';
 
 export const sendMessage = async message => {
     try {
+        let otherUser = null;
         const result = await getUserByUserId(message.userId);
 
         if (!result.exists) {
@@ -31,11 +33,17 @@ export const sendMessage = async message => {
 
         await updateRoomLastMessage(message.roomId, savedMessage);
 
+        if (room.room.type === 'direct') {
+            otherUser = await getUsernameByUserId(message.userId);
+        }
+
         return {
             success: true,
             message: savedMessage,
             roomExists: true,
             roomName: room.room.roomName,
+            otherUser: otherUser?.username,
+            type: room.room.type,
             sentByUser: result.user.username,
         };
     } catch (error) {

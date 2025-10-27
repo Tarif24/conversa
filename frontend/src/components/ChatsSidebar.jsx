@@ -27,7 +27,6 @@ const MessagesSidebar = ({ onRoomClicked, isCreateChatActive }) => {
     });
 
     const handleOnRoomClicked = room => {
-        console.log('Room clicked: ', room);
         sendProtected(EVENTS.SET_ACTIVE_ROOM, { roomId: room._id }, response => {});
         onRoomClicked(room);
         isCreateChatActive(false);

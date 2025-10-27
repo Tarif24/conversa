@@ -75,7 +75,7 @@ const serverSignalHandler = () => {
 
     // New client connection handling
     io.on('connection', socket => {
-        console.log('A user connected');
+        console.log('user with socket ID:', socket.id, 'connected');
 
         connectionManager.addConnection(socket);
 

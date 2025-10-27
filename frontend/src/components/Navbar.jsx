@@ -36,7 +36,7 @@ const Navbar = ({ isCreateChatActive, setActiveRoom }) => {
         });
 
         toast.success('Logout successful!');
-        navigate('/');
+        navigate('/', { replace: true, state: { fromLogout: true } });
     };
 
     const handleOnHomeClicked = () => {
