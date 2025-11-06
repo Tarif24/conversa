@@ -8,38 +8,40 @@ import {
     updateRoomLastMessage,
     getUsernameByUserId,
 } from '../services/databaseService.js';
+import { encryptMessage, decryptMessage } from '../services/messageService.js';
 
-export const createChatRoom = async (room, userId) => {
+export const createChatRoom = async (sentRoom, userId) => {
     try {
-        const result = await getUserByUserId(userId);
-        let doesDirectExist = false;
+        const userResult = await getUserByUserId(userId);
+        if (sentRoom.users.length === 2) {
+            let doesDirectExist = false;
+            // Check if a direct chat already exists
+            for (const roomId of userResult.user.rooms) {
+                const result = await getRoomByRoomId(roomId);
+                const room = result.room;
+                if (result.exists) {
+                    if (room.type === 'direct') {
+                        const other = room.users.find(u => u !== userId);
 
-        // Check if a direct chat already exists
-        for (const roomId of result.user.rooms) {
-            const result = await getRoomByRoomId(roomId);
-            const room = result.room;
-            if (result.exists) {
-                if (room.type === 'direct') {
-                    const other = room.users.find(u => u !== userId);
-
-                    if (room.users.find(u => u === other)) {
-                        doesDirectExist = true;
+                        if (sentRoom.users.find(u => u === other)) {
+                            doesDirectExist = true;
+                        }
                     }
                 }
             }
+
+            if (doesDirectExist) {
+                return {
+                    success: false,
+                    doesDirectExist: true,
+                    message: 'Direct chat already exists',
+                };
+            }
         }
 
-        if (doesDirectExist) {
-            return {
-                success: false,
-                doesDirectExist: true,
-                message: 'Direct chat already exists',
-            };
-        }
-
-        const type = room.users.length > 2 ? 'group' : 'direct';
+        const type = sentRoom.users.length > 2 ? 'group' : 'direct';
         const finalRoom = {
-            ...room,
+            ...sentRoom,
             type: type,
             message: { userId: 'system', message: 'New Room' },
         };
@@ -54,19 +56,23 @@ export const createChatRoom = async (room, userId) => {
 
         const roomId = newRoom._id.toString();
 
-        const systemMessage = room.users.length > 2 ? 'New Group Chat' : 'New Direct Chat';
+        const systemMessage = sentRoom.users.length > 2 ? 'New Group Chat' : 'New Direct Chat';
+
+        const encryptedData = encryptMessage(systemMessage);
 
         const message = {
             userId: 'system',
-            message: systemMessage,
             roomId: roomId,
+            message: encryptedData.encrypted,
+            iv: encryptedData.iv,
+            authTag: encryptedData.authTag,
         };
 
         const initialMessage = await createMessage(message);
 
         updateRoomLastMessage(roomId, initialMessage);
 
-        await addRoomToUsers(roomId, room.users);
+        await addRoomToUsers(roomId, sentRoom.users);
 
         return {
             success: true,
@@ -96,6 +102,15 @@ export const getUserChats = async userId => {
         for (const roomId of result.user.rooms) {
             const result = await getRoomByRoomId(roomId);
             const room = result.room;
+
+            // Decrypt the last message
+            const decryptedMessage = decryptMessage({
+                encrypted: room.message.message,
+                iv: room.message.iv,
+                authTag: room.message.authTag,
+            });
+            room.message.message = decryptedMessage;
+
             let userOther = '';
             if (result.exists) {
                 if (room.type === 'direct') {
@@ -144,10 +159,20 @@ export const getMessagesForChat = async roomId => {
             };
         }
 
+        // Decrypt messages
+        const decryptedMessages = messages.map(msg => {
+            const decrypted = decryptMessage({
+                encrypted: msg.message,
+                iv: msg.iv,
+                authTag: msg.authTag,
+            });
+            return { ...msg._doc, message: decrypted };
+        });
+
         return {
             success: true,
             roomId: roomId,
-            messages: messages,
+            messages: decryptedMessages,
             message: `Got messages for roomId: ${roomId}`,
         };
     } catch (error) {

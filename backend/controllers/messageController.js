@@ -5,6 +5,7 @@ import {
     getUserByUserId,
     getUsernameByUserId,
 } from '../services/databaseService.js';
+import { encryptMessage, decryptMessage } from '../services/messageService.js';
 
 export const sendMessage = async message => {
     try {
@@ -14,7 +15,7 @@ export const sendMessage = async message => {
         if (!result.exists) {
             return {
                 success: false,
-                message: 'User does not exist',
+                message: 'User does not exist ',
             };
         }
 
@@ -23,13 +24,21 @@ export const sendMessage = async message => {
         if (!room.exists) {
             return {
                 success: false,
-                message: 'Room does not exist',
+                message: 'Room does not exist ',
                 roomExists: false,
             };
         }
 
+        // Encrypt the message before creating it
+        const encryptedData = encryptMessage(message.message);
+
         // Logic to save the message to the database
-        const savedMessage = await createMessage(message);
+        const savedMessage = await createMessage({
+            ...message,
+            message: encryptedData.encrypted,
+            iv: encryptedData.iv,
+            authTag: encryptedData.authTag,
+        });
 
         await updateRoomLastMessage(message.roomId, savedMessage);
 
@@ -37,9 +46,11 @@ export const sendMessage = async message => {
             otherUser = await getUsernameByUserId(message.userId);
         }
 
+        const decryptedMessage = { ...savedMessage._doc, message: message.message };
+
         return {
             success: true,
-            message: savedMessage,
+            message: decryptedMessage,
             roomExists: true,
             roomName: room.room.roomName,
             otherUser: otherUser?.username,

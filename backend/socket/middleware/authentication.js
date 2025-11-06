@@ -19,6 +19,7 @@ const authenticateSocket = socket => {
             const token = data.token;
 
             if (!token) {
+                console.log('No token provided for socket ID:', socket.id);
                 socket.emit(EVENTS.ERROR, {
                     event: eventName,
                     message: 'Authentication token required',

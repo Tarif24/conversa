@@ -18,6 +18,14 @@ const messageSchema = new mongoose.Schema(
             type: Date,
             default: Date.now,
         },
+        iv: {
+            type: String,
+            default: null,
+        },
+        authTag: {
+            type: String,
+            default: null,
+        },
     },
     {
         timestamps: true,

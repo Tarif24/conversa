@@ -123,7 +123,7 @@ const MessagingInterface = ({ room, isCreateChatActive }) => {
             <div className="flex h-full w-full flex-col justify-end rounded-2xl bg-white/30">
                 {room ? (
                     <>
-                        <div className="custom-scrollbar mr-1 flex max-h-179 flex-col overflow-y-auto px-4 pt-4">
+                        <div className="custom-scrollbar mr-1 flex max-h-187 flex-col overflow-y-auto px-4">
                             {chatHistory.map(({ role, message }, index) => {
                                 return role !== 'system' ? (
                                     <div

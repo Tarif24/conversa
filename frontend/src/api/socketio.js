@@ -18,7 +18,8 @@ class SocketIOManager {
 
         return new Promise((resolve, reject) => {
             this.socket = io(this.url, {
-                autoConnect: false,
+                reconnection: true,
+                autoConnect: true,
                 reconnection: true,
                 reconnectionAttempts: 5,
                 reconnectionDelay: 1000,
@@ -32,7 +33,6 @@ class SocketIOManager {
                 if (isAuthenticated) {
                     this.send(EVENTS.USER_RECONNECT, { userId: userId }, () => {}, accessToken);
                 }
-
                 resolve();
             });
 
@@ -45,9 +45,6 @@ class SocketIOManager {
             // Disconnection
             this.socket.on('disconnect', reason => {
                 console.log('Socket.IO disconnected:', reason);
-                // Clean up on disconnect
-                this.socket.removeAllListeners();
-                this.socket = null;
             });
 
             // onAny receives all events and forwards the events to our listeners

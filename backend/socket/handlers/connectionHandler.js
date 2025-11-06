@@ -1,5 +1,6 @@
 import { getUser } from '../../controllers/connectionController.js';
 import EVENTS from '../../../constants/socketEvents.js';
+import { authentication } from '../middleware/index.js';
 
 class ConnectionHandler {
     constructor(io, connectionManager) {
@@ -7,6 +8,8 @@ class ConnectionHandler {
         this.connectionManager = connectionManager;
     }
     handleConnection(socket) {
+        socket.use(authentication(socket));
+
         socket.on(EVENTS.DISCONNECT, user => this.handleDisconnect(socket, user));
 
         socket.on(EVENTS.USER_RECONNECT, (user, callback) =>

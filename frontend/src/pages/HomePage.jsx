@@ -24,10 +24,6 @@ const HomePage = () => {
 
     const navigate = useNavigate();
 
-    useEffect(() => {
-        console.log(user);
-    }, [user]);
-
     // Listen for incoming messages
     useSocketIOEvent(EVENTS.ERROR, error => {
         if (error.message.includes('Invalid or expired token')) {

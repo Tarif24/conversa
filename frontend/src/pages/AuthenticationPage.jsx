@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import LogIn from '../components/LogIn';
 import SignUp from '../components/SignUp';
+import IMG1 from '../assets/Auth_Screen_1.png';
+import IMG2 from '../assets/Auth_Screen_2.png';
+import IMG3 from '../assets/Auth_Screen_3.png';
 
 const AuthenticationPage = () => {
     const [isSignUp, setIsSignUp] = useState(false);
@@ -12,14 +15,32 @@ const AuthenticationPage = () => {
                     <div className="flex h-full w-full flex-col rounded-lg bg-[rgb(59,54,76)]">
                         <div className="flex h-[50%] w-full">
                             <div className="h-full w-[50%] pt-6 pr-3 pb-3 pl-6">
-                                <div className="h-full w-full rounded-xl bg-[rgb(165,143,224)]"></div>
+                                <div className="h-full w-full rounded-xl bg-[rgb(165,143,224)]">
+                                    <img
+                                        src={IMG2}
+                                        alt="Auth Screen 1"
+                                        className="h-full w-full rounded-xl"
+                                    />
+                                </div>
                             </div>
                             <div className="h-full w-[50%] pt-6 pr-6 pb-3 pl-3">
-                                <div className="h-full w-full rounded-xl bg-[rgb(83,41,197)]"></div>
+                                <div className="h-full w-full rounded-xl bg-[rgb(83,41,197)]">
+                                    <img
+                                        src={IMG3}
+                                        alt="Auth Screen 1"
+                                        className="h-full w-full rounded-xl"
+                                    />
+                                </div>
                             </div>
                         </div>
                         <div className="h-[50%] w-full pt-3 pr-6 pb-6 pl-6">
-                            <div className="h-full w-full rounded-xl bg-[rgb(65,44,122)]"></div>
+                            <div className="h-full w-full rounded-xl bg-[rgb(65,44,122)]">
+                                <img
+                                    src={IMG1}
+                                    alt="Auth Screen 1"
+                                    className="h-full w-full rounded-xl"
+                                />
+                            </div>
                         </div>
                     </div>
                 </div>
