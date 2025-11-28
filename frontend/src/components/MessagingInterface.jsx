@@ -1,7 +1,8 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, use } from 'react';
 import { useSocketIO, useSocketIOEvent, useSocketIOState } from '../hooks/useSocketIO';
 import { toast } from 'react-toastify';
 import EVENTS from '../../../constants/socketEvents';
+import { PulseLoader } from 'react-spinners';
 import { MessageCirclePlus } from 'lucide-react';
 import { Send } from 'lucide-react';
 import { Users } from 'lucide-react';
@@ -12,13 +13,18 @@ const MessagingInterface = ({ room, isCreateChatActive }) => {
 
     // State to hold the input text and typing status
     const [inputText, setInputText] = useState('');
-    const [isTyping, setIsTyping] = useState(false);
 
     // State to hold the chat history
     const [chatHistory, setChatHistory] = useState([]);
 
     // Reference to the end of the chat history for scrolling
     const chatEndRef = useRef(null);
+
+    // State to hold typing users for the current room
+    const [typingUsers, setTypingUsers] = useState([]);
+
+    const isTyping = useRef(false);
+    const typingTimeoutRef = useRef(null);
 
     // Handles what happens on chat switch
     useEffect(() => {
@@ -38,9 +44,71 @@ const MessagingInterface = ({ room, isCreateChatActive }) => {
         });
     }, [room]);
 
+    // Mange typing status
+    const handleTyping = e => {
+        setInputText(e.target.value);
+
+        // Send "started typing" if not already typing
+        if (!isTyping.current && e.target.value.length > 0) {
+            isTyping.current = true;
+            sendProtected(
+                EVENTS.TYPING_START,
+                {
+                    roomId: room._id,
+                    username: user.username,
+                },
+                response => {}
+            );
+        }
+
+        // Reset the timeout
+        clearTimeout(typingTimeoutRef.current);
+
+        // Stop typing after 3 seconds of inactivity
+        typingTimeoutRef.current = setTimeout(() => {
+            if (isTyping.current) {
+                isTyping.current = false;
+                sendProtected(
+                    EVENTS.TYPING_STOP,
+                    {
+                        roomId: room._id,
+                    },
+                    response => {}
+                );
+            }
+        }, 3000);
+
+        // Also stop if input is empty
+        if (e.target.value.length === 0) {
+            clearTimeout(typingTimeoutRef.current);
+            if (isTyping.current) {
+                isTyping.current = false;
+                sendProtected(
+                    EVENTS.TYPING_STOP,
+                    {
+                        roomId: room._id,
+                    },
+                    response => {}
+                );
+            }
+        }
+    };
+
     // Submit form handler
     const submitForm = async e => {
         e.preventDefault();
+
+        clearTimeout(typingTimeoutRef.current);
+        if (isTyping.current) {
+            isTyping.current = false;
+            sendProtected(
+                EVENTS.TYPING_STOP,
+                {
+                    roomId: room._id,
+                },
+                response => {}
+            );
+        }
 
         if (inputText.trim() === '') return;
 
@@ -53,15 +121,11 @@ const MessagingInterface = ({ room, isCreateChatActive }) => {
 
         const userId = user._id.toString();
 
-        setIsTyping(true);
-
         sendProtected(EVENTS.SEND_MESSAGE, {
             roomId: room._id,
             message: input,
             userId: userId,
         });
-
-        setIsTyping(false);
     };
 
     // Listen for incoming messages
@@ -86,6 +150,12 @@ const MessagingInterface = ({ room, isCreateChatActive }) => {
         if (room._id === data.message.roomId) {
             setChatHistory(prev => [...prev, { role: 'other', message: data.message.message }]);
             return;
+        }
+    });
+
+    useSocketIOEvent(EVENTS.TYPING_UPDATE, data => {
+        if (room._id === data.roomId) {
+            setTypingUsers(data.typingUsers.filter(u => u.userId !== user._id));
         }
     });
 
@@ -148,12 +218,41 @@ const MessagingInterface = ({ room, isCreateChatActive }) => {
                                 );
                             })}
                             <div ref={chatEndRef}></div>
-                            {/* <PulseLoader
-                        color="#000000"
-                        loading={isTyping}
-                        size={12}
-                        speedMultiplier={1}
-                    /> */}
+                            {typingUsers.length > 0 &&
+                                (typingUsers.length === 1 ? (
+                                    <div className="mt-2 mb-2 flex items-center gap-2">
+                                        <div className="flex size-10 items-center justify-center rounded-full bg-white/30 p-2 backdrop-blur-2xl">
+                                            <h1 className="font-bold text-[rgb(80,53,168)]">
+                                                {typingUsers[0].username[0].toUpperCase()}
+                                            </h1>
+                                        </div>
+
+                                        <PulseLoader color="#000000" size={8} speedMultiplier={1} />
+                                    </div>
+                                ) : (
+                                    <div className="mt-2 mb-2 flex items-center gap-2">
+                                        <div className="flex items-center gap-1">
+                                            <div className="flex size-10 items-center justify-center rounded-full bg-white/30 p-2 backdrop-blur-2xl">
+                                                <h1 className="font-bold text-[rgb(80,53,168)]">
+                                                    {typingUsers[0].username[0].toUpperCase()}
+                                                </h1>
+                                            </div>
+                                            <div className="flex size-10 items-center justify-center rounded-full bg-white/30 p-2 backdrop-blur-2xl">
+                                                <h1 className="flex font-bold text-[rgb(80,53,168)]">
+                                                    +
+                                                </h1>
+                                                <h1 className="flex font-bold text-[rgb(80,53,168)]">
+                                                    {typingUsers.length - 1}
+                                                </h1>
+                                            </div>
+                                        </div>
+                                        <PulseLoader
+                                            color="#000000"
+                                            size={12}
+                                            speedMultiplier={1}
+                                        />
+                                    </div>
+                                ))}
                         </div>
                         <form
                             className="flex h-fit items-end justify-center rounded-full"
@@ -165,7 +264,7 @@ const MessagingInterface = ({ room, isCreateChatActive }) => {
                                     placeholder="Send a message..."
                                     className="relative h-full w-full rounded-[5rem] px-5 text-[rgb(81,46,177)] focus:outline-none"
                                     value={inputText}
-                                    onChange={e => setInputText(e.target.value)}
+                                    onChange={e => handleTyping(e)}
                                 />
                                 <button
                                     className="flex h-full items-center justify-center rounded-[5rem] border-2 border-white bg-[rgb(59,37,119)] p-3 text-white transition duration-300 ease-in-out hover:cursor-pointer hover:bg-[rgb(173,154,226)]"

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, use } from 'react';
 import { useSocketIO, useSocketIOEvent, useSocketIOState } from '../hooks/useSocketIO';
 import EVENTS from '../../../constants/socketEvents';
 import { Search } from 'lucide-react';
@@ -13,14 +13,22 @@ const MessagesSidebar = ({ onRoomClicked, isCreateChatActive }) => {
     const [inputText, setInputText] = useState('');
 
     useEffect(() => {
-        sendProtected(EVENTS.GET_USER_ROOMS, { userId: user._id }, async response => {
+        sendProtected(EVENTS.GET_USER_ROOMS, { userId: user._id }, response => {
             setRooms(response.rooms);
             setFilteredRooms(response.rooms);
         });
     }, [user, isConnected]);
 
     useSocketIOEvent(EVENTS.ROOM_REFRESH, data => {
-        sendProtected(EVENTS.GET_USER_ROOMS, { userId: user._id }, async response => {
+        sendProtected(EVENTS.GET_USER_ROOMS, { userId: user._id }, response => {
+            setRooms(response.rooms);
+            setFilteredRooms(response.rooms);
+        });
+    });
+
+    useSocketIOEvent(EVENTS.TYPING_UPDATE, data => {
+        sendProtected(EVENTS.GET_USER_ROOMS, { userId: user._id }, response => {
+            console.log(response.rooms);
             setRooms(response.rooms);
             setFilteredRooms(response.rooms);
         });
@@ -85,8 +93,10 @@ const MessagesSidebar = ({ onRoomClicked, isCreateChatActive }) => {
                                     <h1 className="text-3xl font-medium text-[rgb(80,53,168)]">
                                         {room.type === 'direct' ? room.otherUser : room.roomName}
                                     </h1>
-                                    <h1 className="text-[rgb(80,53,168)]">
-                                        {room.message.message}
+                                    <h1
+                                        className={`text-[rgb(80,53,168)] ${room.isTyping ? 'font-bold' : ''}`}
+                                    >
+                                        {room.isTyping ? 'typing...' : room.message.message}
                                     </h1>
                                 </div>
                             </div>

@@ -12,6 +12,9 @@ const SOCKET_EVENTS = {
     ROOM_REFRESH: 'room_refresh',
     SET_ACTIVE_ROOM: 'set_active_room',
     LEAVE_ROOM: 'leave_room',
+    TYPING_START: 'typing_start',
+    TYPING_STOP: 'typing_stop',
+    TYPING_UPDATE: 'typing_update',
 
     // User events
     USER_ONLINE: 'user_online',

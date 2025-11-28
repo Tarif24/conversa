@@ -3,6 +3,7 @@ class ConnectionManager {
     constructor() {
         this.connections = new Map(); // socketId -> {socket, userId, connectedAt}
         this.userSockets = new Map(); // userId -> socketId
+        this.typingUsers = new Map(); // roomId -> Map({userId, username})
     }
 
     addConnection(socket, userId = null) {
@@ -58,6 +59,59 @@ class ConnectionManager {
             }
         }
         return usersInRoom;
+    }
+
+    setUserTypingInRoom(roomId, userId, username) {
+        if (!this.typingUsers.has(roomId)) {
+            this.typingUsers.set(roomId, new Map());
+        }
+        this.typingUsers.get(roomId).set(userId, username);
+    }
+
+    removeUserTypingInRoom(roomId, userId) {
+        if (this.typingUsers.has(roomId)) {
+            const usersMap = this.typingUsers.get(roomId);
+            usersMap.delete(userId);
+            if (usersMap.size === 0) {
+                this.typingUsers.delete(roomId);
+            }
+            return true;
+        }
+        return false;
+    }
+
+    removeUserFromAllTypingRooms(userId) {
+        for (const [roomId, usersMap] of this.typingUsers) {
+            if (usersMap.has(userId)) {
+                usersMap.delete(userId);
+                if (usersMap.size === 0) {
+                    this.typingUsers.delete(roomId);
+                }
+            }
+        }
+    }
+
+    getTypingUsersInRoom(roomId) {
+        if (this.typingUsers.has(roomId)) {
+            const usersMap = this.typingUsers.get(roomId);
+            return Array.from(usersMap.entries()).map(([userId, username]) => ({
+                userId,
+                username,
+            }));
+        }
+        return [];
+    }
+
+    getAllIsTypingRoomsByUserRooms(userRooms) {
+        const rooms = userRooms.map(room => {
+            if (this.typingUsers.has(room._id.toString())) {
+                const typing = this.getTypingUsersInRoom(room._id.toString());
+                return { ...room, isTyping: true, typingUsers: typing };
+            }
+            return { ...room, isTyping: false, typingUsers: [] };
+        });
+
+        return rooms;
     }
 }
 

@@ -27,6 +27,7 @@ class ConnectionHandler {
 
             // Notify all user rooms about the disconnection
 
+            this.connectionManager.removeUserFromAllTypingRooms(socket.userId);
             this.connectionManager.removeConnection(socket.id);
         } catch (error) {
             socket.emit(EVENTS.ERROR, {
