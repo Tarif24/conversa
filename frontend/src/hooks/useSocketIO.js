@@ -96,13 +96,13 @@ export const useSocketIO = (options = {}) => {
 
     // Logout
     const sendLogout = useCallback(
-        (payload, callback) => {
-            sendProtected(EVENTS.USER_LOGOUT, payload, response => {
+        callback => {
+            sendProtected(EVENTS.USER_LOGOUT, { refreshToken: refreshToken }, response => {
                 logout();
                 if (callback) callback(response);
             });
         },
-        [logout]
+        [logout, refreshToken]
     );
 
     // Refresh Token

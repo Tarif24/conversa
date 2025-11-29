@@ -26,6 +26,8 @@ const MessagingInterface = ({ room, isCreateChatActive }) => {
     const isTyping = useRef(false);
     const typingTimeoutRef = useRef(null);
 
+    const [forceUpdateState, setForceUpdateState] = useState(0);
+
     // Handles what happens on chat switch
     useEffect(() => {
         if (!room) return;
@@ -43,6 +45,14 @@ const MessagingInterface = ({ room, isCreateChatActive }) => {
             setChatHistory(fixedMessages);
         });
     }, [room]);
+
+    useSocketIOEvent(EVENTS.USER_STATUS_UPDATE, data => {
+        if (forceUpdateState === 1) {
+            setForceUpdateState(0);
+        } else {
+            setForceUpdateState(1);
+        }
+    });
 
     // Mange typing status
     const handleTyping = e => {
@@ -182,9 +192,40 @@ const MessagingInterface = ({ room, isCreateChatActive }) => {
                                 )}
                             </h1>
                         </div>
-                        <h1 className="text-3xl font-medium text-[rgb(97,7,180)]">
-                            {room.type === 'direct' ? room.otherUser : room.roomName}
-                        </h1>
+                        <div>
+                            <h1 className="text-3xl font-medium text-[rgb(97,7,180)]">
+                                {room.type === 'direct' ? room.otherUser : room.roomName}
+                            </h1>
+                            <div className="flex items-center gap-1">
+                                {room.type === 'direct' ? (
+                                    room.onlineMembers.length === 2 ? (
+                                        <div className="flex items-center justify-center gap-1">
+                                            <div className="size-3 rounded-full bg-green-400"></div>
+                                            <div className="text-[rgb(97,7,180)]">online</div>
+                                        </div>
+                                    ) : (
+                                        <div className="flex items-center justify-center gap-1">
+                                            <div className="size-3 rounded-full bg-red-400"></div>
+                                            <div className="text-[rgb(97,7,180)]">offline</div>
+                                        </div>
+                                    )
+                                ) : room.onlineMembers.length > 1 ? (
+                                    <div className="flex items-center justify-center gap-1">
+                                        <div className="size-3 rounded-full bg-green-400"></div>
+                                        <h1 className="text-[rgb(97,7,180)]">
+                                            {room.onlineMembers.length - 1}/{room.users.length - 1}
+                                        </h1>
+                                    </div>
+                                ) : (
+                                    <div className="flex items-center justify-center gap-1">
+                                        <div className="size-3 rounded-full bg-red-400"></div>
+                                        <h1 className="text-[rgb(97,7,180)]">
+                                            {room.onlineMembers.length - 1}/{room.users.length - 1}
+                                        </h1>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
                     </div>
                 ) : (
                     <h1 className="text-3xl font-medium text-[rgb(54,0,105)]">No Chat Selected</h1>

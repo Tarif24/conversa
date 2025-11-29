@@ -19,6 +19,7 @@ const SOCKET_EVENTS = {
     // User events
     USER_ONLINE: 'user_online',
     USER_OFFLINE: 'user_offline',
+    USER_STATUS_UPDATE: 'user_status_update',
     USER_SEARCH: 'user_search',
     USER_SET_ACTIVE_ROOM: 'user_set_active_room',
     GET_USERNAME: 'get_username',

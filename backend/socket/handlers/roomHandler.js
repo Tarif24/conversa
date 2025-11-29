@@ -93,9 +93,12 @@ class RoomHandler {
                 result.rooms
             );
 
+            const roomsWithOnlineStatus =
+                this.connectionManager.getAllOnlineStatusForUserRooms(roomsWithTyping);
+
             const finalResult = {
                 ...result,
-                rooms: roomsWithTyping,
+                rooms: roomsWithOnlineStatus,
             };
 
             if (callback) {

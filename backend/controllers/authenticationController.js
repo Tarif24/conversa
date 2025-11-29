@@ -6,6 +6,7 @@ import {
     getRefreshToken,
     deleteRefreshToken,
     deleteRefreshTokensByUserId,
+    getAllRoomsForUser,
 } from '../services/databaseService.js';
 import {
     generateAccessToken,
@@ -112,12 +113,12 @@ export const login = async user => {
     }
 };
 
-export const logout = async tokenData => {
+export const logout = async (tokenData, userId) => {
     try {
-        const token = await getRefreshToken(tokenData.token);
-        await deleteRefreshTokensByUserId(token.userId);
+        const result = await getRefreshToken(tokenData);
+        await deleteRefreshTokensByUserId(userId);
 
-        return { success: true, message: 'Logout successful' };
+        return { success: true, message: 'Logout successful', userId: userId };
     } catch (error) {
         console.error('Controller Logout error:', error);
         const message = 'Failed to logout: ' + error;
@@ -160,6 +161,29 @@ export const refreshToken = async tokenData => {
     } catch (error) {
         console.error('Controller Refresh Token error:', error);
         const message = 'Failed to Refresh Token: ' + error;
+        return { success: false, message: message };
+    }
+};
+
+export const getAllUserRooms = async userId => {
+    try {
+        const result = await getAllRoomsForUser(userId);
+
+        if (!result.success) {
+            return {
+                success: false,
+                message: 'Could not retrieve user rooms',
+            };
+        }
+
+        return {
+            success: true,
+            rooms: result.rooms,
+            message: 'User rooms retrieved successfully',
+        };
+    } catch (error) {
+        console.error('Get all user rooms error:', error);
+        const message = 'Failed to get user rooms: ' + error;
         return { success: false, message: message };
     }
 };

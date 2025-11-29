@@ -1,5 +1,11 @@
 import EVENTS from '../../../constants/socketEvents.js';
-import { signup, login, logout, refreshToken } from '../../controllers/authenticationController.js';
+import {
+    signup,
+    login,
+    logout,
+    refreshToken,
+    getAllUserRooms,
+} from '../../controllers/authenticationController.js';
 
 class AuthenticationHandler {
     constructor(io, connectionManager) {
@@ -66,10 +72,29 @@ class AuthenticationHandler {
                 return;
             }
 
-            this.connectionManager.addUserIDToConnection(socket, result.user._id.toString());
+            const justCameOnline = this.connectionManager.addUserIDToConnection(
+                socket,
+                result.user._id.toString(),
+                result.user.username
+            );
 
-            socket.userId = result.user._id.toString();
+            const userId = result.user._id.toString();
+            const username = result.user.username;
+
+            socket.userId = userId;
             socket.userEmail = result.user.email;
+
+            if (justCameOnline) {
+                const userRooms = await getAllUserRooms(userId);
+
+                userRooms.rooms.forEach(room => {
+                    this.io.to(room._id.toString()).emit(EVENTS.USER_STATUS_UPDATE, {
+                        userId: userId,
+                        username: username,
+                        status: 'online',
+                    });
+                });
+            }
 
             // Join all existing user rooms on login
             for (const room of result.user.rooms) {
@@ -94,9 +119,20 @@ class AuthenticationHandler {
         try {
             console.log('Handel logout for user email: ', socket.userEmail);
 
-            const result = await logout(user);
+            const result = await logout(user.refreshToken, socket.userId);
 
-            this.connectionManager.removeConnection(socket.id);
+            const connectionResult = this.connectionManager.forceUserOffline(socket.userId);
+
+            if (connectionResult.wentOffline) {
+                const userRooms = await getAllUserRooms(result.userId);
+
+                userRooms.rooms.forEach(room => {
+                    this.io.to(room._id.toString()).emit(EVENTS.USER_STATUS_UPDATE, {
+                        userId: result.userId,
+                        status: 'offline',
+                    });
+                });
+            }
 
             if (callback) {
                 callback(result);

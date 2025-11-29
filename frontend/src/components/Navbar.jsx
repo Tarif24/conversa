@@ -30,7 +30,7 @@ const Navbar = ({ isCreateChatActive, setActiveRoom }) => {
     };
 
     const handleOnLogoutClicked = () => {
-        sendLogout({}, response => {
+        sendLogout(response => {
             if (response.success) {
             }
         });

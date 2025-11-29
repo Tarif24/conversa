@@ -94,6 +94,14 @@ export const getRoomByRoomId = async roomId => {
     return { success: true, exists: false };
 };
 
+export const getAllRoomsForUser = async userId => {
+    const rooms = await Room.find({ users: userId }).sort({ updatedAt: -1 });
+    if (!rooms) {
+        return { success: false, rooms: [] };
+    }
+    return { success: true, rooms: rooms };
+};
+
 export const updateRoomLastMessage = async (roomId, message) => {
     const result = await Room.findByIdAndUpdate(roomId, {
         $set: { message: message },

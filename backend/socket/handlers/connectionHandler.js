@@ -1,4 +1,4 @@
-import { getUser } from '../../controllers/connectionController.js';
+import { getUser, getAllUserRooms } from '../../controllers/connectionController.js';
 import EVENTS from '../../../constants/socketEvents.js';
 import { authentication } from '../middleware/index.js';
 
@@ -6,6 +6,21 @@ class ConnectionHandler {
     constructor(io, connectionManager) {
         this.io = io;
         this.connectionManager = connectionManager;
+
+        connectionManager.setOfflineCallback(async userId => {
+            const result = await getAllUserRooms(userId);
+
+            if (!result.success) {
+                return;
+            }
+
+            result.rooms.forEach(room => {
+                io.to(room._id.toString()).emit(EVENTS.USER_STATUS_UPDATE, {
+                    userId,
+                    status: 'offline',
+                });
+            });
+        });
     }
     handleConnection(socket) {
         socket.use(authentication(socket));

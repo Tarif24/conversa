@@ -1,4 +1,4 @@
-import { getUserByUserId } from '../services/databaseService.js';
+import { getUserByUserId, getAllRoomsForUser } from '../services/databaseService.js';
 
 export const getUser = async userId => {
     try {
@@ -19,6 +19,29 @@ export const getUser = async userId => {
     } catch (error) {
         console.error('Get user error:', error);
         const message = 'Failed to get user: ' + error;
+        return { success: false, message: message };
+    }
+};
+
+export const getAllUserRooms = async userId => {
+    try {
+        const result = await getAllRoomsForUser(userId);
+
+        if (!result.success) {
+            return {
+                success: false,
+                message: 'Could not retrieve user rooms',
+            };
+        }
+
+        return {
+            success: true,
+            rooms: result.rooms,
+            message: 'User rooms retrieved successfully',
+        };
+    } catch (error) {
+        console.error('Get all user rooms error:', error);
+        const message = 'Failed to get user rooms: ' + error;
         return { success: false, message: message };
     }
 };

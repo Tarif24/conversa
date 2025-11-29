@@ -12,6 +12,8 @@ const MessagesSidebar = ({ onRoomClicked, isCreateChatActive }) => {
     const [filteredRooms, setFilteredRooms] = useState(rooms);
     const [inputText, setInputText] = useState('');
 
+    const [activeRoomId, setActiveRoomId] = useState(null);
+
     useEffect(() => {
         sendProtected(EVENTS.GET_USER_ROOMS, { userId: user._id }, response => {
             setRooms(response.rooms);
@@ -28,14 +30,27 @@ const MessagesSidebar = ({ onRoomClicked, isCreateChatActive }) => {
 
     useSocketIOEvent(EVENTS.TYPING_UPDATE, data => {
         sendProtected(EVENTS.GET_USER_ROOMS, { userId: user._id }, response => {
-            console.log(response.rooms);
             setRooms(response.rooms);
             setFilteredRooms(response.rooms);
         });
     });
 
+    useSocketIOEvent(EVENTS.USER_STATUS_UPDATE, data => {
+        sendProtected(EVENTS.GET_USER_ROOMS, { userId: user._id }, response => {
+            setRooms(response.rooms);
+            setFilteredRooms(response.rooms);
+
+            response.rooms.forEach(room => {
+                if (room._id === activeRoomId) {
+                    onRoomClicked(room);
+                }
+            });
+        });
+    });
+
     const handleOnRoomClicked = room => {
         sendProtected(EVENTS.SET_ACTIVE_ROOM, { roomId: room._id }, response => {});
+        setActiveRoomId(room._id);
         onRoomClicked(room);
         isCreateChatActive(false);
     };
@@ -94,10 +109,28 @@ const MessagesSidebar = ({ onRoomClicked, isCreateChatActive }) => {
                                         {room.type === 'direct' ? room.otherUser : room.roomName}
                                     </h1>
                                     <h1
-                                        className={`text-[rgb(80,53,168)] ${room.isTyping ? 'font-bold' : ''}`}
+                                        className={`text-[rgb(80,53,168)] ${room.isTyping ? '' : ''}`}
                                     >
                                         {room.isTyping ? 'typing...' : room.message.message}
                                     </h1>
+                                </div>
+                                <div className="flex flex-1 items-center justify-end">
+                                    {room.type === 'direct' ? (
+                                        room.onlineMembers.length === 2 ? (
+                                            <div className="size-3 rounded-full bg-green-400"></div>
+                                        ) : (
+                                            <div className="size-3 rounded-full bg-red-400"></div>
+                                        )
+                                    ) : room.onlineMembers.length > 1 ? (
+                                        <div className="flex items-center justify-center gap-1">
+                                            <h1 className="text-[rgb(80,53,168)]">
+                                                {room.onlineMembers.length - 1}
+                                            </h1>
+                                            <div className="size-3 rounded-full bg-green-400"></div>
+                                        </div>
+                                    ) : (
+                                        <div className="size-3 rounded-full bg-red-400"></div>
+                                    )}
                                 </div>
                             </div>
                         ))
