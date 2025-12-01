@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, use } from 'react';
-import { useSocketIO, useSocketIOEvent, useSocketIOState } from '../hooks/useSocketIO';
+import { useSocketIO, useSocketIOEvent, useSocketIOState } from '../../hooks/useSocketIO';
 import { toast } from 'react-toastify';
-import EVENTS from '../../../constants/socketEvents';
+import EVENTS from '../../../../constants/socketEvents';
 import { PulseLoader } from 'react-spinners';
 import { MessageCirclePlus } from 'lucide-react';
 import { Send } from 'lucide-react';

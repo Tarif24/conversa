@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import LogIn from '../components/LogIn';
-import SignUp from '../components/SignUp';
+import LogIn from '../components/AuthenticationPage/LogIn';
+import SignUp from '../components/AuthenticationPage/SignUp';
 import IMG1 from '../assets/Auth_Screen_1.png';
 import IMG2 from '../assets/Auth_Screen_2.png';
 import IMG3 from '../assets/Auth_Screen_3.png';

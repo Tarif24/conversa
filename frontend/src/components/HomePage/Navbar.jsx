@@ -1,6 +1,6 @@
 import React from 'react';
-import { useSocketIO, useSocketIOEvent, useSocketIOState } from '../hooks/useSocketIO';
-import EVENTS from '../../../constants/socketEvents';
+import { useSocketIO, useSocketIOEvent, useSocketIOState } from '../../hooks/useSocketIO';
+import EVENTS from '../../../../constants/socketEvents';
 import { MessageCirclePlus } from 'lucide-react';
 import { LogOut } from 'lucide-react';
 import { House } from 'lucide-react';

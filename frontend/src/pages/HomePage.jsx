@@ -1,10 +1,10 @@
 import React, { use, useEffect, useState } from 'react';
 import { useSocketIO, useSocketIOEvent, useSocketIOState } from '../hooks/useSocketIO';
 import EVENTS from '../../../constants/socketEvents';
-import MessagingInterface from '../components/MessagingInterface';
-import ChatsSidebar from '../components/ChatsSidebar';
-import CreateChat from '../components/CreateChat';
-import Navbar from '../components/Navbar';
+import MessagingInterface from '../components/HomePage/MessagingInterface';
+import ChatsSidebar from '../components/HomePage/ChatsSidebar';
+import CreateChat from '../components/HomePage/CreateChat';
+import Navbar from '../components/HomePage/Navbar';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 

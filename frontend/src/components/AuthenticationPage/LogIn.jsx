@@ -1,5 +1,5 @@
 import React, { useState, useEffect, use } from 'react';
-import { useSocketIO, useSocketIOEvent, useSocketIOState } from '../hooks/useSocketIO';
+import { useSocketIO, useSocketIOEvent, useSocketIOState } from '../../hooks/useSocketIO';
 import { toast } from 'react-toastify';
 import { useNavigate, useLocation } from 'react-router-dom';
 

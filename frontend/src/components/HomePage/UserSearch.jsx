@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { useSocketIO, useSocketIOEvent, useSocketIOState } from '../hooks/useSocketIO';
-import EVENTS from '../../../constants/socketEvents';
+import { useSocketIO, useSocketIOEvent, useSocketIOState } from '../../hooks/useSocketIO';
+import EVENTS from '../../../../constants/socketEvents';
 
 const UserSearch = ({ handleOnUserClicked }) => {
     const { isConnected, connectionState, user, sendProtected, sendRefresh, sendLastEmitted } =
