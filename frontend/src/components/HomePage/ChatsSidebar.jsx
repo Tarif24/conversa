@@ -64,9 +64,13 @@ const MessagesSidebar = ({ onRoomClicked, isCreateChatActive }) => {
             return;
         }
 
-        const filtered = rooms.filter(room =>
-            room.roomName.toLowerCase().includes(input.toLowerCase())
-        );
+        const filtered = rooms.filter(room => {
+            if (room.type === 'direct') {
+                return room.otherUser.toLowerCase().includes(input.toLowerCase());
+            } else {
+                return room.roomName.toLowerCase().includes(input.toLowerCase());
+            }
+        });
 
         setFilteredRooms(filtered);
     };
