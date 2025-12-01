@@ -4,6 +4,7 @@ import {
     updateRoomLastMessage,
     getUserByUserId,
     getUsernameByUserId,
+    getMessagesForRoom,
 } from '../services/databaseService.js';
 import { encryptMessage, decryptMessage } from '../services/messageService.js';
 
@@ -60,6 +61,40 @@ export const sendMessage = async message => {
     } catch (error) {
         console.error('send message error:', error);
         const message = 'Failed to send message: ' + error;
+        return { success: false, message: message };
+    }
+};
+
+export const getMessagesForChat = async roomId => {
+    try {
+        const messages = await getMessagesForRoom(roomId);
+
+        if (!messages) {
+            return {
+                success: false,
+                message: `Could not get messages for roomId: ${roomId}`,
+            };
+        }
+
+        // Decrypt messages
+        const decryptedMessages = messages.map(msg => {
+            const decrypted = decryptMessage({
+                encrypted: msg.message,
+                iv: msg.iv,
+                authTag: msg.authTag,
+            });
+            return { ...msg._doc, message: decrypted };
+        });
+
+        return {
+            success: true,
+            roomId: roomId,
+            messages: decryptedMessages,
+            message: `Got messages for roomId: ${roomId}`,
+        };
+    } catch (error) {
+        console.error('controller get messages for chat error:', error);
+        const message = 'Failed to get messages for chat: ' + error;
         return { success: false, message: message };
     }
 };

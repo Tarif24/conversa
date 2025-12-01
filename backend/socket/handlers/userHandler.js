@@ -1,6 +1,5 @@
 import EVENTS from '../../../constants/socketEvents.js';
 import { userSearch, getUsername } from '../../controllers/userController.js';
-import { authentication } from '../middleware/index.js';
 
 class UserHandler {
     constructor(io, connectionManager) {
@@ -9,7 +8,7 @@ class UserHandler {
     }
 
     handleConnection(socket) {
-        socket.use(authentication(socket));
+        // Profile update, User search, Get username, User settings
 
         socket.on(EVENTS.USER_SEARCH, (query, callback) =>
             this.handleUserSearch(socket, query, callback)

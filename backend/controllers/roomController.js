@@ -4,7 +4,6 @@ import {
     addRoomToUsers,
     getUserByUserId,
     getRoomByRoomId,
-    getMessagesForRoom,
     updateRoomLastMessage,
     getUsernameByUserId,
 } from '../services/databaseService.js';
@@ -144,40 +143,6 @@ export const getUserChats = async userId => {
     } catch (error) {
         console.error('Handle get user rooms error:', error);
         const message = 'Failed to get user rooms: ' + error;
-        return { success: false, message: message };
-    }
-};
-
-export const getMessagesForChat = async roomId => {
-    try {
-        const messages = await getMessagesForRoom(roomId);
-
-        if (!messages) {
-            return {
-                success: false,
-                message: `Could not get messages for roomId: ${roomId}`,
-            };
-        }
-
-        // Decrypt messages
-        const decryptedMessages = messages.map(msg => {
-            const decrypted = decryptMessage({
-                encrypted: msg.message,
-                iv: msg.iv,
-                authTag: msg.authTag,
-            });
-            return { ...msg._doc, message: decrypted };
-        });
-
-        return {
-            success: true,
-            roomId: roomId,
-            messages: decryptedMessages,
-            message: `Got messages for roomId: ${roomId}`,
-        };
-    } catch (error) {
-        console.error('controller get messages for chat error:', error);
-        const message = 'Failed to get messages for chat: ' + error;
         return { success: false, message: message };
     }
 };

@@ -1,6 +1,5 @@
 import { getUser, getAllUserRooms } from '../../controllers/connectionController.js';
 import EVENTS from '../../../constants/socketEvents.js';
-import { authentication } from '../middleware/index.js';
 
 class ConnectionHandler {
     constructor(io, connectionManager) {
@@ -23,7 +22,7 @@ class ConnectionHandler {
         });
     }
     handleConnection(socket) {
-        socket.use(authentication(socket));
+        // Connection, Disconnection, Reconnection
 
         socket.on(EVENTS.DISCONNECT, user => this.handleDisconnect(socket, user));
 

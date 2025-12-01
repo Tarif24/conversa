@@ -14,6 +14,8 @@ class AuthenticationHandler {
     }
 
     handleConnection(socket) {
+        // User Signup, User Login, User Logout, Refresh Token
+
         socket.on(EVENTS.USER_SIGNUP, (user, callback) =>
             this.handleSignup(socket, user, callback)
         );

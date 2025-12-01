@@ -15,6 +15,14 @@ import ConnectionHandler from './socket/handlers/connectionHandler.js';
 import MessageHandler from './socket/handlers/messageHandler.js';
 import UserHandler from './socket/handlers/userHandler.js';
 import RoomHandler from './socket/handlers/roomHandler.js';
+import PresenceHandler from './socket/handlers/presenceHandler.js';
+import MessageInteractionHandler from './socket/handlers/messageInteractionHandler.js';
+import MessageStatusHandler from './socket/handlers/messageStatusHandler.js';
+import MediaHandler from './socket/handlers/mediaHandler.js';
+import AdminHandler from './socket/handlers/adminHandler.js';
+
+// Import middleware
+import { authentication } from './socket/middleware/index.js';
 
 // Initialize HTTP server and Socket.IO
 const server = createServer();
@@ -32,6 +40,11 @@ const connectionHandler = new ConnectionHandler(io, connectionManager);
 const messageHandler = new MessageHandler(io, connectionManager);
 const userHandler = new UserHandler(io, connectionManager);
 const roomHandler = new RoomHandler(io, connectionManager);
+const presenceHandler = new PresenceHandler(io, connectionManager);
+const messageInteractionHandler = new MessageInteractionHandler(io, connectionManager);
+const messageStatusHandler = new MessageStatusHandler(io, connectionManager);
+const mediaHandler = new MediaHandler(io, connectionManager);
+const adminHandler = new AdminHandler(io, connectionManager);
 
 // Graceful shutdown handling
 const gracefulShutdown = signal => {
@@ -77,6 +90,9 @@ const serverSignalHandler = () => {
     io.on('connection', socket => {
         console.log('user with socket ID:', socket.id, 'connected');
 
+        // Initialize middleware for the new connection
+        socket.use(authentication(socket));
+
         connectionManager.addConnection(socket);
 
         // Initialize handlers for the new connection
@@ -85,6 +101,11 @@ const serverSignalHandler = () => {
         messageHandler.handleConnection(socket);
         userHandler.handleConnection(socket);
         roomHandler.handleConnection(socket);
+        presenceHandler.handleConnection(socket);
+        messageInteractionHandler.handleConnection(socket);
+        messageStatusHandler.handleConnection(socket);
+        mediaHandler.handleConnection(socket);
+        adminHandler.handleConnection(socket);
     });
 
     // Shutdown signals handling
