@@ -3,7 +3,7 @@ import crypto from 'crypto';
 const CRYPTO_KEY = Buffer.from(process.env.CRYPTO_KEY, 'hex');
 
 export const encryptMessage = plaintext => {
-    // Generate a random IV for each encryption
+    // Generate a random IV (initialization vector) for each encryption
     const iv = crypto.randomBytes(12);
     const cipher = crypto.createCipheriv('aes-256-gcm', CRYPTO_KEY, iv);
 

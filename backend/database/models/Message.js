@@ -2,11 +2,8 @@ import mongoose from 'mongoose';
 
 const messageSchema = new mongoose.Schema(
     {
+        // Core fields
         roomId: {
-            type: String,
-            required: true,
-        },
-        message: {
             type: String,
             required: true,
         },
@@ -14,10 +11,35 @@ const messageSchema = new mongoose.Schema(
             type: String,
             required: true,
         },
+        message: {
+            type: String,
+            required: true,
+        },
+        username: {
+            type: String,
+            required: true,
+        },
+
+        // For replies
+        replyToId: {
+            type: String,
+            default: null,
+        },
         timeStamp: {
             type: Date,
             default: Date.now,
         },
+
+        // For edits
+        isEdited: { type: Boolean, default: false },
+        editedAt: Date,
+
+        // For deletes (soft delete)
+        isDeleted: { type: Boolean, default: false },
+        deletedAt: Date,
+        deletedBy: String,
+
+        // For encryption
         iv: {
             type: String,
             default: null,

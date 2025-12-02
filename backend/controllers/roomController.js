@@ -62,6 +62,7 @@ export const createChatRoom = async (sentRoom, userId) => {
         const message = {
             userId: 'system',
             roomId: roomId,
+            username: 'SYSTEM',
             message: encryptedData.encrypted,
             iv: encryptedData.iv,
             authTag: encryptedData.authTag,

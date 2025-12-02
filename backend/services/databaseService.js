@@ -1,5 +1,4 @@
-import { User, Message, File, Room, RefreshToken } from '../database/models/index.js';
-import mongoose from 'mongoose';
+import { User, Message, File, Room, RefreshToken, RoomMember } from '../database/models/index.js';
 
 // User Services
 export const createUser = async userData => {
@@ -62,6 +61,12 @@ export const getUsernameByUserId = async userId => {
 
 // Message Services
 export const createMessage = async messageData => {
+    let finalMessageData = messageData;
+
+    if (!messageData.replyToId) {
+        finalMessageData = { ...messageData, replyToId: null };
+    }
+
     const message = await Message.create(messageData);
     return message;
 };
@@ -72,6 +77,43 @@ export const getMessagesForRoom = async roomId => {
     });
 
     return result;
+};
+
+export const getLatestMessageForRoom = async roomId => {
+    return await Message.findOne({ roomId, isDeleted: false }).sort({ createdAt: -1 }).limit(1);
+};
+
+export const getMessageById = async messageId => {
+    return await Message.findById(messageId).lean();
+};
+
+export const editMessage = async (messageId, newContent, userId) => {
+    // Could use findbyid but with the addition of userId you can make sure that the person editing the message is the person who sent it
+    const message = await Message.findOne({ _id: messageId, userId });
+
+    if (!message) {
+        throw new Error('Message not found or unauthorized');
+    }
+
+    message.content = newContent;
+    message.isEdited = true;
+    message.editedAt = new Date();
+
+    return await message.save();
+};
+
+export const deleteMessage = async (messageId, userId) => {
+    const message = await Message.findOne({ _id: messageId, userId });
+
+    if (!message) {
+        throw new Error('Message not found or unauthorized');
+    }
+
+    message.isDeleted = true;
+    message.deletedAt = new Date();
+    message.deletedBy = userId;
+
+    return await message.save();
 };
 
 // File Services
@@ -133,4 +175,100 @@ export const deleteRefreshToken = async token => {
 export const deleteRefreshTokensByUserId = async userId => {
     await RefreshToken.deleteMany({ userId: userId });
     return { success: true };
+};
+
+// Room Member Services
+export const createRoomMember = async memberData => {
+    const roomMember = await RoomMember.create(memberData);
+    return roomMember;
+};
+
+export const getRoomMemberForRoom = async (roomId, userId) => {
+    return await RoomMember.findOne({ roomId, userId });
+};
+
+export const getUnreadCount = async (roomId, userId) => {
+    const memberRecord = await this.getRoomMemberForRoom(roomId, userId);
+    return memberRecord?.unreadCount || 0;
+};
+
+export const incrementUnreadForOthers = async (roomId, excludeUserId) => {
+    return await RoomMember.updateMany(
+        { roomId, userId: { $ne: excludeUserId } },
+        { $inc: { unreadCount: 1 } }
+    );
+};
+
+export const getUnreadCountsForRooms = async (userId, roomIds) => {
+    const memberRecords = await RoomMember.find({
+        userId,
+        roomId: { $in: roomIds },
+    }).lean();
+
+    // Return as map: roomId -> unreadCount
+    return memberRecords.reduce((acc, record) => {
+        acc[record.roomId.toString()] = record.unreadCount || 0;
+        return acc;
+    }, {});
+};
+
+// Read/Delivery specific
+export const getUnreadMessages = async (roomId, userId, limit = 100) => {
+    const memberRecord = await this.getRoomMemberForRoom(roomId, userId);
+
+    // If no read position, get recent messages
+    if (!memberRecord || !memberRecord.lastReadMessageId) {
+        return await Message.find({ roomId, isDeleted: false })
+            .sort({ createdAt: -1 })
+            .limit(50)
+            .lean();
+    }
+
+    // Use stored timestamp if available
+    let timestampToUse = memberRecord.lastReadMessageTimestamp;
+
+    // Fallback: if timestamp not stored, look up the message
+    if (!timestampToUse) {
+        const lastReadMessage = await Message.findById(memberRecord.lastReadMessageId);
+
+        if (!lastReadMessage) {
+            // Message was hard deleted or doesn't exist - fallback to recent
+            return await Message.find({ roomId, isDeleted: false })
+                .sort({ createdAt: -1 })
+                .limit(50)
+                .lean();
+        }
+
+        timestampToUse = lastReadMessage.createdAt;
+    }
+
+    // Get messages after last read timestamp (excluding deleted)
+    return await Message.find({
+        roomId,
+        isDeleted: false,
+        createdAt: { $gt: timestampToUse },
+    })
+        .sort({ createdAt: 1 })
+        .limit(limit)
+        .lean();
+};
+
+export const updateReadPosition = async (roomId, userId, messageId) => {
+    // Get the message to extract its timestamp
+    const message = await Message.findById(messageId);
+
+    if (!message) {
+        throw new Error('Message not found');
+    }
+
+    return await RoomMember.findOneAndUpdate(
+        { roomId, userId },
+        {
+            lastReadMessageId: messageId,
+            lastReadMessageTimestamp: message.createdAt,
+            lastReadAt: new Date(),
+            unreadCount: 0,
+        },
+        { upsert: true, new: true }
+    );
 };

@@ -36,6 +36,7 @@ export const sendMessage = async message => {
         // Logic to save the message to the database
         const savedMessage = await createMessage({
             ...message,
+            username: result.user.username,
             message: encryptedData.encrypted,
             iv: encryptedData.iv,
             authTag: encryptedData.authTag,
