@@ -4,7 +4,7 @@ import { useSocketIO, useSocketIOEvent, useSocketIOState } from '../../hooks/use
 import { Send } from 'lucide-react';
 import { PulseLoader } from 'react-spinners';
 
-const MessageTypingBar = ({ room, setChatHistory }) => {
+const MessageTypingBar = ({ room, setMessages }) => {
     const { isConnected, connectionState, user, sendProtected, sendRefresh, sendLastEmitted } =
         useSocketIO();
 
@@ -96,15 +96,22 @@ const MessageTypingBar = ({ room, setChatHistory }) => {
         const input = inputText;
         setInputText('');
 
-        setChatHistory(prev => [...prev, { role: 'user', message: `${input}` }]);
-
         const userId = user._id.toString();
 
-        sendProtected(EVENTS.SEND_MESSAGE, {
-            roomId: room._id,
-            message: input,
-            userId: userId,
-        });
+        sendProtected(
+            EVENTS.SEND_MESSAGE,
+            {
+                roomId: room._id,
+                message: input,
+                userId: userId,
+            },
+            response => {
+                sendProtected(EVENTS.GET_MESSAGES_FOR_ROOM, { roomId: room._id }, response => {
+                    if (!response.success) return;
+                    setMessages(response.messages);
+                });
+            }
+        );
     };
 
     return (

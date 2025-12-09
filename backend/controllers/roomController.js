@@ -6,7 +6,12 @@ import {
     getRoomByRoomId,
     updateRoomLastMessage,
     getUsernameByUserId,
+    getLatestMessageForRoom,
+    updateReadPosition,
+    getUnreadMessages,
+    createRoomMember,
 } from '../services/databaseService.js';
+import { populateReplyInfo } from '../services/messageService.js';
 import { encryptMessage, decryptMessage } from '../services/messageService.js';
 
 export const createChatRoom = async (sentRoom, userId) => {
@@ -59,6 +64,24 @@ export const createChatRoom = async (sentRoom, userId) => {
 
         const encryptedData = encryptMessage(systemMessage);
 
+        for (const id of newRoom.users) {
+            const user = (await getUserByUserId(id)).user;
+            if (id === userId) {
+                const newOwner = await createRoomMember({
+                    roomId: roomId,
+                    userId: id,
+                    username: user.username,
+                    role: 'owner',
+                });
+            } else {
+                const newMember = await createRoomMember({
+                    roomId: roomId,
+                    userId: id,
+                    username: user.username,
+                });
+            }
+        }
+
         const message = {
             userId: 'system',
             roomId: roomId,
@@ -104,12 +127,14 @@ export const getUserChats = async userId => {
             const room = result.room;
 
             // Decrypt the last message
-            const decryptedMessage = decryptMessage({
-                encrypted: room.message.message,
-                iv: room.message.iv,
-                authTag: room.message.authTag,
-            });
-            room.message.message = decryptedMessage;
+            if (room.message.message !== 'Deleted Message') {
+                const decryptedMessage = decryptMessage({
+                    encrypted: room.message.message,
+                    iv: room.message.iv,
+                    authTag: room.message.authTag,
+                });
+                room.message.message = decryptedMessage;
+            }
 
             let userOther = '';
             if (result.exists) {
@@ -144,6 +169,43 @@ export const getUserChats = async userId => {
     } catch (error) {
         console.error('Handle get user rooms error:', error);
         const message = 'Failed to get user rooms: ' + error;
+        return { success: false, message: message };
+    }
+};
+
+export const setActiveRoom = async (roomId, userId, isFirstOpen = true) => {
+    try {
+        // Get latest message
+        const latestMessage = await getLatestMessageForRoom(roomId, true);
+        if (!latestMessage) {
+            return {
+                success: true,
+                unreadMessages: [],
+                unreadCount: 0,
+            };
+        }
+
+        // Update user's read position
+        await updateReadPosition(roomId, userId, latestMessage._id);
+
+        // Only fetch unread messages on first open
+        let unreadMessages = [];
+        if (isFirstOpen) {
+            unreadMessages = await getUnreadMessages(roomId, userId);
+
+            // Populate reply parent info for each message
+            unreadMessages = await populateReplyInfo(unreadMessages);
+        }
+
+        return {
+            success: true,
+            unreadMessages,
+            unreadCount: unreadMessages.length,
+            latestMessageId: latestMessage._id,
+        };
+    } catch (error) {
+        console.error('Handle set active room error:', error);
+        const message = 'Failed to set users active room: ' + error;
         return { success: false, message: message };
     }
 };

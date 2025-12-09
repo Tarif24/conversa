@@ -4,6 +4,7 @@ const roomMemberSchema = new mongoose.Schema(
     {
         roomId: { type: mongoose.Schema.Types.ObjectId, required: true, index: true },
         userId: { type: mongoose.Schema.Types.ObjectId, required: true, index: true },
+        username: { type: String, required: true },
 
         // Track where user is in messages
         lastReadMessageId: mongoose.Schema.Types.ObjectId,

@@ -2,8 +2,12 @@
 const SOCKET_EVENTS = {
     // Chat events
     SEND_MESSAGE: 'send_message',
+    EDIT_MESSAGE: 'edit_message',
+    DELETE_MESSAGE: 'delete_message',
     RECEIVE_MESSAGE: 'receive_message',
     MESSAGES_LOADED: 'messages_loaded',
+    MARK_AS_READ: 'mark_as_read',
+    USER_READ_UPDATE: 'user_read_update',
 
     // Room events
     CREATE_CHAT_ROOM: 'create_chat_room',
@@ -15,6 +19,10 @@ const SOCKET_EVENTS = {
     TYPING_START: 'typing_start',
     TYPING_STOP: 'typing_stop',
     TYPING_UPDATE: 'typing_update',
+    GET_UNREAD_COUNT: 'get_unread_count',
+    GET_UNREAD_COUNTS: 'get_unread_counts',
+    USER_UNREAD_UPDATE: 'user_unread_update',
+    UNREAD_COUNT_INCREMENT: 'unread_count_increment',
 
     // User events
     USER_ONLINE: 'user_online',

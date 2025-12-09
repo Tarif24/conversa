@@ -5,6 +5,7 @@ import EVENTS from '../../../../constants/socketEvents';
 import { MessageCirclePlus } from 'lucide-react';
 import { Users } from 'lucide-react';
 import MessageTypingBar from './MessageTypingBar';
+import MessageActionsBar from './MessageActionsBar';
 
 const MessagingInterface = ({ room, isCreateChatActive }) => {
     const { isConnected, connectionState, user, sendProtected, sendRefresh, sendLastEmitted } =
@@ -18,21 +19,14 @@ const MessagingInterface = ({ room, isCreateChatActive }) => {
 
     const [forceUpdateState, setForceUpdateState] = useState(0);
 
+    const [hoveredMessageId, setHoveredMessageId] = useState(null);
+
     // Handles what happens on chat switch
     useEffect(() => {
         if (!room) return;
         sendProtected(EVENTS.GET_MESSAGES_FOR_ROOM, { roomId: room._id }, response => {
             if (!response.success) return;
-            const fixedMessages = response.messages.map(message => {
-                if (message.userId === user._id) {
-                    return { role: 'user', message: message.message };
-                }
-                if (message.userId === 'system' || message.userId === 'System') {
-                    return { role: 'system', message: message.message };
-                }
-                return { role: 'other', message: message.message };
-            });
-            setChatHistory(fixedMessages);
+            organizeMessageStructureAndSave(response.messages);
         });
     }, [room]);
 
@@ -42,6 +36,13 @@ const MessagingInterface = ({ room, isCreateChatActive }) => {
         } else {
             setForceUpdateState(1);
         }
+    });
+
+    useSocketIOEvent(EVENTS.ROOM_REFRESH, () => {
+        sendProtected(EVENTS.GET_MESSAGES_FOR_ROOM, { roomId: room._id }, response => {
+            if (!response.success) return;
+            organizeMessageStructureAndSave(response.messages);
+        });
     });
 
     // Listen for incoming messages
@@ -64,15 +65,41 @@ const MessagingInterface = ({ room, isCreateChatActive }) => {
         }
 
         if (room._id === data.message.roomId) {
-            setChatHistory(prev => [...prev, { role: 'other', message: data.message.message }]);
+            setChatHistory(prev => [...prev, { role: 'other', message: data.message }]);
+
+            sendProtected(
+                EVENTS.MARK_AS_READ,
+                { roomId: room._id, messageId: data.message._id },
+                () => {}
+            );
             return;
         }
+    });
+
+    useSocketIOEvent(EVENTS.USER_READ_UPDATE, data => {
+        sendProtected(EVENTS.GET_MESSAGES_FOR_ROOM, { roomId: room._id }, response => {
+            if (!response.success) return;
+            organizeMessageStructureAndSave(response.messages);
+        });
     });
 
     // Scroll to the bottom of the chat history when a new message is added
     useEffect(() => {
         chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }, [chatHistory]);
+
+    const organizeMessageStructureAndSave = messages => {
+        const organizedMessages = messages.map(message => {
+            if (message.userId === user._id) {
+                return { role: 'user', message: message };
+            }
+            if (message.userId === 'system' || message.userId === 'System') {
+                return { role: 'system', message: message };
+            }
+            return { role: 'other', message: message };
+        });
+        setChatHistory(organizedMessages);
+    };
 
     const handleOnNewChatClicked = () => {
         isCreateChatActive(true);
@@ -137,30 +164,99 @@ const MessagingInterface = ({ room, isCreateChatActive }) => {
                         <div className="custom-scrollbar mr-1 flex max-h-187 flex-col overflow-y-auto px-4">
                             {chatHistory.map(({ role, message }, index) => {
                                 return role !== 'system' ? (
-                                    <div
-                                        className={`mt-2 mb-2 w-fit max-w-[70%] p-4 break-words sm:max-w-[60%] ${
-                                            role === 'user'
-                                                ? 'self-end rounded-l-2xl rounded-tr-2xl bg-[rgb(59,37,119)] text-white'
-                                                : 'self-start rounded-tl-2xl rounded-r-2xl bg-[rgb(152,114,255)] text-white'
-                                        }`}
-                                        key={index}
-                                    >
-                                        <h1 className="text-[0.8rem] sm:text-[1.2rem]">
-                                            {message}
-                                        </h1>
-                                    </div>
+                                    role === 'user' ? (
+                                        <div
+                                            className="mt-2 mb-2 flex w-full flex-col items-end gap-2"
+                                            key={index}
+                                            onMouseEnter={() => setHoveredMessageId(index)}
+                                            onMouseLeave={() => setHoveredMessageId(null)}
+                                        >
+                                            <div className="flex max-w-[70%] items-center gap-2">
+                                                <MessageActionsBar
+                                                    isHovered={hoveredMessageId === index}
+                                                    message={message}
+                                                />
+                                                <h1 className="rounded-l-2xl rounded-tr-2xl bg-[rgb(80,53,168)] p-4 text-[0.8rem] break-words text-white sm:text-[1.2rem]">
+                                                    {message.message}
+                                                </h1>
+                                                <div className="flex size-10 items-center justify-center rounded-full bg-white/30 p-2 backdrop-blur-2xl">
+                                                    <h1 className="text-1xl font-bold text-[rgb(80,53,168)]">
+                                                        {message.username[0].toUpperCase()}
+                                                    </h1>
+                                                </div>
+                                            </div>
+                                            {message.readUsers.length > 0 && (
+                                                <div className="flex w-full justify-end gap-1">
+                                                    {message.readUsers.map(
+                                                        ({ username }, index) => (
+                                                            <div
+                                                                key={index}
+                                                                className="flex size-5 items-center justify-center rounded-full bg-violet-300 p-2"
+                                                            >
+                                                                <h1 className="text-[0.7rem] font-bold text-[rgb(80,53,168)]">
+                                                                    {username[0].toUpperCase()}
+                                                                </h1>
+                                                            </div>
+                                                        )
+                                                    )}
+                                                </div>
+                                            )}
+                                        </div>
+                                    ) : (
+                                        <div
+                                            className={`mt-2 mb-2 flex w-full flex-col items-start`}
+                                            key={index}
+                                            onMouseEnter={() => setHoveredMessageId(index)}
+                                            onMouseLeave={() => setHoveredMessageId(null)}
+                                        >
+                                            <div className="flex max-w-[70%] items-center gap-2">
+                                                <div className="flex size-10 items-center justify-center rounded-full bg-white/30 p-2 backdrop-blur-2xl">
+                                                    <h1 className="text-1xl font-bold text-[rgb(80,53,168)]">
+                                                        {message.username[0].toUpperCase()}
+                                                    </h1>
+                                                </div>
+                                                <h1 className="rounded-tl-2xl rounded-r-2xl bg-[rgb(152,114,255)] p-4 text-[0.8rem] break-words text-white sm:text-[1.2rem]">
+                                                    {message.message}
+                                                </h1>
+                                                <MessageActionsBar
+                                                    isUser={false}
+                                                    isHovered={hoveredMessageId === index}
+                                                    message={message}
+                                                />
+                                            </div>
+                                            {message.readUsers.length > 0 && (
+                                                <div className="flex w-full justify-end gap-1">
+                                                    {message.readUsers.map(
+                                                        ({ username }, index) => (
+                                                            <div
+                                                                key={index}
+                                                                className="flex size-5 items-center justify-center rounded-full bg-violet-300 p-2"
+                                                            >
+                                                                <h1 className="text-[0.7rem] font-bold text-[rgb(80,53,168)]">
+                                                                    {username[0].toUpperCase()}
+                                                                </h1>
+                                                            </div>
+                                                        )
+                                                    )}
+                                                </div>
+                                            )}
+                                        </div>
+                                    )
                                 ) : (
                                     <div
                                         className={`mb-2 flex w-full justify-center break-words`}
                                         key={index}
                                     >
-                                        <h1 className="text-[rgb(59,37,119)]">{message}</h1>
+                                        <h1 className="text-[rgb(59,37,119)]">{message.message}</h1>
                                     </div>
                                 );
                             })}
                             <div ref={chatEndRef}></div>
                         </div>
-                        <MessageTypingBar room={room} setChatHistory={setChatHistory} />
+                        <MessageTypingBar
+                            room={room}
+                            setMessages={organizeMessageStructureAndSave}
+                        />
                     </>
                 ) : (
                     <div className="flex h-full w-full flex-col items-center justify-center gap-4">

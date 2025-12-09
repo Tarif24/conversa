@@ -1,5 +1,10 @@
 import EVENTS from '../../../constants/socketEvents.js';
-import { sendMessage, getMessagesForChat } from '../../controllers/messageController.js';
+import {
+    sendMessage,
+    messageEdit,
+    messageDelete,
+    getMessagesForChat,
+} from '../../controllers/messageController.js';
 
 class MessageHandler {
     constructor(io, connectionManager) {
@@ -10,14 +15,24 @@ class MessageHandler {
     handleConnection(socket) {
         // Send message, Edit message, Delete message, Forward message, Basic message retrieval
 
-        socket.on(EVENTS.SEND_MESSAGE, message => this.handleSendMessage(socket, message));
+        socket.on(EVENTS.SEND_MESSAGE, async (message, callback) => {
+            await this.handleSendMessage(socket, message, callback);
+        });
 
-        socket.on(EVENTS.GET_MESSAGES_FOR_ROOM, (room, callback) =>
-            this.handleGetMessagesForRoom(socket, room, callback)
-        );
+        socket.on(EVENTS.EDIT_MESSAGE, async data => {
+            await this.handleEditMessage(socket, data);
+        });
+
+        socket.on(EVENTS.DELETE_MESSAGE, async data => {
+            await this.handleDeleteMessage(socket, data);
+        });
+
+        socket.on(EVENTS.GET_MESSAGES_FOR_ROOM, async (room, callback) => {
+            await this.handleGetMessagesForRoom(socket, room, callback);
+        });
     }
 
-    async handleSendMessage(socket, message) {
+    async handleSendMessage(socket, message, callback) {
         try {
             console.log('user with socket ID:', socket.userId, 'sent a message');
 
@@ -37,11 +52,55 @@ class MessageHandler {
                 this.io.to(message.roomId).emit(EVENTS.ROOM_REFRESH, {
                     message: 'New message sent please refresh rooms',
                 });
+
+                this.io.to(message.roomId).emit(EVENTS.UNREAD_COUNT_INCREMENT, {
+                    roomId: message.roomId,
+                });
+            }
+
+            if (callback) {
+                callback(result);
             }
         } catch (error) {
             console.error('handle send message error:', error);
             socket.emit(EVENTS.ERROR, {
                 event: EVENTS.SEND_MESSAGE,
+                message: 'Server error',
+            });
+        }
+    }
+
+    async handleEditMessage(socket, data) {
+        try {
+            const result = await messageEdit(data.messageId, socket.userId, data.newContent);
+
+            if (result.success) {
+                this.io.to(message.roomId).emit(EVENTS.ROOM_REFRESH, {
+                    message: 'New message sent please refresh rooms',
+                });
+            }
+        } catch (error) {
+            console.error('handle edit message error:', error);
+            socket.emit(EVENTS.ERROR, {
+                event: EVENTS.EDIT_MESSAGE,
+                message: 'Server error',
+            });
+        }
+    }
+
+    async handleDeleteMessage(socket, data) {
+        try {
+            const result = await messageDelete(data.messageId, socket.userId);
+
+            if (result.success) {
+                this.io.to(data.roomId).emit(EVENTS.ROOM_REFRESH, {
+                    message: 'New deleted message please refresh rooms',
+                });
+            }
+        } catch (error) {
+            console.error('handle delete message error:', error);
+            socket.emit(EVENTS.ERROR, {
+                event: EVENTS.DELETE_MESSAGE,
                 message: 'Server error',
             });
         }

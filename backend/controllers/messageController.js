@@ -5,14 +5,26 @@ import {
     getUserByUserId,
     getUsernameByUserId,
     getMessagesForRoom,
+    getMessageById,
+    updateReadPosition,
+    incrementUnreadForOthers,
+    editMessage,
+    deleteMessage,
+    populateRoomMemberReadStatus,
 } from '../services/databaseService.js';
-import { encryptMessage, decryptMessage } from '../services/messageService.js';
+import {
+    encryptMessage,
+    decryptMessage,
+    addReplyInfo,
+    populateReplyInfo,
+} from '../services/messageService.js';
 
 export const sendMessage = async message => {
     try {
         let otherUser = null;
         const result = await getUserByUserId(message.userId);
 
+        // User existence check
         if (!result.exists) {
             return {
                 success: false,
@@ -22,12 +34,24 @@ export const sendMessage = async message => {
 
         const room = await getRoomByRoomId(message.roomId);
 
+        // Room existence check
         if (!room.exists) {
             return {
                 success: false,
                 message: 'Room does not exist ',
                 roomExists: false,
             };
+        }
+
+        // Validate reply parent exists if provided
+        if (message.replyToId) {
+            const parentMessage = await getMessageById(message.replyToId);
+            if (!parentMessage) {
+                return {
+                    success: false,
+                    error: 'Reply parent message not found',
+                };
+            }
         }
 
         // Encrypt the message before creating it
@@ -44,15 +68,25 @@ export const sendMessage = async message => {
 
         await updateRoomLastMessage(message.roomId, savedMessage);
 
+        // If its a direct message then the otherUser is needed otherwise null
         if (room.room.type === 'direct') {
             otherUser = await getUsernameByUserId(message.userId);
         }
 
         const decryptedMessage = { ...savedMessage._doc, message: message.message };
 
+        // Mark as read by sender immediately
+        await updateReadPosition(message.roomId, message.userId, decryptedMessage._id);
+
+        // Increment unread count for other room members
+        await incrementUnreadForOthers(message.roomId, message.userId);
+
+        // Prepare message with reply info for response
+        const messageWithReply = await addReplyInfo(decryptedMessage);
+
         return {
             success: true,
-            message: decryptedMessage,
+            message: messageWithReply,
             roomExists: true,
             roomName: room.room.roomName,
             otherUser: otherUser?.username,
@@ -84,18 +118,61 @@ export const getMessagesForChat = async roomId => {
                 iv: msg.iv,
                 authTag: msg.authTag,
             });
-            return { ...msg._doc, message: decrypted };
+
+            if (!msg.isDeleted) {
+                return { ...msg._doc, message: decrypted };
+            }
+            return { ...msg._doc, message: 'DELETED MESSAGE' };
         });
+
+        const messagesWithReply = await populateReplyInfo(decryptedMessages);
+
+        const messageWithReadStatus = await populateRoomMemberReadStatus(messagesWithReply, roomId);
 
         return {
             success: true,
             roomId: roomId,
-            messages: decryptedMessages,
+            messages: messageWithReadStatus,
             message: `Got messages for roomId: ${roomId}`,
         };
     } catch (error) {
         console.error('controller get messages for chat error:', error);
         const message = 'Failed to get messages for chat: ' + error;
+        return { success: false, message: message };
+    }
+};
+
+export const messageEdit = async (messageId, userId, newContent) => {
+    try {
+        const message = await editMessage(messageId, newContent, userId);
+
+        return {
+            success: true,
+            message: message.toObject(),
+        };
+    } catch (error) {
+        console.error('controller message edit:', error);
+        const message = 'Failed to edit message: ' + error;
+        return { success: false, message: message };
+    }
+};
+
+export const messageDelete = async (messageId, userId) => {
+    try {
+        // Soft deletes the message
+        const message = await deleteMessage(messageId, userId);
+
+        if (!message.success) {
+            return message;
+        }
+
+        return {
+            success: true,
+            messageId: message.message._id,
+        };
+    } catch (error) {
+        console.error('controller delete message error:', error);
+        const message = 'Failed to delete message: ' + error;
         return { success: false, message: message };
     }
 };

@@ -1,4 +1,5 @@
 import crypto from 'crypto';
+import { getMessageById } from './databaseService.js';
 
 const CRYPTO_KEY = Buffer.from(process.env.CRYPTO_KEY, 'hex');
 
@@ -27,4 +28,40 @@ export const decryptMessage = encryptedData => {
     decipher.setAuthTag(authTag);
 
     return decipher.update(encrypted, null, 'utf8') + decipher.final('utf8');
+};
+
+export const addReplyInfo = async message => {
+    if (!message.replyToId) {
+        return message;
+    }
+
+    const parentMessage = await getMessageById(message.replyToId);
+
+    if (!parentMessage || parentMessage.isDeleted) {
+        // Parent is deleted
+        return {
+            ...message,
+            replyTo: {
+                messageId: message.replyToId,
+                isDeleted: true,
+                content: '[Deleted Message]',
+            },
+        };
+    }
+
+    // Parent exists
+    return {
+        ...message,
+        replyTo: {
+            messageId: parentMessage._id,
+            username: parentMessage.username,
+            content: parentMessage.content,
+            createdAt: parentMessage.createdAt,
+            isDeleted: false,
+        },
+    };
+};
+
+export const populateReplyInfo = async messages => {
+    return await Promise.all(messages.map(msg => addReplyInfo(msg)));
 };

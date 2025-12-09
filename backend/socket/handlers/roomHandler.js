@@ -1,5 +1,5 @@
 import EVENTS from '../../../constants/socketEvents.js';
-import { createChatRoom, getUserChats } from '../../controllers/roomController.js';
+import { createChatRoom, getUserChats, setActiveRoom } from '../../controllers/roomController.js';
 
 class RoomHandler {
     constructor(io, connectionManager) {
@@ -100,12 +100,29 @@ class RoomHandler {
 
     async handleSetActiveRoom(socket, room, callback) {
         try {
-            if (room.roomId) {
+            // Check if roomId was sent
+            if (!room.roomId) {
                 callback({ success: false, message: 'No roomId provided' });
                 return;
             }
 
-            socket.activeRoomId = room.roomId;
+            const result = await setActiveRoom(room.roomId, socket.userId, true);
+
+            // If setting the active room was a success then set the socket active room send a user read update to everyone in the room and send a user unread to the original socket
+            if (result.success) {
+                socket.activeRoomId = room.roomId;
+
+                this.io.to(room.roomId.toString()).emit(EVENTS.USER_READ_UPDATE, {
+                    roomId: room.roomId,
+                    userId: socket.userId,
+                    messageId: result.latestMessageId,
+                });
+
+                socket.emit(EVENTS.USER_UNREAD_UPDATE, {
+                    roomId: room.roomId,
+                    count: 0,
+                });
+            }
 
             if (callback) {
                 callback({
@@ -118,6 +135,7 @@ class RoomHandler {
 
             const typingUsers = this.connectionManager.getTypingUsersInRoom(room.roomId);
 
+            // If any users are typing in the room the user just joined send a user typing update
             if (typingUsers.length > 0) {
                 socket.emit(EVENTS.TYPING_UPDATE, {
                     roomId: room.roomId,

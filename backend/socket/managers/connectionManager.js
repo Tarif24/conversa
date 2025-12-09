@@ -107,6 +107,20 @@ class ConnectionManager {
         return usersInRoom;
     }
 
+    getActiveUsersInList(userIds, roomId) {
+        const activeUsers = [];
+        for (const userId in userIds) {
+            if (this.onlineUsers.has(userId)) {
+                const userSocket = this.userSockets.get(userId);
+                if (userSocket.activeRoom === roomId) {
+                    activeUsers.push(userId);
+                }
+            }
+        }
+
+        return activeUsers;
+    }
+
     scheduleOfflineStatus(userId) {
         // If already scheduled, don't schedule again
         if (this.pendingDisconnects.has(userId)) {

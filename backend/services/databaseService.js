@@ -79,7 +79,11 @@ export const getMessagesForRoom = async roomId => {
     return result;
 };
 
-export const getLatestMessageForRoom = async roomId => {
+export const getLatestMessageForRoom = async (roomId, includingDeleted = false) => {
+    if (includingDeleted) {
+        return await Message.findOne({ roomId }).sort({ createdAt: -1 }).limit(1);
+    }
+
     return await Message.findOne({ roomId, isDeleted: false }).sort({ createdAt: -1 }).limit(1);
 };
 
@@ -104,16 +108,29 @@ export const editMessage = async (messageId, newContent, userId) => {
 
 export const deleteMessage = async (messageId, userId) => {
     const message = await Message.findOne({ _id: messageId, userId });
+    const room = await getRoomByRoomId(message.roomId);
+
+    if (message.isDeleted) {
+        return { success: false, message: 'Already Deleted' };
+    }
 
     if (!message) {
         throw new Error('Message not found or unauthorized');
     }
 
+    if (messageId === room.room.message._id.toString()) {
+        const res = await updateRoomLastMessage(message.roomId, {
+            ...message._doc,
+            message: 'Deleted Message',
+        });
+    }
     message.isDeleted = true;
     message.deletedAt = new Date();
     message.deletedBy = userId;
 
-    return await message.save();
+    const savedMessage = await message.save();
+
+    return { message: savedMessage, success: true };
 };
 
 // File Services
@@ -187,8 +204,12 @@ export const getRoomMemberForRoom = async (roomId, userId) => {
     return await RoomMember.findOne({ roomId, userId });
 };
 
+export const getAllRoomMembersForRoom = async roomId => {
+    return await RoomMember.find({ roomId });
+};
+
 export const getUnreadCount = async (roomId, userId) => {
-    const memberRecord = await this.getRoomMemberForRoom(roomId, userId);
+    const memberRecord = await getRoomMemberForRoom(roomId, userId);
     return memberRecord?.unreadCount || 0;
 };
 
@@ -212,9 +233,32 @@ export const getUnreadCountsForRooms = async (userId, roomIds) => {
     }, {});
 };
 
+export const populateRoomMemberReadStatus = async (messages, roomId) => {
+    const listOfMembers = await getAllRoomMembersForRoom(roomId);
+
+    // Create a map of messageId -> array of users who read it
+    const readStatusMap = new Map();
+    for (const member of listOfMembers) {
+        if (member.lastReadMessageId) {
+            if (!readStatusMap.has(member.lastReadMessageId.toString())) {
+                readStatusMap.set(member.lastReadMessageId.toString(), []);
+            }
+            readStatusMap.get(member.lastReadMessageId.toString()).push({
+                userId: member.userId,
+                username: member.username,
+            });
+        }
+    }
+
+    return messages.map(message => ({
+        ...message,
+        readUsers: readStatusMap.get(message._id.toString()) || [],
+    }));
+};
+
 // Read/Delivery specific
-export const getUnreadMessages = async (roomId, userId, limit = 100) => {
-    const memberRecord = await this.getRoomMemberForRoom(roomId, userId);
+export const getUnreadMessages = async (roomId, userId, limit = 50) => {
+    const memberRecord = await getRoomMemberForRoom(roomId, userId);
 
     // If no read position, get recent messages
     if (!memberRecord || !memberRecord.lastReadMessageId) {
@@ -269,6 +313,6 @@ export const updateReadPosition = async (roomId, userId, messageId) => {
             lastReadAt: new Date(),
             unreadCount: 0,
         },
-        { upsert: true, new: true }
+        { new: true }
     );
 };

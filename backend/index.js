@@ -123,7 +123,7 @@ const serverSignalHandler = () => {
 
     process.on('unhandledRejection', (reason, promise) => {
         console.error('Unhandled Rejection at:', promise, 'reason:', reason);
-        gracefulShutdown('UNHANDLED_REJECTION');
+        //gracefulShutdown('UNHANDLED_REJECTION');
     });
 };
 
