@@ -1,4 +1,5 @@
 import { User, Message, File, Room, RefreshToken, RoomMember } from '../database/models/index.js';
+import { encryptMessage } from './messageService.js';
 
 // User Services
 export const createUser = async userData => {
@@ -99,11 +100,23 @@ export const editMessage = async (messageId, newContent, userId) => {
         throw new Error('Message not found or unauthorized');
     }
 
-    message.content = newContent;
+    const room = await Room.findOne({ _id: message.roomId });
+    const encryptedMessage = encryptMessage(newContent);
+
+    message.message = encryptedMessage.encrypted;
+    message.iv = encryptedMessage.iv;
+    message.authTag = encryptedMessage.authTag;
     message.isEdited = true;
     message.editedAt = new Date();
 
-    return await message.save();
+    const savedMessage = await message.save();
+
+    if (messageId === room.message._id.toString()) {
+        room.message = savedMessage;
+        await room.save();
+    }
+
+    return savedMessage;
 };
 
 export const deleteMessage = async (messageId, userId) => {
@@ -254,6 +267,29 @@ export const populateRoomMemberReadStatus = async (messages, roomId) => {
         ...message,
         readUsers: readStatusMap.get(message._id.toString()) || [],
     }));
+};
+
+export const populateRoomMemberReadStatusSingleMessage = async (message, roomId) => {
+    const listOfMembers = await getAllRoomMembersForRoom(roomId);
+
+    // Create a map of messageId -> array of users who read it
+    const readStatusMap = new Map();
+    for (const member of listOfMembers) {
+        if (member.lastReadMessageId) {
+            if (!readStatusMap.has(member.lastReadMessageId.toString())) {
+                readStatusMap.set(member.lastReadMessageId.toString(), []);
+            }
+            readStatusMap.get(member.lastReadMessageId.toString()).push({
+                userId: member.userId,
+                username: member.username,
+            });
+        }
+    }
+
+    return {
+        ...message,
+        readUsers: readStatusMap.get(message._id.toString()) || [],
+    };
 };
 
 // Read/Delivery specific

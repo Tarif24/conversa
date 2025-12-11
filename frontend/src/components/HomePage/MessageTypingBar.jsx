@@ -2,9 +2,17 @@ import React, { useState, useEffect, useRef, use } from 'react';
 import EVENTS from '../../../../constants/socketEvents';
 import { useSocketIO, useSocketIOEvent, useSocketIOState } from '../../hooks/useSocketIO';
 import { Send } from 'lucide-react';
+import { X } from 'lucide-react';
 import { PulseLoader } from 'react-spinners';
 
-const MessageTypingBar = ({ room, setMessages }) => {
+const MessageTypingBar = ({
+    room,
+    setMessages,
+    selectedEditMessage,
+    selectedReplyMessage,
+    setSelectedEditMessage,
+    setSelectedReplyMessage,
+}) => {
     const { isConnected, connectionState, user, sendProtected, sendRefresh, sendLastEmitted } =
         useSocketIO();
 
@@ -22,6 +30,12 @@ const MessageTypingBar = ({ room, setMessages }) => {
             setTypingUsers(data.typingUsers.filter(u => u.userId !== user._id));
         }
     });
+
+    useEffect(() => {
+        if (selectedEditMessage) {
+            setInputText(selectedEditMessage.message);
+        }
+    }, [selectedEditMessage]);
 
     // Mange typing status
     const handleTyping = e => {
@@ -98,24 +112,60 @@ const MessageTypingBar = ({ room, setMessages }) => {
 
         const userId = user._id.toString();
 
-        sendProtected(
-            EVENTS.SEND_MESSAGE,
-            {
-                roomId: room._id,
-                message: input,
-                userId: userId,
-            },
-            response => {
-                sendProtected(EVENTS.GET_MESSAGES_FOR_ROOM, { roomId: room._id }, response => {
-                    if (!response.success) return;
-                    setMessages(response.messages);
-                });
-            }
-        );
+        if (selectedEditMessage) {
+            sendProtected(
+                EVENTS.EDIT_MESSAGE,
+                {
+                    messageId: selectedEditMessage._id,
+                    newContent: input,
+                    roomId: selectedEditMessage.roomId,
+                },
+                response => {}
+            );
+        } else if (selectedReplyMessage) {
+            sendProtected(
+                EVENTS.SEND_MESSAGE,
+                {
+                    roomId: room._id,
+                    message: input,
+                    userId: userId,
+                    replyToId: selectedReplyMessage._id,
+                },
+                response => {
+                    sendProtected(EVENTS.GET_MESSAGES_FOR_ROOM, { roomId: room._id }, response => {
+                        if (!response.success) return;
+                        setMessages(response.messages);
+                    });
+                }
+            );
+        } else {
+            sendProtected(
+                EVENTS.SEND_MESSAGE,
+                {
+                    roomId: room._id,
+                    message: input,
+                    userId: userId,
+                },
+                response => {
+                    sendProtected(EVENTS.GET_MESSAGES_FOR_ROOM, { roomId: room._id }, response => {
+                        if (!response.success) return;
+                        setMessages(response.messages);
+                    });
+                }
+            );
+        }
+
+        handleOnCloseClicked();
+    };
+
+    const handleOnCloseClicked = () => {
+        setSelectedEditMessage(null);
+        setSelectedReplyMessage(null);
+        setInputText('');
     };
 
     return (
-        <>
+        <div className="w-full">
             <div className="pl-4">
                 {typingUsers.length > 0 &&
                     (typingUsers.length === 1 ? (
@@ -143,13 +193,48 @@ const MessageTypingBar = ({ room, setMessages }) => {
                                     </h1>
                                 </div>
                             </div>
-                            <PulseLoader color="#000000" size={12} speedMultiplier={1} />
+                            <PulseLoader color="#000000" size={8} speedMultiplier={1} />
                         </div>
                     ))}
             </div>
 
+            {selectedEditMessage && (
+                <div className="relative flex w-full flex-col justify-center border-t-1 border-[rgb(59,37,119)] p-4">
+                    <div
+                        className="absolute top-1 right-3 text-[rgb(59,37,119)] hover:cursor-pointer"
+                        onClick={() => handleOnCloseClicked()}
+                    >
+                        <X />
+                    </div>
+                    <h1 className="font-bold text-[rgb(127,82,252)]">Editing message</h1>
+
+                    <h1 className="text-[rgb(127,82,252)]">
+                        Message: {selectedEditMessage?.message}
+                    </h1>
+                </div>
+            )}
+            {selectedReplyMessage && (
+                <div className="relative flex w-full flex-col justify-center border-t-1 border-[rgb(59,37,119)] p-4">
+                    <div
+                        className="absolute top-1 right-3 text-[rgb(59,37,119)] hover:cursor-pointer"
+                        onClick={() => handleOnCloseClicked()}
+                    >
+                        <X />
+                    </div>
+                    <h1 className="font-bold text-[rgb(127,82,252)]">
+                        {selectedReplyMessage.userId === user._id
+                            ? 'Replying to yourself'
+                            : `Replying to ${selectedReplyMessage.username}`}{' '}
+                    </h1>
+
+                    <h1 className="text-[rgb(127,82,252)]">
+                        Message: {selectedReplyMessage?.message}
+                    </h1>
+                </div>
+            )}
+
             <form
-                className="flex h-fit items-end justify-center rounded-full"
+                className="flex h-fit flex-col items-end justify-center rounded-full pl-4"
                 onSubmit={submitForm}
             >
                 <div className="mx-2 mb-2 flex h-fit w-full items-center rounded-[5rem] border-2 border-[rgb(59,37,119)] bg-white/20 backdrop-blur-2xl">
@@ -168,7 +253,7 @@ const MessageTypingBar = ({ room, setMessages }) => {
                     </button>
                 </div>
             </form>
-        </>
+        </div>
     );
 };
 

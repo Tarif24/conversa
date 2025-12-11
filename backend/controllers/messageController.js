@@ -11,6 +11,7 @@ import {
     editMessage,
     deleteMessage,
     populateRoomMemberReadStatus,
+    populateRoomMemberReadStatusSingleMessage,
 } from '../services/databaseService.js';
 import {
     encryptMessage,
@@ -84,9 +85,12 @@ export const sendMessage = async message => {
         // Prepare message with reply info for response
         const messageWithReply = await addReplyInfo(decryptedMessage);
 
+        const messageWithReadStatus =
+            await populateRoomMemberReadStatusSingleMessage(decryptedMessage);
+
         return {
             success: true,
-            message: messageWithReply,
+            message: messageWithReadStatus,
             roomExists: true,
             roomName: room.room.roomName,
             otherUser: otherUser?.username,

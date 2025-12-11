@@ -19,8 +19,8 @@ class MessageHandler {
             await this.handleSendMessage(socket, message, callback);
         });
 
-        socket.on(EVENTS.EDIT_MESSAGE, async data => {
-            await this.handleEditMessage(socket, data);
+        socket.on(EVENTS.EDIT_MESSAGE, async (data, callback) => {
+            await this.handleEditMessage(socket, data, callback);
         });
 
         socket.on(EVENTS.DELETE_MESSAGE, async data => {
@@ -70,14 +70,18 @@ class MessageHandler {
         }
     }
 
-    async handleEditMessage(socket, data) {
+    async handleEditMessage(socket, data, callback) {
         try {
             const result = await messageEdit(data.messageId, socket.userId, data.newContent);
 
             if (result.success) {
-                this.io.to(message.roomId).emit(EVENTS.ROOM_REFRESH, {
+                this.io.to(data.roomId).emit(EVENTS.ROOM_REFRESH, {
                     message: 'New message sent please refresh rooms',
                 });
+            }
+
+            if (callback) {
+                callback(result);
             }
         } catch (error) {
             console.error('handle edit message error:', error);

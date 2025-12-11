@@ -49,13 +49,19 @@ export const addReplyInfo = async message => {
         };
     }
 
+    const decryptedMessage = decryptMessage({
+        encrypted: parentMessage.message,
+        iv: parentMessage.iv,
+        authTag: parentMessage.authTag,
+    });
+
     // Parent exists
     return {
         ...message,
         replyTo: {
             messageId: parentMessage._id,
             username: parentMessage.username,
-            content: parentMessage.content,
+            content: decryptedMessage,
             createdAt: parentMessage.createdAt,
             isDeleted: false,
         },

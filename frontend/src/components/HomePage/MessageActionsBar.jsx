@@ -5,7 +5,13 @@ import { Reply } from 'lucide-react';
 import { Pencil } from 'lucide-react';
 import { Trash2 } from 'lucide-react';
 
-const MessageActionsBar = ({ isUser = true, isHovered = false, message }) => {
+const MessageActionsBar = ({
+    isUser = true,
+    isHovered = false,
+    message,
+    setSelectedEditMessage,
+    setSelectedReplyMessage,
+}) => {
     const { isConnected, connectionState, user, sendProtected, sendRefresh, sendLastEmitted } =
         useSocketIO();
 
@@ -18,6 +24,15 @@ const MessageActionsBar = ({ isUser = true, isHovered = false, message }) => {
         sendProtected(EVENTS.DELETE_MESSAGE, { messageId: message._id, roomId: message.roomId });
     };
 
+    const handleOnEditClicked = () => {
+        setSelectedReplyMessage(null);
+        setSelectedEditMessage(message);
+    };
+    const handleOnReplyClicked = () => {
+        setSelectedEditMessage(null);
+        setSelectedReplyMessage(message);
+    };
+
     return (
         <div className={`${isHovered ? 'flex' : 'hidden'}`}>
             {isUser ? (
@@ -27,12 +42,24 @@ const MessageActionsBar = ({ isUser = true, isHovered = false, message }) => {
                         size={40}
                         onClick={() => handleOnDeleteClicked()}
                     />
-                    <Pencil className={messageActionStyleUser} size={40} />
-                    <Reply className={messageActionStyleUser} size={40} />
+                    <Pencil
+                        className={messageActionStyleUser}
+                        size={40}
+                        onClick={() => handleOnEditClicked()}
+                    />
+                    <Reply
+                        className={messageActionStyleUser}
+                        size={40}
+                        onClick={() => handleOnReplyClicked()}
+                    />
                 </div>
             ) : (
                 <div>
-                    <Reply className={messageActionStyleOther} size={40} />
+                    <Reply
+                        className={messageActionStyleOther}
+                        size={40}
+                        onClick={() => handleOnReplyClicked()}
+                    />
                 </div>
             )}
         </div>
