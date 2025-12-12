@@ -5,6 +5,7 @@ import MessagingInterface from '../components/HomePage/MessagingInterface';
 import ChatsSidebar from '../components/HomePage/ChatsSidebar';
 import CreateChat from '../components/HomePage/CreateChat';
 import Navbar from '../components/HomePage/Navbar';
+import ChatInfo from '../components/HomePage/ChatInfo';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
@@ -21,6 +22,7 @@ const HomePage = () => {
 
     const [isCreateChatActive, setIsCreateChatActive] = useState(false);
     const [activeRoom, setActiveRoom] = useState(null);
+    const [isChatInfoActive, setIsChatInfoActive] = useState(false);
 
     const navigate = useNavigate();
 
@@ -60,8 +62,14 @@ const HomePage = () => {
             {isCreateChatActive ? (
                 <CreateChat isCreateChatActive={setIsCreateChatActive} />
             ) : (
-                <MessagingInterface room={activeRoom} isCreateChatActive={setIsCreateChatActive} />
+                <MessagingInterface
+                    room={activeRoom}
+                    isCreateChatActive={setIsCreateChatActive}
+                    setIsChatInfoActive={setIsChatInfoActive}
+                    isChatInfoActive={isChatInfoActive}
+                />
             )}
+            {isChatInfoActive && <ChatInfo />}
         </div>
     );
 };

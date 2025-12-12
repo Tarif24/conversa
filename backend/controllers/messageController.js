@@ -12,6 +12,7 @@ import {
     deleteMessage,
     populateRoomMemberReadStatus,
     populateRoomMemberReadStatusSingleMessage,
+    messageSearch,
 } from '../services/databaseService.js';
 import {
     encryptMessage,
@@ -177,6 +178,34 @@ export const messageDelete = async (messageId, userId) => {
     } catch (error) {
         console.error('controller delete message error:', error);
         const message = 'Failed to delete message: ' + error;
+        return { success: false, message: message };
+    }
+};
+
+export const getMessagesSearch = async (roomId, query) => {
+    try {
+        if (query.text === '') return { success: false, message: 'No text provided' };
+
+        const result = await messageSearch(roomId, query.text);
+
+        if (!result.foundMessages) {
+            return {
+                success: false,
+                userList: [{ message: 'No messages found' }],
+                foundMessages: false,
+                message: 'No messages found',
+            };
+        }
+
+        return {
+            success: true,
+            userList: result.list,
+            foundUsers: true,
+            message: 'Found Users',
+        };
+    } catch (error) {
+        console.error('user search error:', error);
+        const message = 'Failed to user search: ' + error;
         return { success: false, message: message };
     }
 };

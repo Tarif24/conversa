@@ -5,10 +5,16 @@ import EVENTS from '../../../../constants/socketEvents';
 import { MessageCirclePlus } from 'lucide-react';
 import { Users } from 'lucide-react';
 import { Reply } from 'lucide-react';
+import { Info } from 'lucide-react';
 import MessageTypingBar from './MessageTypingBar';
 import MessageActionsBar from './MessageActionsBar';
 
-const MessagingInterface = ({ room, isCreateChatActive }) => {
+const MessagingInterface = ({
+    room,
+    isCreateChatActive,
+    setIsChatInfoActive,
+    isChatInfoActive,
+}) => {
     const { isConnected, connectionState, user, sendProtected, sendRefresh, sendLastEmitted } =
         useSocketIO();
 
@@ -112,51 +118,63 @@ const MessagingInterface = ({ room, isCreateChatActive }) => {
 
     return (
         <div className="flex h-full flex-1 flex-col justify-between rounded-2xl bg-white/50 backdrop-blur-2xl">
-            <div className="flex h-23 items-center py-4 pl-8">
+            <div className="flex h-23 items-center px-8 py-4">
                 {room ? (
-                    <div className="flex items-center gap-4">
-                        <div className="flex size-15 items-center justify-center rounded-full bg-white/30 p-2 backdrop-blur-2xl">
-                            <h1 className="text-2xl font-bold text-[rgb(80,53,168)]">
-                                {room.type === 'direct' ? (
-                                    room.otherUser[0].toUpperCase()
-                                ) : (
-                                    <Users />
-                                )}
-                            </h1>
-                        </div>
-                        <div>
-                            <h1 className="text-3xl font-medium text-[rgb(97,7,180)]">
-                                {room.type === 'direct' ? room.otherUser : room.roomName}
-                            </h1>
-                            <div className="flex items-center gap-1">
-                                {room.type === 'direct' ? (
-                                    room.onlineMembers.length === 2 ? (
+                    <div className="flex w-full items-center justify-between">
+                        <div className="flex gap-4">
+                            <div className="flex size-15 items-center justify-center rounded-full bg-white/30 p-2 backdrop-blur-2xl">
+                                <h1 className="text-2xl font-bold text-[rgb(80,53,168)]">
+                                    {room.type === 'direct' ? (
+                                        room.otherUser[0].toUpperCase()
+                                    ) : (
+                                        <Users />
+                                    )}
+                                </h1>
+                            </div>
+                            <div>
+                                <h1 className="text-3xl font-medium text-[rgb(97,7,180)]">
+                                    {room.type === 'direct' ? room.otherUser : room.roomName}
+                                </h1>
+                                <div className="flex items-center gap-1">
+                                    {room.type === 'direct' ? (
+                                        room.onlineMembers.length === 2 ? (
+                                            <div className="flex items-center justify-center gap-1">
+                                                <div className="size-3 rounded-full bg-green-400"></div>
+                                                <div className="text-[rgb(97,7,180)]">online</div>
+                                            </div>
+                                        ) : (
+                                            <div className="flex items-center justify-center gap-1">
+                                                <div className="size-3 rounded-full bg-red-400"></div>
+                                                <div className="text-[rgb(97,7,180)]">offline</div>
+                                            </div>
+                                        )
+                                    ) : room.onlineMembers.length > 1 ? (
                                         <div className="flex items-center justify-center gap-1">
                                             <div className="size-3 rounded-full bg-green-400"></div>
-                                            <div className="text-[rgb(97,7,180)]">online</div>
+                                            <h1 className="text-[rgb(97,7,180)]">
+                                                {room.onlineMembers.length - 1}/
+                                                {room.users.length - 1}
+                                            </h1>
                                         </div>
                                     ) : (
                                         <div className="flex items-center justify-center gap-1">
                                             <div className="size-3 rounded-full bg-red-400"></div>
-                                            <div className="text-[rgb(97,7,180)]">offline</div>
+                                            <h1 className="text-[rgb(97,7,180)]">
+                                                {room.onlineMembers.length - 1}/
+                                                {room.users.length - 1}
+                                            </h1>
                                         </div>
-                                    )
-                                ) : room.onlineMembers.length > 1 ? (
-                                    <div className="flex items-center justify-center gap-1">
-                                        <div className="size-3 rounded-full bg-green-400"></div>
-                                        <h1 className="text-[rgb(97,7,180)]">
-                                            {room.onlineMembers.length - 1}/{room.users.length - 1}
-                                        </h1>
-                                    </div>
-                                ) : (
-                                    <div className="flex items-center justify-center gap-1">
-                                        <div className="size-3 rounded-full bg-red-400"></div>
-                                        <h1 className="text-[rgb(97,7,180)]">
-                                            {room.onlineMembers.length - 1}/{room.users.length - 1}
-                                        </h1>
-                                    </div>
-                                )}
+                                    )}
+                                </div>
                             </div>
+                        </div>
+                        <div
+                            className={`${isChatInfoActive ? 'bg-[rgb(97,7,180)] text-[rgb(176,168,226)]' : ' text-[rgb(97,7,180)]'} w-fit rounded-full transition duration-200 ease-in-out hover:scale-110 hover:cursor-pointer`}
+                            onClick={() => {
+                                setIsChatInfoActive(!isChatInfoActive);
+                            }}
+                        >
+                            <Info size={30} />
                         </div>
                     </div>
                 ) : (

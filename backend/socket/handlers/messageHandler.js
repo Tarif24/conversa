@@ -4,6 +4,7 @@ import {
     messageEdit,
     messageDelete,
     getMessagesForChat,
+    getMessagesSearch,
 } from '../../controllers/messageController.js';
 
 class MessageHandler {
@@ -29,6 +30,10 @@ class MessageHandler {
 
         socket.on(EVENTS.GET_MESSAGES_FOR_ROOM, async (room, callback) => {
             await this.handleGetMessagesForRoom(socket, room, callback);
+        });
+
+        socket.on(EVENTS.MESSAGE_SEARCH, async (data, callback) => {
+            await this.handleMessageSearch(socket, data, callback);
         });
     }
 
@@ -128,6 +133,22 @@ class MessageHandler {
             console.error('handle get messages for room:', error);
             socket.emit(EVENTS.ERROR, {
                 event: EVENTS.GET_MESSAGES_FOR_ROOM,
+                message: 'Server error',
+            });
+        }
+    }
+
+    async handleMessageSearch(socket, data, callback) {
+        try {
+            const result = await getMessagesSearch(data.roomId, data.query);
+
+            if (callback) {
+                callback(result);
+            }
+        } catch (error) {
+            console.error('handle message search error:', error);
+            socket.emit(EVENTS.ERROR, {
+                event: EVENTS.MESSAGE_SEARCH,
                 message: 'Server error',
             });
         }

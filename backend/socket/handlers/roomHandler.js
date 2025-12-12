@@ -1,5 +1,12 @@
 import EVENTS from '../../../constants/socketEvents.js';
-import { createChatRoom, getUserChats, setActiveRoom } from '../../controllers/roomController.js';
+import {
+    createChatRoom,
+    getUserChats,
+    setActiveRoom,
+    GetRoomSidebarInfo,
+    leaveRoom,
+    joinRoom,
+} from '../../controllers/roomController.js';
 
 class RoomHandler {
     constructor(io, connectionManager) {
@@ -20,6 +27,18 @@ class RoomHandler {
 
         socket.on(EVENTS.SET_ACTIVE_ROOM, (room, callback) =>
             this.handleSetActiveRoom(socket, room, callback)
+        );
+
+        socket.on(EVENTS.GET_ROOM_SIDEBAR_INFO, (room, callback) =>
+            this.handleSetActiveRoom(socket, room, callback)
+        );
+
+        socket.on(EVENTS.JOIN_ROOM, (data, callback) =>
+            this.handleJoinRoom(socket, data, callback)
+        );
+
+        socket.on(EVENTS.LEAVE_ROOM, (data, callback) =>
+            this.handleLeaveRoom(socket, data, callback)
         );
     }
 
@@ -55,8 +74,6 @@ class RoomHandler {
 
             if (callback) {
                 callback(result);
-            } else {
-                console.log('No callback provided for user_search event');
             }
         } catch (error) {
             console.error('handle create room error:', error);
@@ -86,8 +103,6 @@ class RoomHandler {
 
             if (callback) {
                 callback(finalResult);
-            } else {
-                console.log('No callback provided for user_search event');
             }
         } catch (error) {
             console.error('handle get user rooms:', error);
@@ -129,8 +144,6 @@ class RoomHandler {
                     success: true,
                     message: `Active roomId set to ${room.roomId}`,
                 });
-            } else {
-                console.log('No callback provided for user_search event');
             }
 
             const typingUsers = this.connectionManager.getTypingUsersInRoom(room.roomId);
@@ -146,6 +159,71 @@ class RoomHandler {
             console.error('handle get user rooms:', error);
             socket.emit(EVENTS.ERROR, {
                 event: EVENTS.GET_USER_ROOMS,
+                message: 'Server error',
+            });
+        }
+    }
+
+    async handleGetRoomSidebarInfo(socket, room, callback) {
+        try {
+            const result = await GetRoomSidebarInfo(room.roomId);
+
+            if (!result.success) {
+                callback({ success: false });
+                return;
+            }
+
+            const onlineMembers = this.connectionManager.getOnlineUsersInRoom(result.room.users);
+
+            if (callback) {
+                callback({ ...result, onlineMembers: onlineMembers });
+            }
+        } catch (error) {
+            console.error('handle get room sidebar info:', error);
+            socket.emit(EVENTS.ERROR, {
+                event: EVENTS.GET_ROOM_SIDEBAR_INFO,
+                message: 'Server error',
+            });
+        }
+    }
+
+    async handleJoinRoom(socket, data, callback) {
+        try {
+            const result = await joinRoom(data.roomId, socket.userId);
+
+            if (!result.success) {
+                callback({ success: false });
+                return;
+            }
+
+            if (callback) {
+                callback(result);
+            }
+        } catch (error) {
+            console.error('handle join room:', error);
+            socket.emit(EVENTS.ERROR, {
+                event: EVENTS.JOIN_ROOM,
+                message: 'Server error',
+            });
+        }
+    }
+
+    async handleLeaveRoom(socket, data, callback) {
+        try {
+            const result = await leaveRoom(data.roomId, data.isKick);
+
+            if (!result.success) {
+                callback();
+                return;
+            }
+
+            if (callback) {
+                callback();
+            }
+        } catch (error) {
+            console.error('handle leave room:', error);
+            socket.emit(EVENTS.ERROR, {
+                event: EVENTS.LEAVE_ROOM,
                 message: 'Server error',
             });
         }

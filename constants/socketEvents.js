@@ -8,6 +8,7 @@ const SOCKET_EVENTS = {
     MESSAGES_LOADED: 'messages_loaded',
     MARK_AS_READ: 'mark_as_read',
     USER_READ_UPDATE: 'user_read_update',
+    MESSAGE_SEARCH: 'message_search',
 
     // Room events
     CREATE_CHAT_ROOM: 'create_chat_room',
@@ -23,6 +24,9 @@ const SOCKET_EVENTS = {
     GET_UNREAD_COUNTS: 'get_unread_counts',
     USER_UNREAD_UPDATE: 'user_unread_update',
     UNREAD_COUNT_INCREMENT: 'unread_count_increment',
+    GET_ROOM_SIDEBAR_INFO: 'get_room_sidebar_info',
+    JOIN_ROOM: 'join_room',
+    LEAVE_ROOM: 'leave_room',
 
     // User events
     USER_ONLINE: 'user_online',

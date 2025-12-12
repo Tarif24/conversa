@@ -10,6 +10,15 @@ import {
     updateReadPosition,
     getUnreadMessages,
     createRoomMember,
+    getAllRoomMembersForRoom,
+    addRoomToUser,
+    addUserToRoom,
+    deleteRoomFromUser,
+    deleteUserFromRoom,
+    deleteRoomMember,
+    deleteAllMessagesInRoom,
+    deleteAllRoomMemberInRoom,
+    deleteRoom,
 } from '../services/databaseService.js';
 import { populateReplyInfo } from '../services/messageService.js';
 import { encryptMessage, decryptMessage } from '../services/messageService.js';
@@ -206,6 +215,109 @@ export const setActiveRoom = async (roomId, userId, isFirstOpen = true) => {
     } catch (error) {
         console.error('Handle set active room error:', error);
         const message = 'Failed to set users active room: ' + error;
+        return { success: false, message: message };
+    }
+};
+
+export const GetRoomSidebarInfo = async roomId => {
+    try {
+        const room = await getRoomByRoomId(roomId);
+
+        const roomMembers = await getAllRoomMembersForRoom(roomId);
+
+        return {
+            success: true,
+            room: room.room,
+            roomMembers: roomMembers,
+        };
+    } catch (error) {
+        console.error('Handle get room sidebar info error:', error);
+        const message = 'Failed to get room sidebar info: ' + error;
+        return { success: false, message: message };
+    }
+};
+
+export const joinRoom = async (roomId, userId) => {
+    try {
+        const userAddResult = await addRoomToUser(roomId, userId);
+
+        const roomAddResult = await addUserToRoom(roomId, userId);
+
+        const user = await getUserByUserId(userId);
+
+        const newMember = await createRoomMember({
+            roomId: roomId,
+            userId: userId,
+            username: user.user.username,
+        });
+        return {
+            success: true,
+        };
+    } catch (error) {
+        console.error('Handle leave room error:', error);
+        const message = 'Failed to leave room: ' + error;
+        return { success: false, message: message };
+    }
+};
+
+export const leaveRoom = async (roomId, userId, isKick = false) => {
+    try {
+        const roomMember = await getRoomMemberForRoom(roomId, userId);
+
+        if (roomMember.role === 'owner') {
+            if (isKick) {
+                await deleteAllMessagesInRoom(roomId);
+                await deleteAllRoomMemberInRoom(roomId);
+                await deleteRoom(roomId);
+
+                return {
+                    success: true,
+                };
+            }
+
+            return { success: false, message: 'Owner cant leave room' };
+        }
+
+        const room = (await getRoomByRoomId(roomId)).room;
+
+        if (room.type === 'direct') {
+            for (const id of room.users) {
+                await deleteRoomFromUser(roomId, id);
+            }
+
+            await deleteAllMessagesInRoom(roomId);
+            await deleteAllRoomMemberInRoom(roomId);
+            await deleteRoom(roomId);
+
+            return {
+                success: true,
+            };
+        }
+
+        if (room.users.length === 3 && room.type === 'group') {
+            for (const id of room.users) {
+                await deleteRoomFromUser(roomId, id);
+            }
+
+            await deleteAllMessagesInRoom(roomId);
+            await deleteAllRoomMemberInRoom(roomId);
+            await deleteRoom(roomId);
+
+            return {
+                success: true,
+            };
+        }
+
+        await deleteUserFromRoom(roomId, userId);
+        await deleteRoomFromUser(roomId, userId);
+        await deleteRoomMember(roomId, userId);
+
+        return {
+            success: true,
+        };
+    } catch (error) {
+        console.error('Handle leave room error:', error);
+        const message = 'Failed to leave room: ' + error;
         return { success: false, message: message };
     }
 };
