@@ -55,7 +55,7 @@ const messageSchema = new mongoose.Schema(
 );
 
 // Compound indexes
-messageSchema.index({ message: 1, roomID: 1, timeStamp: -1 }, { name: 'MessageRoomTimeIndex' });
+messageSchema.index({ message: 1, roomId: 1, timeStamp: -1 }, { name: 'MessageRoomTimeIndex' });
 
 // Text search index
 messageSchema.index(

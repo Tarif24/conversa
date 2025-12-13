@@ -50,6 +50,9 @@ const MessagingInterface = ({
     });
 
     useSocketIOEvent(EVENTS.ROOM_REFRESH, () => {
+        if (!room) {
+            return;
+        }
         sendProtected(EVENTS.GET_MESSAGES_FOR_ROOM, { roomId: room._id }, response => {
             if (!response.success) return;
             organizeMessageStructureAndSave(response.messages);
@@ -183,7 +186,7 @@ const MessagingInterface = ({
             </div>
             <div className="flex flex-1 flex-col justify-end rounded-2xl bg-white/30">
                 {room ? (
-                    <div className="flex max-h-203 flex-1 flex-col justify-between">
+                    <div className="flex max-h-203 flex-1 flex-col justify-end">
                         <div className="custom-scrollbar mr-1 flex flex-col overflow-y-auto px-4">
                             {chatHistory.map(({ role, message }, index) => {
                                 return role !== 'system' ? (

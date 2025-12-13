@@ -140,7 +140,7 @@ class MessageHandler {
 
     async handleMessageSearch(socket, data, callback) {
         try {
-            const result = await getMessagesSearch(data.roomId, data.query);
+            const result = await getMessagesSearch(data.roomId, data.text);
 
             if (callback) {
                 callback(result);

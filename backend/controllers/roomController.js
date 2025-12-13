@@ -19,8 +19,9 @@ import {
     deleteAllMessagesInRoom,
     deleteAllRoomMemberInRoom,
     deleteRoom,
+    getRoomMemberForRoom,
 } from '../services/databaseService.js';
-import { populateReplyInfo } from '../services/messageService.js';
+import { populateReplyInfo, newSystemMessage } from '../services/messageService.js';
 import { encryptMessage, decryptMessage } from '../services/messageService.js';
 
 export const createChatRoom = async (sentRoom, userId) => {
@@ -69,10 +70,6 @@ export const createChatRoom = async (sentRoom, userId) => {
 
         const roomId = newRoom._id.toString();
 
-        const systemMessage = sentRoom.users.length > 2 ? 'New Group Chat' : 'New Direct Chat';
-
-        const encryptedData = encryptMessage(systemMessage);
-
         for (const id of newRoom.users) {
             const user = (await getUserByUserId(id)).user;
             if (id === userId) {
@@ -91,18 +88,9 @@ export const createChatRoom = async (sentRoom, userId) => {
             }
         }
 
-        const message = {
-            userId: 'system',
-            roomId: roomId,
-            username: 'SYSTEM',
-            message: encryptedData.encrypted,
-            iv: encryptedData.iv,
-            authTag: encryptedData.authTag,
-        };
+        const systemMessage = sentRoom.users.length > 2 ? 'New Group Chat' : 'New Direct Chat';
 
-        const initialMessage = await createMessage(message);
-
-        updateRoomLastMessage(roomId, initialMessage);
+        await newSystemMessage(roomId, systemMessage);
 
         await addRoomToUsers(roomId, sentRoom.users);
 
@@ -250,6 +238,10 @@ export const joinRoom = async (roomId, userId) => {
             userId: userId,
             username: user.user.username,
         });
+
+        const systemMessage = `${user.user.username} has joined the chat`;
+
+        await newSystemMessage(roomId, systemMessage);
         return {
             success: true,
         };
@@ -260,12 +252,23 @@ export const joinRoom = async (roomId, userId) => {
     }
 };
 
-export const leaveRoom = async (roomId, userId, isKick = false) => {
+export const leaveRoom = async (roomId, userId, senderUserId, isKick = false) => {
     try {
         const roomMember = await getRoomMemberForRoom(roomId, userId);
+        const senderRoomMember = await getRoomMemberForRoom(roomId, senderUserId);
+        const user = await getUserByUserId(userId);
+        const room = (await getRoomByRoomId(roomId)).room;
 
-        if (roomMember.role === 'owner') {
-            if (isKick) {
+        if (roomMember.role === 'owner' && room.type === 'group') {
+            return { success: false, message: 'Owner cant leave room' };
+        }
+
+        if (isKick && senderRoomMember.role === 'owner') {
+            if (room.users.length === 3 && room.type === 'group') {
+                for (const id of room.users) {
+                    await deleteRoomFromUser(roomId, id);
+                }
+
                 await deleteAllMessagesInRoom(roomId);
                 await deleteAllRoomMemberInRoom(roomId);
                 await deleteRoom(roomId);
@@ -275,10 +278,18 @@ export const leaveRoom = async (roomId, userId, isKick = false) => {
                 };
             }
 
-            return { success: false, message: 'Owner cant leave room' };
-        }
+            await deleteUserFromRoom(roomId, userId);
+            await deleteRoomFromUser(roomId, userId);
+            await deleteRoomMember(roomId, userId);
 
-        const room = (await getRoomByRoomId(roomId)).room;
+            const systemMessage = `${user.user.username} has been kicked from the chat`;
+
+            await newSystemMessage(roomId, systemMessage);
+
+            return {
+                success: true,
+            };
+        }
 
         if (room.type === 'direct') {
             for (const id of room.users) {
@@ -312,11 +323,15 @@ export const leaveRoom = async (roomId, userId, isKick = false) => {
         await deleteRoomFromUser(roomId, userId);
         await deleteRoomMember(roomId, userId);
 
+        const systemMessage = `${user.user.username} has left the chat`;
+
+        await newSystemMessage(roomId, systemMessage);
+
         return {
             success: true,
         };
     } catch (error) {
-        console.error('Handle leave room error:', error);
+        console.error('leave room error:', error);
         const message = 'Failed to leave room: ' + error;
         return { success: false, message: message };
     }

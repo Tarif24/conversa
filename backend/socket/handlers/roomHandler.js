@@ -7,6 +7,7 @@ import {
     leaveRoom,
     joinRoom,
 } from '../../controllers/roomController.js';
+import { newSystemMessage } from '../../services/messageService.js';
 
 class RoomHandler {
     constructor(io, connectionManager) {
@@ -30,7 +31,7 @@ class RoomHandler {
         );
 
         socket.on(EVENTS.GET_ROOM_SIDEBAR_INFO, (room, callback) =>
-            this.handleSetActiveRoom(socket, room, callback)
+            this.handleGetRoomSidebarInfo(socket, room, callback)
         );
 
         socket.on(EVENTS.JOIN_ROOM, (data, callback) =>
@@ -166,6 +167,11 @@ class RoomHandler {
 
     async handleGetRoomSidebarInfo(socket, room, callback) {
         try {
+            if (!room.roomId) {
+                callback({ success: false });
+                return;
+            }
+
             const result = await GetRoomSidebarInfo(room.roomId);
 
             if (!result.success) {
@@ -173,7 +179,7 @@ class RoomHandler {
                 return;
             }
 
-            const onlineMembers = this.connectionManager.getOnlineUsersInRoom(result.room.users);
+            const onlineMembers = this.connectionManager.getOnlineUsersInRoom(result.room?.users);
 
             if (callback) {
                 callback({ ...result, onlineMembers: onlineMembers });
@@ -189,12 +195,22 @@ class RoomHandler {
 
     async handleJoinRoom(socket, data, callback) {
         try {
-            const result = await joinRoom(data.roomId, socket.userId);
+            const result = await joinRoom(data.roomId, data.userId);
 
             if (!result.success) {
                 callback({ success: false });
                 return;
             }
+
+            const userSocket = this.connectionManager.getSocketByUserId(data.userId);
+
+            if (userSocket) {
+                await userSocket.join(data.roomId);
+            }
+
+            this.io.to(data.roomId).emit(EVENTS.ROOM_REFRESH, {
+                message: 'New room available please refresh rooms',
+            });
 
             if (callback) {
                 callback(result);
@@ -210,15 +226,28 @@ class RoomHandler {
 
     async handleLeaveRoom(socket, data, callback) {
         try {
-            const result = await leaveRoom(data.roomId, data.isKick);
+            const result = await leaveRoom(data.roomId, data.userId, socket.userId, data.isKick);
 
             if (!result.success) {
-                callback();
+                if (callback) {
+                    callback(result);
+                }
+
                 return;
             }
 
+            this.io.to(data.roomId).emit(EVENTS.ROOM_REFRESH, {
+                message: 'New room available please refresh rooms',
+            });
+
+            const userSocket = this.connectionManager.getSocketByUserId(data.userId);
+
+            if (userSocket) {
+                await userSocket.join(data.roomId);
+            }
+
             if (callback) {
-                callback();
+                callback(result);
             }
         } catch (error) {
             console.error('handle leave room:', error);

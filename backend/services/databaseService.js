@@ -1,5 +1,5 @@
 import { User, Message, File, Room, RefreshToken, RoomMember } from '../database/models/index.js';
-import { encryptMessage } from './messageService.js';
+import { encryptMessage, decryptMessage } from './messageService.js';
 
 // User Services
 export const createUser = async userData => {
@@ -33,10 +33,10 @@ export const getUserByUserId = async userId => {
 
 export const getUsersByUsernameSearch = async (usernameQuery, excludeUserIds = []) => {
     const users = await User.find({
+        _id: { $nin: excludeUserIds },
         username: {
             $regex: usernameQuery,
             $options: 'i', // case-insensitive
-            $nin: excludeUserIds,
         },
     }).limit(10);
 
@@ -48,13 +48,13 @@ export const getUsersByUsernameSearch = async (usernameQuery, excludeUserIds = [
 };
 
 export const addRoomToUser = async (roomId, userId) => {
-    const result = await User.update({ _id: userId }, { $push: { rooms: roomId } });
+    const result = await User.updateOne({ _id: userId }, { $push: { rooms: roomId } });
 
     return result;
 };
 
 export const deleteRoomFromUser = async (roomId, userId) => {
-    const result = await User.update({ _id: userId }, { $pull: { rooms: roomId } });
+    const result = await User.updateOne({ _id: userId }, { $pull: { rooms: roomId } });
 
     return result;
 };
@@ -168,14 +168,37 @@ export const deleteMessage = async (messageId, userId) => {
 export const messageSearch = async (roomId, query) => {
     const messages = await Message.find({
         roomId: roomId,
-        $text: { $search: `"${query}"` },
-    });
+        isDeleted: false,
+    })
+        .sort({ timeStamp: -1 })
+        .limit(500) // Limit for performance
+        .lean();
 
-    if (messages.length === 0) {
+    const results = [];
+    for (const msg of messages) {
+        try {
+            const decrypted = decryptMessage({
+                encrypted: msg.message,
+                iv: msg.iv,
+                authTag: msg.authTag,
+            });
+            if (decrypted.toLowerCase().includes(query.toLowerCase())) {
+                results.push({
+                    ...msg,
+                    message: decrypted, // Return decrypted
+                });
+            }
+        } catch (err) {
+            // Skip messages that fail to decrypt
+            continue;
+        }
+    }
+
+    if (results.length === 0) {
         return { success: false, foundMessages: false };
     }
 
-    return { success: true, foundMessages: true, list: messages };
+    return { success: true, foundMessages: true, list: results };
 };
 
 // File Services
@@ -191,7 +214,7 @@ export const createRoom = async roomData => {
 };
 
 export const deleteRoom = async roomId => {
-    const room = await Room.deleteOne({ roomId });
+    const room = await Room.deleteOne({ _id: roomId });
     return room;
 };
 

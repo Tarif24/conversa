@@ -7,7 +7,7 @@ import { House } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
-const Navbar = ({ isCreateChatActive, setActiveRoom }) => {
+const Navbar = ({ isCreateChatActive, setActiveRoom, setIsChatInfoActive }) => {
     const {
         isConnected,
         connectionState,
@@ -26,6 +26,7 @@ const Navbar = ({ isCreateChatActive, setActiveRoom }) => {
         'flex size-15 items-center justify-center rounded-full bg-white/60 backdrop-blur-2xl p-2 hover:cursor-pointer hover:scale-110 transition-all duration-200 ease-in-out';
 
     const handleOnNewChatClicked = () => {
+        setIsChatInfoActive(false);
         isCreateChatActive(true);
     };
 
@@ -40,6 +41,7 @@ const Navbar = ({ isCreateChatActive, setActiveRoom }) => {
     };
 
     const handleOnHomeClicked = () => {
+        setIsChatInfoActive(false);
         setActiveRoom(null);
         isCreateChatActive(false);
     };

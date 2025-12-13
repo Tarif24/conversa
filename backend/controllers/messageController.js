@@ -182,16 +182,16 @@ export const messageDelete = async (messageId, userId) => {
     }
 };
 
-export const getMessagesSearch = async (roomId, query) => {
+export const getMessagesSearch = async (roomId, text) => {
     try {
-        if (query.text === '') return { success: false, message: 'No text provided' };
+        if (text === '') return { success: false, message: 'No text provided' };
 
-        const result = await messageSearch(roomId, query.text);
+        const result = await messageSearch(roomId, text);
 
         if (!result.foundMessages) {
             return {
                 success: false,
-                userList: [{ message: 'No messages found' }],
+                messageList: [{ message: 'No messages found', user: '' }],
                 foundMessages: false,
                 message: 'No messages found',
             };
@@ -199,7 +199,7 @@ export const getMessagesSearch = async (roomId, query) => {
 
         return {
             success: true,
-            userList: result.list,
+            messageList: result.list,
             foundUsers: true,
             message: 'Found Users',
         };

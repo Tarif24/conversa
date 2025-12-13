@@ -10,17 +10,17 @@ class UserHandler {
     handleConnection(socket) {
         // Profile update, User search, Get username, User settings
 
-        socket.on(EVENTS.USER_SEARCH, (query, callback) =>
-            this.handleUserSearch(socket, query, callback)
+        socket.on(EVENTS.USER_SEARCH, (data, callback) =>
+            this.handleUserSearch(socket, data, callback)
         );
         socket.on(EVENTS.GET_USERNAME, (user, callback) =>
             this.handleGetUsername(socket, user, callback)
         );
     }
 
-    async handleUserSearch(socket, query, callback) {
+    async handleUserSearch(socket, data, callback) {
         try {
-            const result = await userSearch(query);
+            const result = await userSearch(data.text, data.excludeUsers);
 
             if (callback) {
                 callback(result);

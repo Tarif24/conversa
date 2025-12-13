@@ -88,7 +88,10 @@ const CreateChat = ({ isCreateChatActive }) => {
 
                     {/* SELECT USERS */}
                     <div>
-                        <UserSearch handleOnUserClicked={handleOnUserClicked} />
+                        <UserSearch
+                            handleOnUserClicked={handleOnUserClicked}
+                            selectedUsers={newChat.users}
+                        />
                     </div>
 
                     {/* SELECTED USERS LIST */}

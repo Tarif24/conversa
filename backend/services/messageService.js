@@ -1,5 +1,5 @@
 import crypto from 'crypto';
-import { getMessageById } from './databaseService.js';
+import { getMessageById, createMessage, updateRoomLastMessage } from './databaseService.js';
 
 const CRYPTO_KEY = Buffer.from(process.env.CRYPTO_KEY, 'hex');
 
@@ -70,4 +70,21 @@ export const addReplyInfo = async message => {
 
 export const populateReplyInfo = async messages => {
     return await Promise.all(messages.map(msg => addReplyInfo(msg)));
+};
+
+export const newSystemMessage = async (roomId, systemMessage) => {
+    const encryptedData = encryptMessage(systemMessage);
+
+    const message = {
+        userId: 'system',
+        roomId: roomId,
+        username: 'system',
+        message: encryptedData.encrypted,
+        iv: encryptedData.iv,
+        authTag: encryptedData.authTag,
+    };
+
+    const initialMessage = await createMessage(message);
+
+    await updateRoomLastMessage(roomId, initialMessage);
 };

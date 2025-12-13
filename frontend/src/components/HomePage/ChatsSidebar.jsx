@@ -4,7 +4,13 @@ import EVENTS from '../../../../constants/socketEvents';
 import { Search } from 'lucide-react';
 import { Users } from 'lucide-react';
 
-const MessagesSidebar = ({ onRoomClicked, isCreateChatActive }) => {
+const MessagesSidebar = ({
+    onRoomClicked,
+    setIsCreateChatActive,
+    setActiveRoom,
+    activeRoom,
+    setIsChatInfoActive,
+}) => {
     const { isConnected, connectionState, user, sendProtected, sendRefresh, sendLastEmitted } =
         useSocketIO();
 
@@ -25,6 +31,24 @@ const MessagesSidebar = ({ onRoomClicked, isCreateChatActive }) => {
         sendProtected(EVENTS.GET_USER_ROOMS, { userId: user._id }, response => {
             setRooms(response.rooms);
             setFilteredRooms(response.rooms);
+
+            let doesHaveRoom = false;
+
+            // Checks if user still has the active room might have been deleted or kicked
+            if (!activeRoom) {
+                return;
+            }
+
+            for (const room of response.rooms) {
+                if (activeRoom._id === room._id) {
+                    doesHaveRoom = true;
+                }
+            }
+
+            if (!doesHaveRoom) {
+                setIsChatInfoActive(false);
+                setActiveRoom(null);
+            }
         });
     });
 
@@ -39,12 +63,6 @@ const MessagesSidebar = ({ onRoomClicked, isCreateChatActive }) => {
         sendProtected(EVENTS.GET_USER_ROOMS, { userId: user._id }, response => {
             setRooms(response.rooms);
             setFilteredRooms(response.rooms);
-
-            response.rooms.forEach(room => {
-                if (room._id === activeRoomId) {
-                    onRoomClicked(room);
-                }
-            });
         });
     });
 
@@ -52,7 +70,7 @@ const MessagesSidebar = ({ onRoomClicked, isCreateChatActive }) => {
         sendProtected(EVENTS.SET_ACTIVE_ROOM, { roomId: room._id }, response => {});
         setActiveRoomId(room._id);
         onRoomClicked(room);
-        isCreateChatActive(false);
+        setIsCreateChatActive(false);
     };
 
     const handleTextOnChange = input => {

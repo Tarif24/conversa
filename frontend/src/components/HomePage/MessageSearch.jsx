@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useSocketIO, useSocketIOEvent, useSocketIOState } from '../../hooks/useSocketIO';
 import EVENTS from '../../../../constants/socketEvents';
 
-const UserSearch = ({ handleOnUserClicked, selectedUsers }) => {
+const MessageSearch = ({ roomId }) => {
     const { isConnected, connectionState, user, sendProtected, sendRefresh, sendLastEmitted } =
         useSocketIO();
 
@@ -12,27 +12,21 @@ const UserSearch = ({ handleOnUserClicked, selectedUsers }) => {
     const textOnChange = e => {
         setInputText(e.target.value);
 
-        const userId = user._id.toString();
         const input = e.target.value.trim();
 
         if (input === '') {
             setSearchResult([]);
             return;
         }
-
-        const excludedUsers = selectedUsers.map(user => {
-            return user.userId;
-        });
-
         try {
             sendProtected(
-                EVENTS.USER_SEARCH,
+                EVENTS.MESSAGE_SEARCH,
                 {
+                    roomId: roomId,
                     text: input,
-                    excludeUsers: [...excludedUsers, user._id],
                 },
                 response => {
-                    setSearchResult(response.userList);
+                    setSearchResult(response.messageList);
                 }
             );
         } catch (error) {
@@ -40,18 +34,12 @@ const UserSearch = ({ handleOnUserClicked, selectedUsers }) => {
         }
     };
 
-    const userResultOnClick = user => {
-        handleOnUserClicked(user);
-        setInputText('');
-        setSearchResult([]);
-    };
-
     return (
         <div className="flex h-fit w-full flex-col justify-center">
             <div className="w-full overflow-hidden rounded-md border-1 border-[rgb(103,67,221)] bg-white/80 p-2 focus:ring-0">
                 <input
                     type="text"
-                    placeholder="Search for users"
+                    placeholder="Search for messages"
                     className="h-7 w-full rounded-[5rem] px-1 text-[rgb(103,67,221)] focus:outline-none"
                     value={inputText}
                     onChange={textOnChange}
@@ -59,15 +47,12 @@ const UserSearch = ({ handleOnUserClicked, selectedUsers }) => {
                 {searchResult && searchResult.length > 0 && (
                     <div className="flex max-h-36 w-full flex-col items-center gap-2 overflow-x-hidden">
                         <span className="w-[75%] border-1 border-[rgb(164,146,224)]"></span>
-                        {searchResult.map(result => (
+                        {searchResult.map((result, index) => (
                             <div
                                 className="w-full rounded-xl border-1 border-[rgb(103,67,221)] bg-gray-100 px-5 py-1 text-[rgb(103,67,221)] hover:cursor-pointer"
-                                key={result.userId}
-                                onClick={() => {
-                                    userResultOnClick(result);
-                                }}
+                                key={index}
                             >
-                                <h1>{result.username}</h1>
+                                <h1>{result.message}</h1>
                             </div>
                         ))}
                     </div>
@@ -77,4 +62,4 @@ const UserSearch = ({ handleOnUserClicked, selectedUsers }) => {
     );
 };
 
-export default UserSearch;
+export default MessageSearch;

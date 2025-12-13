@@ -62,10 +62,14 @@ class ConnectionManager {
 
         if (isNewConnection) {
             this.onlineUsers.set(userId, {
-                userI: userId,
+                userId: userId,
                 username: username,
                 connectedAt: Date.now(),
             });
+        } else {
+            const onlineUser = this.onlineUsers.get(userId);
+
+            this.onlineUsers.set(userId, { ...onlineUser, username: username });
         }
 
         return isNewConnection;
@@ -188,6 +192,10 @@ class ConnectionManager {
     }
 
     getOnlineUsersInRoom(roomMembers) {
+        if (!roomMembers || roomMembers.length === 0) {
+            return [];
+        }
+
         return roomMembers
             .filter(memberId => this.isUserOnline(memberId))
             .map(memberId => this.onlineUsers.get(memberId));

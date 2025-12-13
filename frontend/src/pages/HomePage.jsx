@@ -57,8 +57,18 @@ const HomePage = () => {
 
     return (
         <div className="flex h-full w-full items-center justify-center gap-2 bg-gradient-to-br from-[#363163] via-[#695ce0] to-[#595C8A] p-5">
-            <Navbar isCreateChatActive={setIsCreateChatActive} setActiveRoom={setActiveRoom} />
-            <ChatsSidebar onRoomClicked={roomClicked} isCreateChatActive={setIsCreateChatActive} />
+            <Navbar
+                isCreateChatActive={setIsCreateChatActive}
+                setActiveRoom={setActiveRoom}
+                setIsChatInfoActive={setIsChatInfoActive}
+            />
+            <ChatsSidebar
+                onRoomClicked={roomClicked}
+                setIsCreateChatActive={setIsCreateChatActive}
+                setActiveRoom={setActiveRoom}
+                activeRoom={activeRoom}
+                setIsChatInfoActive={setIsChatInfoActive}
+            />
             {isCreateChatActive ? (
                 <CreateChat isCreateChatActive={setIsCreateChatActive} />
             ) : (
@@ -69,7 +79,13 @@ const HomePage = () => {
                     isChatInfoActive={isChatInfoActive}
                 />
             )}
-            {isChatInfoActive && <ChatInfo />}
+            {isChatInfoActive && (
+                <ChatInfo
+                    room={activeRoom}
+                    setActiveRoom={setActiveRoom}
+                    setIsChatInfoActive={setIsChatInfoActive}
+                />
+            )}
         </div>
     );
 };

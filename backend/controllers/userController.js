@@ -1,15 +1,15 @@
 import { getUsersByUsernameSearch, getUsernameByUserId } from '../services/databaseService.js';
 
-export const userSearch = async query => {
+export const userSearch = async (text, excludeUsers) => {
     try {
-        if (query.text === '') return { success: false, message: 'No text provided' };
+        if (text === '') return { success: false, message: 'No text provided' };
 
-        const result = await getUsersByUsernameSearch(query.text);
+        const result = await getUsersByUsernameSearch(text, excludeUsers);
 
         if (!result.foundUsers) {
             return {
                 success: false,
-                userList: [{ username: 'No users found' }],
+                userList: [{ username: 'No users found', userId: 'NOT FOUND' }],
                 foundUsers: false,
                 message: 'No users found',
             };
