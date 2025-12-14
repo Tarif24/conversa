@@ -39,6 +39,9 @@ const MessageTypingBar = ({
 
     // Mange typing status
     const handleTyping = e => {
+        if (e.target.value.length > 500) {
+            return;
+        }
         setInputText(e.target.value);
 
         // Send "started typing" if not already typing
@@ -241,10 +244,11 @@ const MessageTypingBar = ({
                     <input
                         type="text"
                         placeholder="Send a message..."
-                        className="relative h-full w-full rounded-[5rem] px-5 text-[rgb(81,46,177)] focus:outline-none"
+                        className="relative h-full w-full rounded-[5rem] px-5 break-words text-[rgb(81,46,177)] focus:outline-none"
                         value={inputText}
                         onChange={e => handleTyping(e)}
                     />
+                    <div className="mr-2 text-[rgb(81,46,177)]">{inputText.length}/500</div>
                     <button
                         className="flex h-full items-center justify-center rounded-[5rem] border-2 border-white bg-[rgb(59,37,119)] p-3 text-white transition duration-300 ease-in-out hover:cursor-pointer hover:bg-[rgb(173,154,226)]"
                         type="submit"
