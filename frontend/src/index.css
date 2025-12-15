@@ -1,6 +1,11 @@
 /* eslint-disable */
 @import 'tailwindcss';
 
+:root {
+    --toastify-color-progress-light: #5035a8;
+    --toastify-color-progress-info: #5035a8;
+}
+
 @theme {
     --color-background: rgb(14 11 31);
     --color-card: rgb(26 21 52);

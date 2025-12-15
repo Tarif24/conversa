@@ -45,11 +45,11 @@ const MessageSearch = ({ roomId }) => {
                     onChange={textOnChange}
                 />
                 {searchResult && searchResult.length > 0 && (
-                    <div className="flex max-h-36 w-full flex-col items-center gap-2 overflow-x-hidden">
+                    <div className="custom-scrollbar flex max-h-36 w-full flex-col items-center gap-2 overflow-x-hidden">
                         <span className="w-[75%] border-1 border-[rgb(164,146,224)]"></span>
                         {searchResult.map((result, index) => (
                             <div
-                                className="w-full rounded-xl border-1 border-[rgb(103,67,221)] bg-gray-100 px-5 py-1 text-[rgb(103,67,221)] hover:cursor-pointer"
+                                className="w-[90%] rounded-xl border-1 border-[rgb(103,67,221)] bg-gray-100 px-5 py-1 text-[rgb(103,67,221)] hover:cursor-pointer"
                                 key={index}
                             >
                                 <h1>{result.message}</h1>

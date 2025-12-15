@@ -73,7 +73,8 @@ const MessagingInterface = ({
                         {data.type === 'direct' ? data.otherUser : data.roomName}
                     </h1>
                     <h1>{message}</h1>
-                </div>
+                </div>,
+                {}
             );
             return;
         }
@@ -309,7 +310,7 @@ const MessagingInterface = ({
                                                                 </h1>
                                                             </div>
                                                             <div className="flex items-center gap-1">
-                                                                <h1 className="rounded-l-2xl rounded-tr-2xl bg-[rgb(80,53,168)] p-4 text-[0.8rem] break-words text-white sm:text-[1.2rem]">
+                                                                <h1 className="rounded-l-2xl rounded-tr-2xl bg-[rgb(138,102,255)] p-4 text-[0.8rem] break-words text-white sm:text-[1.2rem]">
                                                                     {message.message}
                                                                 </h1>
                                                                 <MessageActionsBar
