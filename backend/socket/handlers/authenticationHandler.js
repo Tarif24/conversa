@@ -32,8 +32,6 @@ class AuthenticationHandler {
         try {
             const emailFixed = user.email.trim().toLowerCase();
 
-            console.log('Handel signup for user email: ', emailFixed);
-
             const result = await signup({ ...user, email: emailFixed });
 
             if (result.success) {
@@ -60,8 +58,6 @@ class AuthenticationHandler {
     async handleLogin(socket, user, callback) {
         try {
             const emailFixed = user.email.trim().toLowerCase();
-
-            console.log('Handel login for user email: ', emailFixed);
 
             const result = await login({ ...user, email: emailFixed });
 
@@ -119,8 +115,6 @@ class AuthenticationHandler {
 
     async handleLogout(socket, user, callback) {
         try {
-            console.log('Handel logout for user email: ', socket.userEmail);
-
             const result = await logout(user.refreshToken, socket.userId);
 
             const connectionResult = this.connectionManager.forceUserOffline(socket.userId);
@@ -152,8 +146,6 @@ class AuthenticationHandler {
 
     async handleRefreshToken(socket, tokenData, callback) {
         try {
-            console.log('Handle refresh token for: ', socket.userId);
-
             const { token } = tokenData;
 
             if (!token) {

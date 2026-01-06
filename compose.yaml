@@ -36,6 +36,8 @@ services:
                   path: ./backend/package.json
         depends_on:
             - mongodb
+        volumes:
+            - ./backend/logs:/app/logs
     mongodb:
         image: mongo:7.0
         container_name: mongo_database

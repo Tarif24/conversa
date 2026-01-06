@@ -8,6 +8,7 @@ dotenv.config();
 import { connectToDatabase } from './database/connection.js';
 
 import ConnectionManager from './socket/managers/connectionManager.js';
+import LogManager from './socket/managers/logManager.js';
 
 // Import all the handlers
 import AuthenticationHandler from './socket/handlers/authenticationHandler.js';
@@ -22,7 +23,7 @@ import MediaHandler from './socket/handlers/mediaHandler.js';
 import AdminHandler from './socket/handlers/adminHandler.js';
 
 // Import middleware
-import { authentication } from './socket/middleware/index.js';
+import { authentication, logging } from './socket/middleware/index.js';
 
 // Initialize HTTP server and Socket.IO
 const server = createServer();
@@ -31,12 +32,13 @@ const io = new Server(server, {
 });
 const PORT = process.env.PORT;
 
-// Initialize connection manager
+// Initialize Managers
 const connectionManager = new ConnectionManager();
+const logManager = new LogManager();
 
 // Initialize handlers
 const authenticationHandler = new AuthenticationHandler(io, connectionManager);
-const connectionHandler = new ConnectionHandler(io, connectionManager);
+const connectionHandler = new ConnectionHandler(io, connectionManager, logManager);
 const messageHandler = new MessageHandler(io, connectionManager);
 const userHandler = new UserHandler(io, connectionManager);
 const roomHandler = new RoomHandler(io, connectionManager);
@@ -88,9 +90,11 @@ const serverSignalHandler = () => {
 
     // New client connection handling
     io.on('connection', socket => {
-        console.log('user with socket ID:', socket.id, 'connected');
+        logManager.log('INFO', 'CONNECTION', { event: 'CONNECTION', authenticated: false });
+        //console.log('user with socket ID:', socket.id, 'connected');
 
         // Initialize middleware for the new connection
+        socket.use(logging(socket, logManager));
         socket.use(authentication(socket));
 
         connectionManager.addConnection(socket);

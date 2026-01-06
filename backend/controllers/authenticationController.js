@@ -18,8 +18,6 @@ import {
 
 export const signup = async user => {
     try {
-        console.log('Signup attempt for user: ', user.email);
-
         const emailExists = await getUserByEmail(user.email);
         const usernameExists = await getUserByUsername(user.username);
 
@@ -64,8 +62,6 @@ export const signup = async user => {
 
 export const login = async user => {
     try {
-        console.log('Login attempt for user: ', user.email);
-
         const emailExists = await getUserByEmail(user.email);
         if (!emailExists.exists) {
             return {
