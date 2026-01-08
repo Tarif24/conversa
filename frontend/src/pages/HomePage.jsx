@@ -26,7 +26,7 @@ const HomePage = () => {
 
     const navigate = useNavigate();
 
-    // Listen for incoming messages
+    // Listen for incoming error messages
     useSocketIOEvent(EVENTS.ERROR, error => {
         if (error.message.includes('Invalid or expired token')) {
             sendRefresh(response => {
@@ -38,6 +38,10 @@ const HomePage = () => {
                 }
             });
         }
+    });
+
+    useSocketIOEvent(EVENTS.RATE_LIMIT_REACHED, data => {
+        toast.error('RATE LIMIT REACHED PLEASE WAIT');
     });
 
     // Wait for both user and socket connection

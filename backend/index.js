@@ -9,6 +9,7 @@ import { connectToDatabase } from './database/connection.js';
 
 import ConnectionManager from './socket/managers/connectionManager.js';
 import LogManager from './socket/managers/logManager.js';
+import RateLimitManager from './socket/managers/rateLimitManager.js';
 
 // Import all the handlers
 import AuthenticationHandler from './socket/handlers/authenticationHandler.js';
@@ -23,7 +24,7 @@ import MediaHandler from './socket/handlers/mediaHandler.js';
 import AdminHandler from './socket/handlers/adminHandler.js';
 
 // Import middleware
-import { authentication, logging } from './socket/middleware/index.js';
+import { authentication, logging, rateLimit } from './socket/middleware/index.js';
 
 // Initialize HTTP server and Socket.IO
 const server = createServer();
@@ -35,10 +36,11 @@ const PORT = process.env.PORT;
 // Initialize Managers
 const connectionManager = new ConnectionManager();
 const logManager = new LogManager();
+const rateLimitManager = new RateLimitManager();
 
 // Initialize handlers
 const authenticationHandler = new AuthenticationHandler(io, connectionManager);
-const connectionHandler = new ConnectionHandler(io, connectionManager, logManager);
+const connectionHandler = new ConnectionHandler(io, connectionManager);
 const messageHandler = new MessageHandler(io, connectionManager);
 const userHandler = new UserHandler(io, connectionManager);
 const roomHandler = new RoomHandler(io, connectionManager);
@@ -94,6 +96,7 @@ const serverSignalHandler = () => {
         //console.log('user with socket ID:', socket.id, 'connected');
 
         // Initialize middleware for the new connection
+        socket.use(rateLimit(socket, logManager, rateLimitManager));
         socket.use(logging(socket, logManager));
         socket.use(authentication(socket));
 
@@ -145,6 +148,10 @@ const startServer = async () => {
         server.listen(PORT, () => {
             console.log(`Server running on http://localhost:${PORT}`);
         });
+
+        // Cleanup rate limiter every 5 minutes
+        setInterval(() => rateLimitManager.cleanup(), 5 * 60 * 1000);
+        console.log('Started cleanup intervals');
 
         console.log('Application setup complete');
     } catch (error) {

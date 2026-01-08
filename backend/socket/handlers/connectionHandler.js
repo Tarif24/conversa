@@ -2,10 +2,9 @@ import { getUser, getAllUserRooms } from '../../controllers/connectionController
 import EVENTS from '../../../constants/socketEvents.js';
 
 class ConnectionHandler {
-    constructor(io, connectionManager, logManger) {
+    constructor(io, connectionManager) {
         this.io = io;
         this.connectionManager = connectionManager;
-        this.logManager = logManger;
 
         connectionManager.setOfflineCallback(async userId => {
             const result = await getAllUserRooms(userId);
@@ -38,11 +37,6 @@ class ConnectionHandler {
 
     async handleDisconnect(socket, user) {
         try {
-            this.logManager.log('INFO', 'DISCONNECTION', {
-                event: 'DISCONNECTION',
-                authenticated: false,
-            });
-
             // Notify all user rooms about the disconnection
 
             this.connectionManager.removeUserFromAllTypingRooms(socket.userId);

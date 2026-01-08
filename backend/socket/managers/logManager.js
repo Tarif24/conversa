@@ -27,8 +27,8 @@ class Logger {
         //console.log(message);
     }
 
-    connection(socketId, userId, ip) {
-        this.log('INFO', 'CONNECTION', { socketId, userId, ip });
+    connection(socketId, userId) {
+        this.log('INFO', 'CONNECTION', { socketId, userId });
     }
 
     message(socketId, userId, roomId) {
@@ -39,11 +39,9 @@ class Logger {
         this.log('WARN', 'RATE_LIMIT', { socketId, userId });
     }
 
-    error(event, error, data = {}) {
-        this.log('ERROR', event, {
+    error(data = {}) {
+        this.log('ERROR', 'ERROR', {
             ...data,
-            error: error.message,
-            stack: error.stack,
         });
     }
 

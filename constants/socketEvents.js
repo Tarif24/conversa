@@ -47,6 +47,7 @@ const SOCKET_EVENTS = {
     ERROR: 'error',
     CONNECT: 'connect',
     DISCONNECT: 'disconnect',
+    RATE_LIMIT_REACHED: 'rate_limit_reached',
 };
 
 export default SOCKET_EVENTS;

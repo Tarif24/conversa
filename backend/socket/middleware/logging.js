@@ -4,11 +4,6 @@ import EVENTS from '../../../constants/socketEvents.js';
 const logEvent = (socket, logManager) => {
     return ([eventName, data], next) => {
         try {
-            // Skip the logging middleware if its the following events
-            if (eventName === EVENTS.DISCONNECT) {
-                return next();
-            }
-
             const token = data.token;
 
             let filteredData = { ...data };
@@ -19,6 +14,21 @@ const logEvent = (socket, logManager) => {
 
             if (data.refreshToken) {
                 filteredData.refreshToken = 'SENT';
+            }
+
+            if (eventName === EVENTS.DISCONNECT) {
+                logManager.connection(socket.id, socket.userId || data.userId);
+                return next();
+            }
+
+            if (eventName === EVENTS.SEND_MESSAGE) {
+                logManager.message(socket.id, socket.userId || data.userId, data.roomId);
+                return next();
+            }
+
+            if (eventName === EVENTS.ERROR) {
+                logManager.error(data);
+                return next();
             }
 
             if (!token) {

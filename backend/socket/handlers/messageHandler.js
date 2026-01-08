@@ -39,8 +39,6 @@ class MessageHandler {
 
     async handleSendMessage(socket, message, callback) {
         try {
-            console.log('user with socket ID:', socket.userId, 'sent a message');
-
             const result = await sendMessage(message);
 
             if (!result.success) {
