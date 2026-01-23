@@ -1,4 +1,3 @@
-// simpleFileLogger.js
 import fs from 'fs';
 import path from 'path';
 
@@ -27,8 +26,8 @@ class Logger {
         //console.log(message);
     }
 
-    connection(socketId, userId) {
-        this.log('INFO', 'CONNECTION', { socketId, userId });
+    connection(socketId, userId, event) {
+        this.log('INFO', event, { socketId, userId });
     }
 
     message(socketId, userId, roomId) {

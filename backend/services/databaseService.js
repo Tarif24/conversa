@@ -440,3 +440,17 @@ export const updateReadPosition = async (roomId, userId, messageId) => {
         { new: true }
     );
 };
+
+// ADMIN DB SERVICES
+
+export const getTotalUserCount = async () => {
+    return await User.countDocuments();
+};
+
+export const getTotalRoomCount = async () => {
+    return await Room.countDocuments();
+};
+
+export const getTotalMessageCount = async () => {
+    return await Message.countDocuments();
+};

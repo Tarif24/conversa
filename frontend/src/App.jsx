@@ -13,6 +13,7 @@ import AppLayout from './layouts/AppLayout';
 
 import AuthenticationPage from './pages/AuthenticationPage';
 import HomePage from './pages/HomePage';
+import AdminPage from './pages/AdminPage';
 import NotFoundPage from './pages/NotFoundPage';
 
 import ProtectedRoute from './components/ProtectedRoute';
@@ -34,6 +35,7 @@ function App() {
                 >
                     <Route index element={<HomePage />} />
                 </Route>
+                <Route path="/admin" element={<AdminPage />} />
                 <Route path="*" element={<NotFoundPage />} />
             </Route>
         )

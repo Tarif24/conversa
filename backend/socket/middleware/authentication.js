@@ -1,9 +1,32 @@
-import { verifyAccessToken } from '../../services/authenticationService.js';
+import { verifyAccessToken, verifyAdminToken } from '../../services/authenticationService.js';
 import EVENTS from '../../../constants/socketEvents.js';
 
 const authenticateSocket = socket => {
     return ([eventName, data], next) => {
         try {
+            // Admin authentication
+
+            // Allow admin login without token
+            if (eventName === EVENTS.ADMIN_LOGIN) {
+                return next();
+            }
+
+            if (
+                eventName === EVENTS.GET_ALL_ADMIN_DATA ||
+                eventName === EVENTS.GET_ADMIN_LOG_FOR_DAY
+            ) {
+                const decoded = verifyAdminToken(data.adminToken);
+
+                if (!decoded) {
+                    socket.emit(EVENTS.ERROR, {
+                        event: eventName,
+                        message: 'Invalid or expired admin token',
+                    });
+                    return next(new Error('Invalid or expired admin token'));
+                }
+                return next();
+            }
+
             // Skip the auth middleware if its the following events
             if (
                 eventName === EVENTS.CONNECT ||

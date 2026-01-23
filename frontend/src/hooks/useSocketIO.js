@@ -72,6 +72,25 @@ export const useSocketIO = (options = {}) => {
         socketManager.leaveRoom(roomName);
     }, []);
 
+    // AdminLogin
+    const sendAdminLogin = useCallback((payload, callback) => {
+        socketManager.send(EVENTS.ADMIN_LOGIN, payload, response => {
+            callback(response);
+        });
+    }, []);
+
+    // SendAdmin
+    const sendAdmin = useCallback((event, payload, callback, adminToken) => {
+        socketManager.send(
+            event,
+            payload,
+            response => {
+                callback(response);
+            },
+            adminToken
+        );
+    }, []);
+
     // Login
     const sendLogin = useCallback(
         (payload, callback) => {
@@ -162,6 +181,8 @@ export const useSocketIO = (options = {}) => {
     return {
         isConnected,
         connectionState,
+        sendAdminLogin,
+        sendAdmin,
         sendProtected,
         joinRoom,
         leaveRoom,

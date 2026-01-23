@@ -137,10 +137,10 @@ export const refreshToken = async tokenData => {
         if (!decoded) {
             // Remove invalid token
             await deleteRefreshToken(tokenData.token);
-            return callback({
+            return {
                 success: false,
                 message: 'Invalid refresh token',
-            });
+            };
         }
 
         // Generate new access token

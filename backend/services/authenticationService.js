@@ -11,10 +11,20 @@ export const generateRefreshToken = user => {
     return jwt.sign(
         {
             userId: user._id,
-            email: user.email,
         },
         process.env.REFRESH_TOKEN_SECRET,
         { expiresIn: process.env.REFRESH_TOKEN_EXPIRY }
+    );
+};
+
+export const generateAdminToken = user => {
+    return jwt.sign(
+        {
+            userId: user._id,
+            email: user.email,
+        },
+        process.env.ADMIN_TOKEN_SECRET,
+        { expiresIn: process.env.ADMIN_TOKEN_EXPIRY }
     );
 };
 
@@ -29,6 +39,14 @@ export const verifyAccessToken = token => {
 export const verifyRefreshToken = token => {
     try {
         return jwt.verify(token, process.env.REFRESH_TOKEN_SECRET);
+    } catch (error) {
+        return null;
+    }
+};
+
+export const verifyAdminToken = token => {
+    try {
+        return jwt.verify(token, process.env.ADMIN_TOKEN_SECRET);
     } catch (error) {
         return null;
     }

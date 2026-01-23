@@ -16,8 +16,31 @@ const logEvent = (socket, logManager) => {
                 filteredData.refreshToken = 'SENT';
             }
 
-            if (eventName === EVENTS.DISCONNECT) {
-                logManager.connection(socket.id, socket.userId || data.userId);
+            if (data.password) {
+                filteredData.password = 'SENT';
+            }
+
+            if (data.username) {
+                filteredData.username = 'SENT';
+            }
+
+            if (data.adminToken) {
+                filteredData.adminToken = 'SENT';
+            }
+
+            if (
+                eventName === EVENTS.ADMIN_LOGIN ||
+                eventName === EVENTS.GET_ALL_ADMIN_DATA ||
+                eventName === EVENTS.GET_ADMIN_LOG_FOR_DAY
+            ) {
+                logManager.log('ADMIN', eventName, {
+                    data: JSON.stringify(filteredData),
+                });
+                return next();
+            }
+
+            if (eventName === EVENTS.USER_RECONNECT) {
+                logManager.connection(socket.id, socket.userId || data.userId, 'RECONNECTION');
                 return next();
             }
 
@@ -33,7 +56,6 @@ const logEvent = (socket, logManager) => {
 
             if (!token) {
                 logManager.log('INFO', eventName, {
-                    event: eventName,
                     authenticated: false,
                     data: JSON.stringify(filteredData),
                 });
@@ -42,7 +64,6 @@ const logEvent = (socket, logManager) => {
             const decoded = verifyAccessToken(token);
             if (!decoded) {
                 logManager.log('INFO', eventName, {
-                    event: eventName,
                     authenticated: false,
                     data: JSON.stringify(filteredData),
                 });
@@ -50,7 +71,6 @@ const logEvent = (socket, logManager) => {
             }
 
             logManager.log('INFO', eventName, {
-                event: eventName,
                 authenticated: true,
                 data: JSON.stringify(filteredData),
             });

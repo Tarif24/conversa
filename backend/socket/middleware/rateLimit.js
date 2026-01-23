@@ -25,7 +25,6 @@ const rateLimit = (socket, logManager, rateLimitManager) => {
                 return next(new Error('Rate Limit error'));
             }
 
-            console.log('yay');
             return next();
         } catch (error) {
             console.error('Rate Limit middleware error:', error);

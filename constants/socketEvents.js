@@ -43,6 +43,11 @@ const SOCKET_EVENTS = {
     USER_LOGOUT: 'user_logout',
     USER_REFRESH_TOKEN: 'user_refresh_token',
 
+    // Admin events
+    ADMIN_LOGIN: 'admin_login',
+    GET_ALL_ADMIN_DATA: 'get_all_admin_data',
+    GET_ADMIN_LOG_FOR_DAY: 'get_admin_log_for_day',
+
     // System events
     ERROR: 'error',
     CONNECT: 'connect',

@@ -40,7 +40,7 @@ const rateLimitManager = new RateLimitManager();
 
 // Initialize handlers
 const authenticationHandler = new AuthenticationHandler(io, connectionManager);
-const connectionHandler = new ConnectionHandler(io, connectionManager);
+const connectionHandler = new ConnectionHandler(io, connectionManager, logManager);
 const messageHandler = new MessageHandler(io, connectionManager);
 const userHandler = new UserHandler(io, connectionManager);
 const roomHandler = new RoomHandler(io, connectionManager);
@@ -92,7 +92,7 @@ const serverSignalHandler = () => {
 
     // New client connection handling
     io.on('connection', socket => {
-        logManager.log('INFO', 'CONNECTION', { event: 'CONNECTION', authenticated: false });
+        logManager.connection(socket.id, socket.userId || 'N/A', 'CONNECTION');
         //console.log('user with socket ID:', socket.id, 'connected');
 
         // Initialize middleware for the new connection
