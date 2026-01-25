@@ -15,7 +15,7 @@ const authenticateSocket = socket => {
                 eventName === EVENTS.GET_ALL_ADMIN_DATA ||
                 eventName === EVENTS.GET_ADMIN_LOG_FOR_DAY
             ) {
-                const decoded = verifyAdminToken(data.adminToken);
+                const decoded = verifyAdminToken(data.token);
 
                 if (!decoded) {
                     socket.emit(EVENTS.ERROR, {

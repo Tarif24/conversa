@@ -48,7 +48,7 @@ class AdminHandler {
 
             const updatedResult = {
                 ...result,
-                activeUsers: this.connectionManager.getActiveUserCount(),
+                activeUsers: this.connectionManager.getOnlineUsers(),
             };
 
             if (callback) {

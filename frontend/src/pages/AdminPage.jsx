@@ -1,12 +1,18 @@
 import React, { useState } from 'react';
 import AdminLogIn from '../components/AdminPage/AdminLogIn';
+import AdminData from '../components/AdminPage/AdminData';
 
 const AdminPage = () => {
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [adminToken, setAdminToken] = useState(null);
+
     return (
-        <div className="relative flex h-full w-full flex-col items-center justify-center bg-gradient-to-br from-[#7C77AA] to-[#595C8A] p-15">
-            <div className="flex h-full w-full items-center justify-center rounded-2xl bg-[rgb(45,38,56)] shadow-xl/40 backdrop-blur-lg">
-                <AdminLogIn />
-            </div>
+        <div className="relative flex h-full w-full flex-col items-center justify-center bg-gradient-to-br from-[#7C77AA] to-[#595C8A]">
+            {isLoggedIn ? (
+                <AdminData adminToken={adminToken} setIsLoggedIn={setIsLoggedIn} />
+            ) : (
+                <AdminLogIn setIsLoggedIn={setIsLoggedIn} setAdminToken={setAdminToken} />
+            )}
         </div>
     );
 };

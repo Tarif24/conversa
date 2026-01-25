@@ -5,7 +5,7 @@ export const getAllLogFileNames = async (logDir = 'logs') => {
     if (!fs.existsSync(logDir)) {
         return [];
     }
-    const files = await fs.readdir(logDir);
+    const files = await fs.promises.readdir(logDir);
     return files.filter(file => file.startsWith('socket-') && file.endsWith('.log'));
 };
 
