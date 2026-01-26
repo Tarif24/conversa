@@ -1,6 +1,6 @@
 import React, { use, useEffect, useState } from 'react';
 import { useSocketIO, useSocketIOEvent, useSocketIOState } from '../hooks/useSocketIO';
-import EVENTS from '../../../constants/socketEvents';
+import EVENTS from '../../constants/socketEvents';
 import MessagingInterface from '../components/HomePage/MessagingInterface';
 import ChatsSidebar from '../components/HomePage/ChatsSidebar';
 import CreateChat from '../components/HomePage/CreateChat';

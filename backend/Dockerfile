@@ -5,21 +5,18 @@ FROM node:18-slim
 WORKDIR /app
 
 # Copy package files and install dependencies
-COPY backend/package*.json ./
+COPY package*.json ./
 RUN npm install
 
 # Copy and apply patches
 #COPY patches/ ./patches/
 #RUN npx patch-package
 
-# Copy constants
-COPY constants/ ./constants/
-
 # Copy the rest of your app
-COPY backend/ ./backend/
+COPY . .
 
 # Optional:
 EXPOSE 8000
 
 # Start the app
-CMD ["node", "backend/index.js"]
+CMD ["node", "index.js"]

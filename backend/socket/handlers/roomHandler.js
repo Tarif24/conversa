@@ -1,4 +1,4 @@
-import EVENTS from '../../../constants/socketEvents.js';
+import EVENTS from '../../constants/socketEvents.js';
 import {
     createChatRoom,
     getUserChats,

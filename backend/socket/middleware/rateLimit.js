@@ -1,5 +1,5 @@
 import { verifyAccessToken } from '../../services/authenticationService.js';
-import EVENTS from '../../../constants/socketEvents.js';
+import EVENTS from '../../constants/socketEvents.js';
 
 const rateLimit = (socket, logManager, rateLimitManager) => {
     return ([eventName, data], next) => {

@@ -1,5 +1,5 @@
 import { getUser, getAllUserRooms } from '../../controllers/connectionController.js';
-import EVENTS from '../../../constants/socketEvents.js';
+import EVENTS from '../../constants/socketEvents.js';
 
 class ConnectionHandler {
     constructor(io, connectionManager, logManager) {

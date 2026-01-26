@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useSocketIO, useSocketIOEvent, useSocketIOState } from '../../hooks/useSocketIO';
-import EVENTS from '../../../../constants/socketEvents';
+import EVENTS from '../../../constants/socketEvents';
 import { UserPlus } from 'lucide-react';
 
 const UserAdd = ({ room }) => {

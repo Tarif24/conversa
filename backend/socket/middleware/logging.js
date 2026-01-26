@@ -1,5 +1,5 @@
 import { verifyAccessToken } from '../../services/authenticationService.js';
-import EVENTS from '../../../constants/socketEvents.js';
+import EVENTS from '../../constants/socketEvents.js';
 
 const logEvent = (socket, logManager) => {
     return ([eventName, data], next) => {

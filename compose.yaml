@@ -1,8 +1,6 @@
 services:
     frontend:
-        build:
-            context: .
-            dockerfile: ./frontend/Dockerfile
+        build: ./frontend
         container_name: vite_frontend
         ports:
             - '3000:3000' # Serve frontend on localhost:3000
@@ -12,16 +10,14 @@ services:
             watch:
                 - action: sync
                   path: ./frontend/src
-                  target: /app/frontend/src
+                  target: /app
                 - action: rebuild
                   path: ./frontend/package.json
         depends_on:
             - backend
 
     backend:
-        build:
-            context: .
-            dockerfile: ./backend/Dockerfile
+        build: ./backend
         container_name: socket_backend
         ports:
             - '5000:5000' # Backend runs on port 5000
@@ -31,7 +27,7 @@ services:
             watch:
                 - action: rebuild
                   path: ./backend
-                  target: /app/backend
+                  target: /app
                 - action: rebuild
                   path: ./backend/package.json
         depends_on:

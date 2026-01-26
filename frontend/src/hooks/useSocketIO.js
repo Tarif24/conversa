@@ -2,7 +2,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import socketManager from '../api/socketio';
 import { useAuth } from '../contexts/Authentication';
-import EVENTS from '../../../constants/socketEvents';
+import EVENTS from '../../constants/socketEvents';
 
 // Hook to establish Socket.IO connection and give any file using it functions to work with the api
 export const useSocketIO = (options = {}) => {

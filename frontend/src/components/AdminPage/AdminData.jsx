@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useSocketIO, useSocketIOEvent, useSocketIOState } from '../../hooks/useSocketIO';
-import EVENTS from '../../../../constants/socketEvents';
+import EVENTS from '../../../constants/socketEvents';
 import { toast } from 'react-toastify';
 import { LogOut } from 'lucide-react';
 import { RotateCw } from 'lucide-react';

@@ -1,6 +1,6 @@
 // api/socketio.js
 import { io } from 'socket.io-client';
-import EVENTS from '../../../constants/socketEvents.js';
+import EVENTS from '../../constants/socketEvents.js';
 
 class SocketIOManager {
     constructor() {
