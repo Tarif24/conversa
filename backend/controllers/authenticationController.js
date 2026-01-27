@@ -21,7 +21,11 @@ export const signup = async user => {
         const emailExists = await getUserByEmail(user.email);
         const usernameExists = await getUserByUsername(user.username);
 
-        if (emailExists.exists || usernameExists.exists) {
+        if (
+            emailExists.exists ||
+            usernameExists.exists ||
+            user.username.toLowerCase() === 'system'
+        ) {
             return {
                 success: false,
                 message: 'User already exists signup failed',
