@@ -37,6 +37,7 @@ class AuthenticationHandler {
             if (result.success) {
                 this.connectionManager.addUserIDToConnection(socket, result.user._id.toString());
 
+                // Sets the userId the userEmail within the socket connection
                 socket.userId = result.user._id.toString();
                 socket.userEmail = result.user.email;
             }
@@ -79,9 +80,11 @@ class AuthenticationHandler {
             const userId = result.user._id.toString();
             const username = result.user.username;
 
+            // Sets the userId the userEmail within the socket connection
             socket.userId = userId;
             socket.userEmail = result.user.email;
 
+            // If they just came online and did not reconnect then a status update is sent to all user rooms
             if (justCameOnline) {
                 const userRooms = await getAllUserRooms(userId);
 
@@ -119,6 +122,7 @@ class AuthenticationHandler {
 
             const connectionResult = this.connectionManager.forceUserOffline(socket.userId);
 
+            // IF the user offline was successful then send a status update to all user rooms
             if (connectionResult.wentOffline) {
                 const userRooms = await getAllUserRooms(result.userId);
 

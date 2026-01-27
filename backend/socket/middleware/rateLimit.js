@@ -1,10 +1,9 @@
-import { verifyAccessToken } from '../../services/authenticationService.js';
 import EVENTS from '../../constants/socketEvents.js';
 
 const rateLimit = (socket, logManager, rateLimitManager) => {
     return ([eventName, data], next) => {
         try {
-            // Skip the auth middleware if its the following events
+            // Skip the rate limit if its the following events
             if (
                 eventName === EVENTS.CONNECT ||
                 eventName === EVENTS.DISCONNECT ||
@@ -16,6 +15,7 @@ const rateLimit = (socket, logManager, rateLimitManager) => {
                 return next();
             }
 
+            // Checks with the rateLimitManager if the socket connection can send it or not
             if (!rateLimitManager.canSend(socket.id)) {
                 logManager.rateLimit(socket.id, socket.userId || data.userId);
                 socket.emit(EVENTS.RATE_LIMIT_REACHED, {

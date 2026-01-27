@@ -21,6 +21,7 @@ export const signup = async user => {
         const emailExists = await getUserByEmail(user.email);
         const usernameExists = await getUserByUsername(user.username);
 
+        // Checks if the user already exists or if its an invalid username
         if (
             emailExists.exists ||
             usernameExists.exists ||
@@ -33,6 +34,7 @@ export const signup = async user => {
             };
         }
 
+        // Passwords are hashed before DB storage
         const hashedPassword = await hashPassword(user.password);
 
         const finalUser = {
@@ -42,6 +44,7 @@ export const signup = async user => {
 
         const newUser = await createUser(finalUser);
 
+        // Creating JWT tokens for user and adding the refresh token to the DB
         const accessToken = generateAccessToken(newUser);
         const refreshToken = generateRefreshToken(newUser);
 
@@ -66,6 +69,7 @@ export const signup = async user => {
 
 export const login = async user => {
     try {
+        // Need to check if user exists by verifying if the email exists
         const emailExists = await getUserByEmail(user.email);
         if (!emailExists.exists) {
             return {
@@ -88,6 +92,7 @@ export const login = async user => {
             };
         }
 
+        // After credentials are confirmed old refresh tokens are deleted and a new set of tokens are given and the refresh token is once again saved to the DB
         await deleteRefreshTokensByUserId(existingUser._id);
 
         const accessToken = generateAccessToken(existingUser);
@@ -115,6 +120,7 @@ export const login = async user => {
 
 export const logout = async (tokenData, userId) => {
     try {
+        // Deletes all user refresh tokens
         const result = await getRefreshToken(tokenData);
         await deleteRefreshTokensByUserId(userId);
 
@@ -130,6 +136,7 @@ export const refreshToken = async tokenData => {
     try {
         const existingToken = await getRefreshToken(tokenData.token);
 
+        // Checks if a token was sent
         if (!existingToken.exists) {
             return {
                 success: false,
@@ -137,6 +144,7 @@ export const refreshToken = async tokenData => {
             };
         }
 
+        // Verifies the token sends another accesstoken if everything is verified
         const decoded = verifyRefreshToken(tokenData.token);
         if (!decoded) {
             // Remove invalid token

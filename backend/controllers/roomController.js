@@ -1,10 +1,8 @@
 import {
     createRoom,
-    createMessage,
     addRoomToUsers,
     getUserByUserId,
     getRoomByRoomId,
-    updateRoomLastMessage,
     getUsernameByUserId,
     getLatestMessageForRoom,
     updateReadPosition,
@@ -22,11 +20,13 @@ import {
     getRoomMemberForRoom,
 } from '../services/databaseService.js';
 import { populateReplyInfo, newSystemMessage } from '../services/messageService.js';
-import { encryptMessage, decryptMessage } from '../services/messageService.js';
+import { decryptMessage } from '../services/messageService.js';
 
 export const createChatRoom = async (sentRoom, userId) => {
     try {
         const userResult = await getUserByUserId(userId);
+
+        // Checks if the user length is 2 meaning if its a direct one on one chat than checks the users other rooms to see if another direct chat with this user exists or not (users can only have one direct chat with the same person)
         if (sentRoom.users.length === 2) {
             let doesDirectExist = false;
             // Check if a direct chat already exists
@@ -54,6 +54,8 @@ export const createChatRoom = async (sentRoom, userId) => {
         }
 
         const type = sentRoom.users.length > 2 ? 'group' : 'direct';
+
+        // Creates the final room object with the type and initial room message
         const finalRoom = {
             ...sentRoom,
             type: type,
@@ -70,6 +72,7 @@ export const createChatRoom = async (sentRoom, userId) => {
 
         const roomId = newRoom._id.toString();
 
+        // If creating the room succeeds then a room member object is created and saved to the DB (roomMember objects hold all the room specific data for the user)
         for (const id of newRoom.users) {
             const user = (await getUserByUserId(id)).user;
             if (id === userId) {
@@ -88,10 +91,9 @@ export const createChatRoom = async (sentRoom, userId) => {
             }
         }
 
+        // Sends a initial system message stating chat creation and adds the chat to all users lists
         const systemMessage = sentRoom.users.length > 2 ? 'New Group Chat' : 'New Direct Chat';
-
         await newSystemMessage(roomId, systemMessage);
-
         await addRoomToUsers(roomId, sentRoom.users);
 
         return {
@@ -111,6 +113,7 @@ export const getUserChats = async userId => {
         const result = await getUserByUserId(userId);
         let rooms = [];
 
+        // Checks if user exists
         if (!result.exists) {
             return {
                 success: false,
@@ -119,6 +122,7 @@ export const getUserChats = async userId => {
             };
         }
 
+        // Loops through all the user rooms to decrypt all the last messages sent and set a other user for all direct chats
         for (const roomId of result.user.rooms) {
             const result = await getRoomByRoomId(roomId);
             const room = result.room;
@@ -134,6 +138,7 @@ export const getUserChats = async userId => {
             }
 
             let userOther = '';
+            // Set the other person in the direct chat relative to the user
             if (result.exists) {
                 if (room.type === 'direct') {
                     const other = room.users.find(u => u !== userId);
@@ -151,6 +156,7 @@ export const getUserChats = async userId => {
             rooms.push(roomFinal);
         }
 
+        // Sort all rooms in order of latest message first (system messages do count)
         const roomsSorted = rooms.sort((a, b) => {
             const dateA = a.message.updatedAt ? new Date(a.message.updatedAt) : new Date(0);
             const dateB = b.message.updatedAt ? new Date(b.message.updatedAt) : new Date(0);
@@ -174,6 +180,7 @@ export const setActiveRoom = async (roomId, userId, isFirstOpen = true) => {
     try {
         // Get latest message
         const latestMessage = await getLatestMessageForRoom(roomId, true);
+        // If the room dose not have a latest message its a new room and nothing needs to be updated when its set as the active room
         if (!latestMessage) {
             return {
                 success: true,
@@ -227,21 +234,23 @@ export const GetRoomSidebarInfo = async roomId => {
 
 export const joinRoom = async (roomId, userId) => {
     try {
+        // Adds the room to the users room list and adds the user to the rooms user list
         const userAddResult = await addRoomToUser(roomId, userId);
-
         const roomAddResult = await addUserToRoom(roomId, userId);
 
         const user = await getUserByUserId(userId);
 
+        // Creates a new roomMember object for the user to hold all room specific data
         const newMember = await createRoomMember({
             roomId: roomId,
             userId: userId,
             username: user.user.username,
         });
 
+        // Sends a system message to the room saying that a new user has joined
         const systemMessage = `${user.user.username} has joined the chat`;
-
         await newSystemMessage(roomId, systemMessage);
+
         return {
             success: true,
         };
@@ -254,21 +263,26 @@ export const joinRoom = async (roomId, userId) => {
 
 export const leaveRoom = async (roomId, userId, senderUserId, isKick = false) => {
     try {
+        // Gets the roomMember objects if the person is getting kicked it gets the member thats getting kicked and the one kicking else just the user that sent the request
         const roomMember = await getRoomMemberForRoom(roomId, userId);
         const senderRoomMember = await getRoomMemberForRoom(roomId, senderUserId);
         const user = await getUserByUserId(userId);
         const room = (await getRoomByRoomId(roomId)).room;
 
+        // If it is a leave not a kick it verifies if the person leaving is not a owner
         if (roomMember.role === 'owner' && room.type === 'group') {
             return { success: false, message: 'Owner cant leave room' };
         }
 
+        // If it is a kick we need to verify if the person is the owner
         if (isKick && senderRoomMember.role === 'owner') {
+            // If its a room of three to avoid dm conflicts the group chat is deleted
             if (room.users.length === 3 && room.type === 'group') {
                 for (const id of room.users) {
                     await deleteRoomFromUser(roomId, id);
                 }
 
+                // Deletes all room messages the roomMember objects and then the room itself
                 await deleteAllMessagesInRoom(roomId);
                 await deleteAllRoomMemberInRoom(roomId);
                 await deleteRoom(roomId);
@@ -278,12 +292,13 @@ export const leaveRoom = async (roomId, userId, senderUserId, isKick = false) =>
                 };
             }
 
+            // If its a valid kick and will leave the room with 3 users or more the room is deleted from the user and user is deleted from the room and the roomMember is deleted
             await deleteUserFromRoom(roomId, userId);
             await deleteRoomFromUser(roomId, userId);
             await deleteRoomMember(roomId, userId);
 
+            // A system message is sent to the room stating that the user has been kicked
             const systemMessage = `${user.user.username} has been kicked from the chat`;
-
             await newSystemMessage(roomId, systemMessage);
 
             return {
@@ -291,11 +306,13 @@ export const leaveRoom = async (roomId, userId, senderUserId, isKick = false) =>
             };
         }
 
+        // If the person is leaving and its a direct chat it will delete the chat and all messages
         if (room.type === 'direct') {
             for (const id of room.users) {
                 await deleteRoomFromUser(roomId, id);
             }
 
+            // Delete all messages, roomMembers and then the room
             await deleteAllMessagesInRoom(roomId);
             await deleteAllRoomMemberInRoom(roomId);
             await deleteRoom(roomId);
@@ -305,11 +322,13 @@ export const leaveRoom = async (roomId, userId, senderUserId, isKick = false) =>
             };
         }
 
+        // If its a leave and a room of three to avoid dm conflicts the group chat is deleted
         if (room.users.length === 3 && room.type === 'group') {
             for (const id of room.users) {
                 await deleteRoomFromUser(roomId, id);
             }
 
+            // Delete all messages, roomMembers and then the room
             await deleteAllMessagesInRoom(roomId);
             await deleteAllRoomMemberInRoom(roomId);
             await deleteRoom(roomId);
@@ -319,12 +338,13 @@ export const leaveRoom = async (roomId, userId, senderUserId, isKick = false) =>
             };
         }
 
+        // If its a valid leave and will leave the room with 3 users or more the room is deleted from the user and user is deleted from the room and the roomMember is deleted
         await deleteUserFromRoom(roomId, userId);
         await deleteRoomFromUser(roomId, userId);
         await deleteRoomMember(roomId, userId);
 
+        // A system message is sent to the room stating that the user has left
         const systemMessage = `${user.user.username} has left the chat`;
-
         await newSystemMessage(roomId, systemMessage);
 
         return {

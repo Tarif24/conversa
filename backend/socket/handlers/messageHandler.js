@@ -49,6 +49,7 @@ class MessageHandler {
                 return;
             }
 
+            // If the room exists tell all users in room to refresh for new data and add to the unread count
             if (result.roomExists) {
                 socket.broadcast.to(message.roomId).emit(EVENTS.RECEIVE_MESSAGE, result);
 

@@ -11,6 +11,7 @@ const authenticateSocket = socket => {
                 return next();
             }
 
+            // For admin events
             if (
                 eventName === EVENTS.GET_ALL_ADMIN_DATA ||
                 eventName === EVENTS.GET_ADMIN_LOG_FOR_DAY
@@ -59,6 +60,7 @@ const authenticateSocket = socket => {
                 return next(new Error('Invalid or expired token'));
             }
 
+            // Sets the userId the userEmail within the socket connection
             socket.userId = decoded.userId;
             socket.userEmail = decoded.email;
 

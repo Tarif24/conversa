@@ -90,10 +90,10 @@ class RoomHandler {
             const userId = user.userId;
             const result = await getUserChats(userId);
 
+            // Adds the list of typing users and the online users
             const roomsWithTyping = this.connectionManager.getAllIsTypingRoomsByUserRooms(
                 result.rooms
             );
-
             const roomsWithOnlineStatus =
                 this.connectionManager.getAllOnlineStatusForUserRooms(roomsWithTyping);
 

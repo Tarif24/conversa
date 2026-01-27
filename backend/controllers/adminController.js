@@ -8,6 +8,7 @@ import {
 
 export const adminLogin = async user => {
     try {
+        // Checks username and password with the ones in the env
         if (
             user.username === process.env.ADMIN_USERNAME &&
             user.password === process.env.ADMIN_PASSWORD

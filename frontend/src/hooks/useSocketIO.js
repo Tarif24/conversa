@@ -54,7 +54,7 @@ export const useSocketIO = (options = {}) => {
         };
     }, []);
 
-    // Send event function
+    // Send event function that needs a jwt token
     const sendProtected = useCallback(
         (eventType, payload, callback) => {
             socketManager.send(eventType, payload, callback, accessToken);

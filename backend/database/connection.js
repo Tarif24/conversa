@@ -3,6 +3,7 @@ import './models/index.js'; // Import all models to register schemas
 
 export const connectToDatabase = async () => {
     try {
+        // This is where it actually connects to mongoDB via the url
         await mongoose.connect(process.env.MONGO_URL);
 
         console.log('Connected to MongoDB with Mongoose');

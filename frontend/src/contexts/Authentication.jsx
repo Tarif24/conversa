@@ -11,10 +11,12 @@ export const AuthProvider = ({ children }) => {
 
     // Load saved tokens and create authenticated socket
     useEffect(() => {
+        // Gets localStorage items
         const savedAccessToken = localStorage.getItem('accessToken');
         const savedRefreshToken = localStorage.getItem('refreshToken');
         const savedUser = localStorage.getItem('user');
 
+        // If the user has saved data save it to auth variables
         if (savedAccessToken && savedRefreshToken && savedUser) {
             const parsedUser = JSON.parse(savedUser);
 
@@ -45,11 +47,13 @@ export const AuthProvider = ({ children }) => {
 
         try {
             if (response.success) {
+                // Set auth variables
                 setAccessToken(response.accessToken);
                 setRefreshToken(response.refreshToken);
                 setUser(response.user);
                 setIsAuthenticated(true);
 
+                // Save to local storage
                 localStorage.setItem('accessToken', response.accessToken);
                 localStorage.setItem('refreshToken', response.refreshToken);
                 localStorage.setItem('user', JSON.stringify(response.user));
@@ -69,11 +73,13 @@ export const AuthProvider = ({ children }) => {
 
         try {
             if (response.success) {
+                // Set auth variables
                 setAccessToken(response.accessToken);
                 setRefreshToken(response.refreshToken);
                 setUser(response.user);
                 setIsAuthenticated(true);
 
+                // Save to local storage
                 localStorage.setItem('accessToken', response.accessToken);
                 localStorage.setItem('refreshToken', response.refreshToken);
                 localStorage.setItem('user', JSON.stringify(response.user));

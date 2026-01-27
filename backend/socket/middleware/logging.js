@@ -6,28 +6,25 @@ const logEvent = (socket, logManager) => {
         try {
             const token = data.token;
 
+            // Filters all the sensitive data
             let filteredData = { ...data };
-
             if (data.token) {
                 filteredData.token = 'SENT';
             }
-
             if (data.refreshToken) {
                 filteredData.refreshToken = 'SENT';
             }
-
             if (data.password) {
                 filteredData.password = 'SENT';
             }
-
             if (data.username) {
                 filteredData.username = 'SENT';
             }
-
             if (data.adminToken) {
                 filteredData.adminToken = 'SENT';
             }
 
+            // Special logs for admin
             if (
                 eventName === EVENTS.ADMIN_LOGIN ||
                 eventName === EVENTS.GET_ALL_ADMIN_DATA ||

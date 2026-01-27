@@ -83,11 +83,10 @@ export const sendMessage = async message => {
         // Increment unread count for other room members
         await incrementUnreadForOthers(message.roomId, message.userId);
 
-        // Prepare message with reply info for response
+        // Prepare message with reply info for response and read status
         const messageWithReply = await addReplyInfo(decryptedMessage);
-
         const messageWithReadStatus =
-            await populateRoomMemberReadStatusSingleMessage(decryptedMessage);
+            await populateRoomMemberReadStatusSingleMessage(messageWithReply);
 
         return {
             success: true,
@@ -130,8 +129,8 @@ export const getMessagesForChat = async roomId => {
             return { ...msg._doc, message: 'DELETED MESSAGE' };
         });
 
+        // Adds the reply and read status for each message
         const messagesWithReply = await populateReplyInfo(decryptedMessages);
-
         const messageWithReadStatus = await populateRoomMemberReadStatus(messagesWithReply, roomId);
 
         return {

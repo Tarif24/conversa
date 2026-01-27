@@ -119,6 +119,7 @@ export const editMessage = async (messageId, newContent, userId) => {
         throw new Error('Message not found or unauthorized');
     }
 
+    // Encrypt the new message and save the new encryption along with new IV and authTag and edited data to original message object (same ID)
     const room = await Room.findOne({ _id: message.roomId });
     const encryptedMessage = encryptMessage(newContent);
 
@@ -139,6 +140,7 @@ export const editMessage = async (messageId, newContent, userId) => {
 };
 
 export const deleteMessage = async (messageId, userId) => {
+    // Using the user along side the messageId ensures that the person editing is the person who sent it
     const message = await Message.findOne({ _id: messageId, userId });
     const room = await getRoomByRoomId(message.roomId);
 
@@ -175,6 +177,8 @@ export const messageSearch = async (roomId, query) => {
         .lean();
 
     const results = [];
+
+    // Need to decrypt message then compare
     for (const msg of messages) {
         try {
             const decrypted = decryptMessage({
