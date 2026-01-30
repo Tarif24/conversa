@@ -22,11 +22,7 @@ export const signup = async user => {
         const usernameExists = await getUserByUsername(user.username);
 
         // Checks if the user already exists or if its an invalid username
-        if (
-            emailExists.exists ||
-            usernameExists.exists ||
-            user.username.toLowerCase() === 'system'
-        ) {
+        if (emailExists || usernameExists || user.username.toLowerCase() === 'system') {
             return {
                 success: false,
                 message: 'User already exists signup failed',
@@ -71,16 +67,16 @@ export const login = async user => {
     try {
         // Need to check if user exists by verifying if the email exists
         const emailExists = await getUserByEmail(user.email);
-        if (!emailExists.exists) {
+        if (!emailExists) {
             return {
                 success: false,
-                user: emailExists.user,
+                user: emailExists,
                 exists: false,
                 message: 'Login failed user does not exist',
             };
         }
 
-        const existingUser = (await getUserByEmail(user.email)).user;
+        const existingUser = await getUserByEmail(user.email);
 
         const validPassword = await validatePassword(user.password, existingUser.password);
 
@@ -121,7 +117,7 @@ export const login = async user => {
 export const logout = async (tokenData, userId) => {
     try {
         // Deletes all user refresh tokens
-        const result = await getRefreshToken(tokenData);
+        await getRefreshToken(tokenData);
         await deleteRefreshTokensByUserId(userId);
 
         return { success: true, message: 'Logout successful', userId: userId };
@@ -137,7 +133,7 @@ export const refreshToken = async tokenData => {
         const existingToken = await getRefreshToken(tokenData.token);
 
         // Checks if a token was sent
-        if (!existingToken.exists) {
+        if (!existingToken) {
             return {
                 success: false,
                 message: 'Refresh token not found',
@@ -177,7 +173,7 @@ export const getAllUserRooms = async userId => {
     try {
         const result = await getAllRoomsForUser(userId);
 
-        if (!result.success) {
+        if (!result) {
             return {
                 success: false,
                 message: 'Could not retrieve user rooms',
@@ -186,7 +182,7 @@ export const getAllUserRooms = async userId => {
 
         return {
             success: true,
-            rooms: result.rooms,
+            rooms: result,
             message: 'User rooms retrieved successfully',
         };
     } catch (error) {

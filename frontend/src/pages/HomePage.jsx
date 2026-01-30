@@ -18,6 +18,7 @@ const HomePage = () => {
         sendProtected,
         sendRefresh,
         sendLastEmitted,
+        clearAuth,
     } = useSocketIO();
 
     const [isCreateChatActive, setIsCreateChatActive] = useState(false);
@@ -34,6 +35,7 @@ const HomePage = () => {
                     sendLastEmitted();
                 } else {
                     console.error('Token refresh failed:', response.message);
+                    clearAuth();
                     navigate('/');
                 }
             });

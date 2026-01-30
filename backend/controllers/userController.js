@@ -6,7 +6,7 @@ export const userSearch = async (text, excludeUsers) => {
 
         const result = await getUsersByUsernameSearch(text, excludeUsers);
 
-        if (!result.foundUsers) {
+        if (result.length === 0) {
             return {
                 success: false,
                 userList: [{ username: 'No users found', userId: 'NOT FOUND' }],
@@ -16,7 +16,7 @@ export const userSearch = async (text, excludeUsers) => {
         }
 
         // Secure list only sends the userid and username
-        const resultListSecure = result.list.map(user => {
+        const resultListSecure = result.map(user => {
             const id = user._id.toString();
             return {
                 userId: id,
@@ -41,7 +41,7 @@ export const getUsername = async userId => {
     try {
         const result = await getUsernameByUserId(userId);
 
-        if (!result.exists) {
+        if (!result) {
             return {
                 success: false,
                 username: 'Unknown User',
@@ -52,7 +52,7 @@ export const getUsername = async userId => {
 
         return {
             success: true,
-            username: result.username,
+            username: result,
             foundUser: true,
             message: 'Found User',
         };

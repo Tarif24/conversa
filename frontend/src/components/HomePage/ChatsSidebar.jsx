@@ -21,10 +21,7 @@ const MessagesSidebar = ({
     const [activeRoomId, setActiveRoomId] = useState(null);
 
     useEffect(() => {
-        sendProtected(EVENTS.GET_USER_ROOMS, { userId: user._id }, response => {
-            setRooms(response.rooms);
-            setFilteredRooms(response.rooms);
-        });
+        updateRooms();
     }, [user, isConnected]);
 
     useSocketIOEvent(EVENTS.ROOM_REFRESH, data => {
@@ -53,21 +50,24 @@ const MessagesSidebar = ({
     });
 
     useSocketIOEvent(EVENTS.TYPING_UPDATE, data => {
-        sendProtected(EVENTS.GET_USER_ROOMS, { userId: user._id }, response => {
-            setRooms(response.rooms);
-            setFilteredRooms(response.rooms);
-        });
+        updateRooms();
     });
 
     useSocketIOEvent(EVENTS.USER_STATUS_UPDATE, data => {
+        updateRooms();
+    });
+
+    const updateRooms = () => {
         sendProtected(EVENTS.GET_USER_ROOMS, { userId: user._id }, response => {
             setRooms(response.rooms);
             setFilteredRooms(response.rooms);
         });
-    });
+    };
 
     const handleOnRoomClicked = room => {
-        sendProtected(EVENTS.SET_ACTIVE_ROOM, { roomId: room._id }, response => {});
+        sendProtected(EVENTS.SET_ACTIVE_ROOM, { roomId: room._id }, response => {
+            updateRooms();
+        });
         setActiveRoomId(room._id);
         onRoomClicked(room);
         setIsCreateChatActive(false);
@@ -109,12 +109,12 @@ const MessagesSidebar = ({
                 <div className="flex items-center">
                     <h1 className="text-3xl font-medium text-[rgb(59,37,119)]">Chats</h1>
                 </div>
-                <div className="custom-scrollbar flex h-189 flex-col gap-6 overflow-x-hidden py-2 pr-1">
+                <div className="custom-scrollbar flex h-189 flex-col gap-4 overflow-x-hidden py-2 pr-1">
                     {filteredRooms && filteredRooms.length > 0 ? (
                         filteredRooms.map(room => (
                             <div
                                 key={room._id}
-                                className="flex h-fit w-full gap-3 rounded-xl p-4 transition duration-300 ease-in-out hover:cursor-pointer hover:bg-white/30"
+                                className="relative flex h-fit w-full gap-3 rounded-xl px-4 py-6 transition duration-300 ease-in-out hover:cursor-pointer hover:bg-white/30"
                                 onClick={() => handleOnRoomClicked(room)}
                             >
                                 <div className="flex size-15 items-center justify-center rounded-full bg-white/30 p-2 backdrop-blur-2xl">
@@ -154,6 +154,11 @@ const MessagesSidebar = ({
                                         <div className="size-3 rounded-full bg-red-400"></div>
                                     )}
                                 </div>
+                                {room.unreadCount > 0 && (
+                                    <div className="g-white/30 absolute top-1 right-1 flex size-6 items-center justify-center rounded-full p-1 text-[rgb(80,53,168)] backdrop-blur-2xl">
+                                        {room.unreadCount}
+                                    </div>
+                                )}
                             </div>
                         ))
                     ) : (

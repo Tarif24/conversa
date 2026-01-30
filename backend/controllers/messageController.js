@@ -27,7 +27,7 @@ export const sendMessage = async message => {
         const result = await getUserByUserId(message.userId);
 
         // User existence check
-        if (!result.exists) {
+        if (!result) {
             return {
                 success: false,
                 message: 'User does not exist ',
@@ -37,7 +37,7 @@ export const sendMessage = async message => {
         const room = await getRoomByRoomId(message.roomId);
 
         // Room existence check
-        if (!room.exists) {
+        if (!room) {
             return {
                 success: false,
                 message: 'Room does not exist ',
@@ -62,7 +62,7 @@ export const sendMessage = async message => {
         // Logic to save the message to the database
         const savedMessage = await createMessage({
             ...message,
-            username: result.user.username,
+            username: result.username,
             message: encryptedData.encrypted,
             iv: encryptedData.iv,
             authTag: encryptedData.authTag,
@@ -71,7 +71,7 @@ export const sendMessage = async message => {
         await updateRoomLastMessage(message.roomId, savedMessage);
 
         // If its a direct message then the otherUser is needed otherwise null
-        if (room.room.type === 'direct') {
+        if (room.type === 'direct') {
             otherUser = await getUsernameByUserId(message.userId);
         }
 
@@ -92,10 +92,10 @@ export const sendMessage = async message => {
             success: true,
             message: messageWithReadStatus,
             roomExists: true,
-            roomName: room.room.roomName,
+            roomName: room.roomName,
             otherUser: otherUser?.username,
-            type: room.room.type,
-            sentByUser: result.user.username,
+            type: room.type,
+            sentByUser: result.username,
         };
     } catch (error) {
         console.error('send message error:', error);
@@ -166,13 +166,13 @@ export const messageDelete = async (messageId, userId) => {
         // Soft deletes the message
         const message = await deleteMessage(messageId, userId);
 
-        if (!message.success) {
+        if (!message) {
             return message;
         }
 
         return {
             success: true,
-            messageId: message.message._id,
+            messageId: message._id,
         };
     } catch (error) {
         console.error('controller delete message error:', error);
@@ -187,7 +187,7 @@ export const getMessagesSearch = async (roomId, text) => {
 
         const result = await messageSearch(roomId, text);
 
-        if (!result.foundMessages) {
+        if (result.length === 0) {
             return {
                 success: false,
                 messageList: [{ message: 'No messages found', user: '' }],
@@ -198,7 +198,7 @@ export const getMessagesSearch = async (roomId, text) => {
 
         return {
             success: true,
-            messageList: result.list,
+            messageList: result,
             foundUsers: true,
             message: 'Found Users',
         };

@@ -4,7 +4,7 @@ export const getUser = async userId => {
     try {
         const result = await getUserByUserId(userId);
 
-        if (!result.exists) {
+        if (!result) {
             return {
                 success: false,
                 message: 'User not be retrieved',
@@ -13,7 +13,7 @@ export const getUser = async userId => {
 
         return {
             success: true,
-            user: result.user,
+            user: result,
             message: 'User retrieved successfully',
         };
     } catch (error) {
@@ -27,7 +27,7 @@ export const getAllUserRooms = async userId => {
     try {
         const result = await getAllRoomsForUser(userId);
 
-        if (!result.success) {
+        if (!result) {
             return {
                 success: false,
                 message: 'Could not retrieve user rooms',
@@ -36,7 +36,7 @@ export const getAllUserRooms = async userId => {
 
         return {
             success: true,
-            rooms: result.rooms,
+            rooms: result,
             message: 'User rooms retrieved successfully',
         };
     } catch (error) {

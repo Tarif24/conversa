@@ -92,6 +92,9 @@ const MessagingInterface = ({
     });
 
     useSocketIOEvent(EVENTS.USER_READ_UPDATE, data => {
+        if (!room) {
+            return;
+        }
         sendProtected(EVENTS.GET_MESSAGES_FOR_ROOM, { roomId: room._id }, response => {
             if (!response.success) return;
             organizeMessageStructureAndSave(response.messages);

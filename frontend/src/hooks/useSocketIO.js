@@ -18,6 +18,7 @@ export const useSocketIO = (options = {}) => {
         signup,
         logout,
         refreshAccessToken,
+        clearAuth,
         accessToken,
         refreshToken,
     } = useAuth();
@@ -191,6 +192,7 @@ export const useSocketIO = (options = {}) => {
         sendLogout,
         sendRefresh,
         sendLastEmitted,
+        clearAuth,
         user,
         isAuthenticated,
     };

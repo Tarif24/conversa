@@ -157,9 +157,9 @@ class RoomHandler {
                 });
             }
         } catch (error) {
-            console.error('handle get user rooms:', error);
+            console.error('handle set active room:', error);
             socket.emit(EVENTS.ERROR, {
-                event: EVENTS.GET_USER_ROOMS,
+                event: EVENTS.SET_ACTIVE_ROOM,
                 message: 'Server error',
             });
         }

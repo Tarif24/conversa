@@ -3,74 +3,45 @@ import { encryptMessage, decryptMessage } from './messageService.js';
 
 // User Services
 export const createUser = async userData => {
-    const user = await User.create(userData);
-    return user;
+    return await User.create(userData);
 };
 
 export const getUserByEmail = async email => {
-    const user = await User.findOne({ email: email });
-    if (user) {
-        return { success: true, exists: true, user: user };
-    }
-    return { success: true, exists: false };
+    return await User.findOne({ email: email });
 };
 
 export const getUserByUsername = async username => {
-    const user = await User.findOne({ username: username });
-    if (user) {
-        return { success: true, exists: true, user: user };
-    }
-    return { success: true, exists: false };
+    return await User.findOne({ username: username });
 };
 
 export const getUserByUserId = async userId => {
-    const user = await User.findById(userId);
-    if (user) {
-        return { success: true, exists: true, user: user };
-    }
-    return { success: true, exists: false };
+    return await User.findById(userId);
 };
 
 export const getUsersByUsernameSearch = async (usernameQuery, excludeUserIds = []) => {
-    const users = await User.find({
+    return await User.find({
         _id: { $nin: excludeUserIds },
         username: {
             $regex: usernameQuery,
             $options: 'i', // case-insensitive
         },
     }).limit(10);
-
-    if (users && users.length !== 0) {
-        return { success: true, list: users, foundUsers: true };
-    } else {
-        return { success: true, foundUsers: false };
-    }
 };
 
 export const addRoomToUser = async (roomId, userId) => {
-    const result = await User.updateOne({ _id: userId }, { $push: { rooms: roomId } });
-
-    return result;
+    return await User.updateOne({ _id: userId }, { $push: { rooms: roomId } });
 };
 
 export const deleteRoomFromUser = async (roomId, userId) => {
-    const result = await User.updateOne({ _id: userId }, { $pull: { rooms: roomId } });
-
-    return result;
+    return await User.updateOne({ _id: userId }, { $pull: { rooms: roomId } });
 };
 
 export const addRoomToUsers = async (roomId, userIds = []) => {
-    const result = await User.updateMany({ _id: { $in: userIds } }, { $push: { rooms: roomId } });
-
-    return result;
+    return await User.updateMany({ _id: { $in: userIds } }, { $push: { rooms: roomId } });
 };
 
 export const getUsernameByUserId = async userId => {
-    const user = await User.findById(userId);
-    if (user) {
-        return { success: true, exists: true, username: user.username };
-    }
-    return { success: true, exists: false };
+    return await User.findById(userId);
 };
 
 // Message Services
@@ -81,22 +52,17 @@ export const createMessage = async messageData => {
         finalMessageData = { ...messageData, replyToId: null };
     }
 
-    const message = await Message.create(messageData);
-    return message;
+    return await Message.create(messageData);
 };
 
 export const deleteAllMessagesInRoom = async roomId => {
-    const result = Message.deleteMany({ roomId });
-
-    return result;
+    return await Message.deleteMany({ roomId });
 };
 
 export const getMessagesForRoom = async roomId => {
-    const result = await Message.find({ roomId: roomId }).limit(50).sort({
+    return await Message.find({ roomId: roomId }).limit(50).sort({
         createdAt: 1,
     });
-
-    return result;
 };
 
 export const getLatestMessageForRoom = async (roomId, includingDeleted = false) => {
@@ -152,7 +118,7 @@ export const deleteMessage = async (messageId, userId) => {
         throw new Error('Message not found or unauthorized');
     }
 
-    if (messageId === room.room.message._id.toString()) {
+    if (messageId === room.message._id.toString()) {
         const res = await updateRoomLastMessage(message.roomId, {
             ...message._doc,
             message: 'Deleted Message',
@@ -162,9 +128,7 @@ export const deleteMessage = async (messageId, userId) => {
     message.deletedAt = new Date();
     message.deletedBy = userId;
 
-    const savedMessage = await message.save();
-
-    return { message: savedMessage, success: true };
+    return await message.save();
 };
 
 export const messageSearch = async (roomId, query) => {
@@ -198,111 +162,77 @@ export const messageSearch = async (roomId, query) => {
         }
     }
 
-    if (results.length === 0) {
-        return { success: false, foundMessages: false };
-    }
-
-    return { success: true, foundMessages: true, list: results };
+    return results;
 };
 
 // File Services
 export const createFile = async fileData => {
-    const file = await File.create(fileData);
-    return file;
+    return await File.create(fileData);
 };
 
 // Room Services
 export const createRoom = async roomData => {
-    const room = await Room.create(roomData);
-    return room;
+    return await Room.create(roomData);
 };
 
 export const deleteRoom = async roomId => {
-    const room = await Room.deleteOne({ _id: roomId });
-    return room;
+    return await Room.deleteOne({ _id: roomId });
 };
 
 export const getRoomByRoomId = async roomId => {
-    const room = await Room.findById(roomId);
-    if (room) {
-        return { success: true, exists: true, room: room };
-    }
-    return { success: true, exists: false };
+    return await Room.findById(roomId);
 };
 
 export const getAllRoomsForUser = async userId => {
-    const rooms = await Room.find({ users: userId }).sort({ updatedAt: -1 });
-    if (!rooms) {
-        return { success: false, rooms: [] };
-    }
-    return { success: true, rooms: rooms };
+    return await Room.find({ users: userId }).sort({ updatedAt: -1 });
 };
 
 export const updateRoomLastMessage = async (roomId, message) => {
-    const result = await Room.findByIdAndUpdate(roomId, {
+    return await Room.findByIdAndUpdate(roomId, {
         $set: { message: message },
     });
-
-    return result;
 };
 
 export const addUserToRoom = async (roomId, userId) => {
-    const result = await Room.findByIdAndUpdate(roomId, {
+    return await Room.findByIdAndUpdate(roomId, {
         $push: { users: userId },
     });
-
-    return result;
 };
 
 export const deleteUserFromRoom = async (roomId, userId) => {
-    const result = await Room.findByIdAndUpdate(roomId, {
+    return await Room.findByIdAndUpdate(roomId, {
         $pull: { users: userId },
     });
-
-    return result;
 };
 
 // Refresh Token Services
 export const createRefreshToken = async tokenData => {
-    const token = await RefreshToken.create(tokenData);
-    return token;
+    return await RefreshToken.create(tokenData);
 };
 
 export const getRefreshToken = async token => {
-    const refreshToken = await RefreshToken.findOne({ token: token });
-
-    if (refreshToken) {
-        return { success: true, exists: true, refreshToken: refreshToken };
-    }
-    return { success: true, exists: false };
+    return await RefreshToken.findOne({ token: token });
 };
 
 export const deleteRefreshToken = async token => {
-    await RefreshToken.deleteOne({ token: token });
-    return { success: true };
+    return await RefreshToken.deleteOne({ token: token });
 };
 
 export const deleteRefreshTokensByUserId = async userId => {
-    await RefreshToken.deleteMany({ userId: userId });
-    return { success: true };
+    return await RefreshToken.deleteMany({ userId: userId });
 };
 
 // Room Member Services
 export const createRoomMember = async memberData => {
-    const roomMember = await RoomMember.create(memberData);
-    return roomMember;
+    return await RoomMember.create(memberData);
 };
 
 export const deleteRoomMember = async (roomId, userId) => {
-    const result = RoomMember.deleteOne({ roomId, userId });
-
-    return result;
+    return await RoomMember.deleteOne({ roomId, userId });
 };
 
 export const deleteAllRoomMemberInRoom = async roomId => {
-    const result = RoomMember.deleteMany({ roomId });
-
-    return result;
+    return await RoomMember.deleteMany({ roomId });
 };
 
 export const getRoomMemberForRoom = async (roomId, userId) => {

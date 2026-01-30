@@ -47,7 +47,7 @@ export const addReplyInfo = async message => {
             replyTo: {
                 messageId: message.replyToId,
                 isDeleted: true,
-                content: '[Deleted Message]',
+                content: 'DELETED MESSAGE',
             },
         };
     }
