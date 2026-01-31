@@ -161,21 +161,27 @@ const ChatInfo = ({ room, setActiveRoom, setIsChatInfoActive }) => {
                                     Members
                                 </h1>
                                 {roomMembers.map(({ username, online, role, userId }, index) => (
-                                    <div key={index} className="flex items-center gap-2">
-                                        <div className="flex size-10 items-center justify-center rounded-full bg-white/30 p-2 backdrop-blur-2xl">
-                                            <h1 className="text-2xl font-bold text-[rgb(80,53,168)]">
-                                                {username[0].toUpperCase()}
-                                            </h1>
+                                    <div
+                                        key={index}
+                                        className="flex w-full items-center justify-between gap-2"
+                                    >
+                                        <div className="flex items-center gap-2">
+                                            <div className="flex size-10 items-center justify-center rounded-full bg-white/30 p-2 backdrop-blur-2xl">
+                                                <h1 className="text-2xl font-bold text-[rgb(80,53,168)]">
+                                                    {username[0].toUpperCase()}
+                                                </h1>
+                                            </div>
+                                            <div className="text-[rgb(80,53,168)]">{username}</div>
+                                            <div
+                                                className={`size-3 rounded-full ${online ? 'bg-green-400' : 'bg-red-400'}`}
+                                            ></div>
+                                            <h1 className="text-[rgb(80,53,168)]">{role}</h1>
                                         </div>
-                                        <div className="text-[rgb(80,53,168)]">{username}</div>
-                                        <div
-                                            className={`size-3 rounded-full ${online ? 'bg-green-400' : 'bg-red-400'}`}
-                                        ></div>
-                                        <h1 className="text-[rgb(80,53,168)]">{role}</h1>
+
                                         {userMember.role === 'owner' &&
                                             userMember.username !== username && (
                                                 <UserMinus
-                                                    className="rounded-full bg-white/30 p-1 text-red-400 backdrop-blur-2xl transition duration-150 ease-in-out hover:cursor-pointer hover:bg-red-400 hover:text-white"
+                                                    className="justify-self-end rounded-full bg-white/30 p-1 text-red-400 backdrop-blur-2xl transition duration-150 ease-in-out hover:cursor-pointer hover:bg-red-400 hover:text-white"
                                                     size={30}
                                                     onClick={() => handleOnKickClicked(userId)}
                                                 />

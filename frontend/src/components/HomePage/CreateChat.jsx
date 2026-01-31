@@ -76,12 +76,6 @@ const CreateChat = ({ isCreateChatActive }) => {
                                     ...newChat,
                                     roomName: e.target.value,
                                 });
-                                if (newChat.roomName === '') {
-                                    setNewChat({
-                                        ...newChat,
-                                        roomName: null,
-                                    });
-                                }
                             }}
                         />
                     </div>
