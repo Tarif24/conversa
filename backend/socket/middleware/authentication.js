@@ -1,9 +1,21 @@
 import { verifyAccessToken, verifyAdminToken } from '../../services/authenticationService.js';
 import EVENTS from '../../constants/socketEvents.js';
 
-const authenticateSocket = socket => {
+const authenticateSocket = (socket, logManager) => {
     return ([eventName, data], next) => {
         try {
+            // Skip the auth middleware if its the following events
+            if (
+                eventName === EVENTS.CONNECT ||
+                eventName === EVENTS.DISCONNECT ||
+                eventName === EVENTS.ERROR ||
+                eventName === EVENTS.USER_LOGIN ||
+                eventName === EVENTS.USER_SIGNUP ||
+                eventName === EVENTS.USER_REFRESH_TOKEN
+            ) {
+                return next();
+            }
+
             // Admin authentication
 
             // Allow admin login without token
@@ -23,20 +35,12 @@ const authenticateSocket = socket => {
                         event: eventName,
                         message: 'Invalid or expired admin token',
                     });
+                    logManager.log('ADMIN', eventName, {
+                        userId: socket.userId || data.userId || 'N/A',
+                        message: 'Invalid or expired admin token',
+                    });
                     return next(new Error('Invalid or expired admin token'));
                 }
-                return next();
-            }
-
-            // Skip the auth middleware if its the following events
-            if (
-                eventName === EVENTS.CONNECT ||
-                eventName === EVENTS.DISCONNECT ||
-                eventName === EVENTS.ERROR ||
-                eventName === EVENTS.USER_LOGIN ||
-                eventName === EVENTS.USER_SIGNUP ||
-                eventName === EVENTS.USER_REFRESH_TOKEN
-            ) {
                 return next();
             }
 
@@ -57,10 +61,15 @@ const authenticateSocket = socket => {
                     event: eventName,
                     message: 'Invalid or expired token',
                 });
+                logManager.log('INFO', eventName, {
+                    userId: socket.userId || data.userId || 'N/A',
+                    message: 'Invalid or expired token',
+                });
                 return next(new Error('Invalid or expired token'));
             }
 
             // Sets the userId the userEmail within the socket connection
+
             socket.userId = decoded.userId;
             socket.userEmail = decoded.email;
 

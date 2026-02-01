@@ -31,6 +31,7 @@ const logEvent = (socket, logManager) => {
                 eventName === EVENTS.GET_ADMIN_LOG_FOR_DAY
             ) {
                 logManager.log('ADMIN', eventName, {
+                    userId: socket.userId || data.userId || 'N/A',
                     data: JSON.stringify(filteredData),
                 });
                 return next();
@@ -54,6 +55,7 @@ const logEvent = (socket, logManager) => {
             if (!token) {
                 logManager.log('INFO', eventName, {
                     authenticated: false,
+                    userId: socket.userId || data.userId || 'N/A',
                     data: JSON.stringify(filteredData),
                 });
             }

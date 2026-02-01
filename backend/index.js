@@ -98,7 +98,7 @@ const serverSignalHandler = () => {
         // Initialize middleware for the new connection
         socket.use(rateLimit(socket, logManager, rateLimitManager));
         socket.use(logging(socket, logManager));
-        socket.use(authentication(socket));
+        socket.use(authentication(socket, logManager));
 
         connectionManager.addConnection(socket);
 
