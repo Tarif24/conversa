@@ -84,18 +84,15 @@ class AuthenticationHandler {
             socket.userId = userId;
             socket.userEmail = result.user.email;
 
-            // If they just came online and did not reconnect then a status update is sent to all user rooms
-            if (justCameOnline) {
-                const userRooms = await getAllUserRooms(userId);
+            const userRooms = await getAllUserRooms(userId);
 
-                userRooms.rooms.forEach(room => {
-                    this.io.to(room._id.toString()).emit(EVENTS.USER_STATUS_UPDATE, {
-                        userId: userId,
-                        username: username,
-                        status: 'online',
-                    });
+            userRooms.rooms.forEach(room => {
+                this.io.to(room._id.toString()).emit(EVENTS.USER_STATUS_UPDATE, {
+                    userId: userId,
+                    username: username,
+                    status: 'online',
                 });
-            }
+            });
 
             // Join all existing user rooms on login
             for (const room of result.user.rooms) {

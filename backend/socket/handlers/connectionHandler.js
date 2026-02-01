@@ -65,7 +65,7 @@ class ConnectionHandler {
                 return;
             }
 
-            this.connectionManager.addConnection(socket, user.userId);
+            this.connectionManager.addConnection(socket, user.userId, result.user.username);
 
             // Join all existing user rooms on login
             for (const room of result.user.rooms) {

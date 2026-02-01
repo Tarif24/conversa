@@ -54,13 +54,28 @@ const MessagesSidebar = ({
     });
 
     useSocketIOEvent(EVENTS.USER_STATUS_UPDATE, data => {
-        updateRooms();
+        const updatedRooms = updateRooms(true);
     });
 
-    const updateRooms = () => {
+    const updateRooms = (updateActiveRoom = false) => {
         sendProtected(EVENTS.GET_USER_ROOMS, { userId: user._id }, response => {
             setRooms(response.rooms);
             setFilteredRooms(response.rooms);
+
+            // If when you update rooms you want to update the data in the current room too (for example to change the active room data to reflect when someone goes from online to offline)
+            if (updateActiveRoom) {
+                if (!activeRoom) {
+                    return;
+                }
+
+                for (const room of response.rooms) {
+                    if (activeRoom._id === room._id) {
+                        console.log(room);
+                        setActiveRoom(room);
+                        return;
+                    }
+                }
+            }
         });
     };
 

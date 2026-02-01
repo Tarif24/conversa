@@ -24,9 +24,6 @@ const MessagingInterface = ({
     // Reference to the end of the chat history for scrolling
     const chatEndRef = useRef(null);
 
-    // To force update room for status and other updates from other components
-    const [forceUpdateState, setForceUpdateState] = useState(0);
-
     // For MessageActionBar
     const [hoveredMessageId, setHoveredMessageId] = useState(null);
     const [selectedEditMessage, setSelectedEditMessage] = useState(null);
@@ -40,14 +37,6 @@ const MessagingInterface = ({
             organizeMessageStructureAndSave(response.messages);
         });
     }, [room]);
-
-    useSocketIOEvent(EVENTS.USER_STATUS_UPDATE, data => {
-        if (forceUpdateState === 1) {
-            setForceUpdateState(0);
-        } else {
-            setForceUpdateState(1);
-        }
-    });
 
     useSocketIOEvent(EVENTS.ROOM_REFRESH, () => {
         if (!room) {
