@@ -52,18 +52,11 @@ const logEvent = (socket, logManager) => {
                 return next();
             }
 
-            if (!token) {
-                logManager.log('INFO', eventName, {
-                    authenticated: false,
-                    userId: socket.userId || data.userId || 'N/A',
-                    data: JSON.stringify(filteredData),
-                });
-            }
-
             const decoded = verifyAccessToken(token);
             if (!decoded) {
                 logManager.log('INFO', eventName, {
                     authenticated: false,
+                    userId: socket.userId || data.userId || 'N/A',
                     data: JSON.stringify(filteredData),
                 });
                 return next();
@@ -71,6 +64,7 @@ const logEvent = (socket, logManager) => {
 
             logManager.log('INFO', eventName, {
                 authenticated: true,
+                userId: socket.userId || data.userId || 'N/A',
                 data: JSON.stringify(filteredData),
             });
 

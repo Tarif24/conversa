@@ -47,10 +47,13 @@ const authenticateSocket = (socket, logManager) => {
             const token = data.token;
 
             if (!token) {
-                console.log('No token provided for socket ID:', socket.id);
                 socket.emit(EVENTS.ERROR, {
                     event: eventName,
                     message: 'Authentication token required',
+                });
+                logManager.log('INFO', eventName, {
+                    userId: socket.userId || data.userId || 'N/A',
+                    message: `Authentication token required, no token provided by userId: ${socket.userId || data.userId || 'N/A'}`,
                 });
                 return next(new Error('Authentication token required'));
             }

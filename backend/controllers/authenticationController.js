@@ -153,7 +153,7 @@ export const refreshToken = async tokenData => {
 
         // Generate new access token
         const newAccessToken = generateAccessToken({
-            id: decoded.userId,
+            _id: decoded.userId,
             email: decoded.email,
         });
 
