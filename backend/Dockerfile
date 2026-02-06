@@ -16,7 +16,7 @@ RUN npm install
 COPY . .
 
 # Optional:
-EXPOSE 8000
+EXPOSE 5000
 
 # Start the app
 CMD ["node", "index.js"]
