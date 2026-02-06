@@ -12,6 +12,10 @@ RUN npm install
 # Copy the rest of your app
 COPY . .
 
+# ENV vars needed for build
+ARG VITE_CONVERSA_API_URL
+ENV VITE_CONVERSA_API_URL=$VITE_CONVERSA_API_URL
+
 # Build the app for production
 RUN npm run build
 
