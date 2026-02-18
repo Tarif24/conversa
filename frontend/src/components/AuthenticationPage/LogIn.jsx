@@ -49,11 +49,11 @@ const LogIn = () => {
     };
 
     return (
-        <div className="w-150">
-            <h1 className="mb-25 block text-center text-6xl font-medium break-words text-white">
+        <div className="flex w-full flex-col items-center justify-center p-4 sm:p-0">
+            <h1 className="mb-25 block text-4xl font-medium break-words text-white sm:text-6xl">
                 Welcome back
             </h1>
-            <form onSubmit={handleSubmit} className="w-full space-y-6">
+            <form onSubmit={handleSubmit} className="w-full space-y-6 sm:w-[75%]">
                 {/* EMAIL */}
 
                 <input

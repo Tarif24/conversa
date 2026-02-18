@@ -39,11 +39,11 @@ const SignUp = () => {
     };
 
     return (
-        <div>
-            <h1 className="mb-25 block text-center text-6xl font-medium text-white">
+        <div className="flex w-full flex-col items-center justify-center p-4 sm:p-0">
+            <h1 className="mb-25 block text-center text-4xl font-medium text-white sm:text-5xl">
                 Create an account
             </h1>
-            <form onSubmit={handleSubmit} className="w-150 space-y-6">
+            <form onSubmit={handleSubmit} className="w-full space-y-4 sm:w-[75%] sm:space-y-6">
                 {/* NAME */}
                 <div className="flex gap-8">
                     <input

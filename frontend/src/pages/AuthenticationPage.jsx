@@ -9,9 +9,9 @@ const AuthenticationPage = () => {
     const [isSignUp, setIsSignUp] = useState(false);
 
     return (
-        <div className="relative flex h-full w-full flex-col items-center justify-center bg-gradient-to-br from-[#7C77AA] to-[#595C8A] p-15">
+        <div className="relative flex h-full w-full flex-col items-center justify-center bg-gradient-to-br from-[#7C77AA] to-[#595C8A] p-3 sm:p-15">
             <div className="z-2 flex h-full w-full rounded-2xl bg-[rgb(45,38,56)] shadow-xl/40 backdrop-blur-lg">
-                <div className="flex w-[60%] items-center justify-center p-5">
+                <div className="hidden w-[60%] items-center justify-center p-5 xl:flex">
                     <div className="flex h-full w-full flex-col rounded-lg bg-[rgb(59,54,76)]">
                         <div className="flex h-[50%] w-full">
                             <div className="h-full w-[50%] pt-6 pr-3 pb-3 pl-6">
@@ -44,8 +44,8 @@ const AuthenticationPage = () => {
                         </div>
                     </div>
                 </div>
-                <div className="flex w-[40%] flex-col items-center justify-center">
-                    <div>{isSignUp ? <SignUp /> : <LogIn />}</div>
+                <div className="flex w-full flex-col items-center justify-center xl:w-[40%]">
+                    {isSignUp ? <SignUp /> : <LogIn />}
                     <div className="mt-6 flex gap-2 text-[rgb(168,167,173)]">
                         <h1>
                             {isSignUp ? 'Already have an account? ' : "Don't have an account? "}
