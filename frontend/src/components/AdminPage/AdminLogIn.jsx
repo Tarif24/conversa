@@ -25,10 +25,10 @@ const AdminLogIn = ({ setIsLoggedIn, setAdminToken }) => {
     };
 
     return (
-        <div className="flex h-full w-full items-center justify-center p-15">
+        <div className="flex h-full w-full items-center justify-center p-3 md:p-15">
             <div className="flex h-full w-full items-center justify-center rounded-2xl bg-[rgb(45,38,56)] shadow-xl/40 backdrop-blur-lg">
-                <div className="w-fit">
-                    <h1 className="mb-25 block text-center text-6xl font-medium text-white">
+                <div className="w-fit p-3">
+                    <h1 className="mb-25 block text-center text-3xl font-medium text-white sm:text-4xl md:text-6xl">
                         Conversa Admin Panel
                     </h1>
                     <form onSubmit={handleSubmit} className="w-full space-y-6">

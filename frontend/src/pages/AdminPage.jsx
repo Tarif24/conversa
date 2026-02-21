@@ -7,7 +7,7 @@ const AdminPage = () => {
     const [adminToken, setAdminToken] = useState(null);
 
     return (
-        <div className="relative flex h-full w-full flex-col items-center justify-center bg-gradient-to-br from-[#7C77AA] to-[#595C8A]">
+        <div className="flex h-full w-full flex-col items-center justify-center bg-gradient-to-br from-[#7C77AA] to-[#595C8A]">
             {isLoggedIn ? (
                 <AdminData adminToken={adminToken} setIsLoggedIn={setIsLoggedIn} />
             ) : (
