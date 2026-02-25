@@ -3,11 +3,9 @@ import { useSocketIO, useSocketIOEvent, useSocketIOState } from '../../hooks/use
 import { toast } from 'react-toastify';
 import EVENTS from '../../../constants/socketEvents';
 import { MessageCirclePlus } from 'lucide-react';
-import { Users } from 'lucide-react';
-import { Reply } from 'lucide-react';
-import { Info } from 'lucide-react';
 import MessageTypingBar from './MessageTypingBar';
-import MessageActionsBar from './MessageActionsBar';
+import Message from './Message';
+import ChatHeader from './ChatHeader';
 
 const MessagingInterface = ({
     room,
@@ -28,20 +26,6 @@ const MessagingInterface = ({
     const [hoveredMessageId, setHoveredMessageId] = useState(null);
     const [selectedEditMessage, setSelectedEditMessage] = useState(null);
     const [selectedReplyMessage, setSelectedReplyMessage] = useState(null);
-
-    // For responsive design
-    const [windowSize, setWindowSize] = useState({
-        width: window.innerWidth,
-        height: window.innerHeight,
-    });
-
-    useEffect(() => {
-        function handleResize() {
-            setWindowSize({ width: window.innerWidth, height: window.innerHeight });
-        }
-        window.addEventListener('resize', handleResize);
-        return () => window.removeEventListener('resize', handleResize);
-    }, []);
 
     // Handles what happens on chat switch
     useEffect(() => {
@@ -128,247 +112,28 @@ const MessagingInterface = ({
 
     return (
         <div className="flex h-full flex-1 flex-col justify-between rounded-2xl bg-white/50 backdrop-blur-2xl">
-            <div className="flex h-17 items-center px-3 py-4 sm:h-23 sm:px-6">
-                {room ? (
-                    <div className="flex w-full items-center justify-between">
-                        <div className="flex items-center gap-4">
-                            <div className="flex size-7 items-center justify-center rounded-full bg-white/30 p-2 backdrop-blur-2xl sm:size-15">
-                                <h1 className="font-bold text-[rgb(80,53,168)] sm:text-2xl">
-                                    {room.type === 'direct' ? (
-                                        room.otherUser[0].toUpperCase()
-                                    ) : (
-                                        <Users className="size-5 sm:size-8" />
-                                    )}
-                                </h1>
-                            </div>
-                            <div>
-                                <h1 className="text-2xl font-medium text-[rgb(97,7,180)] sm:text-3xl">
-                                    {room.type === 'direct'
-                                        ? windowSize.width < 640
-                                            ? room.otherUser.substring(0, 14) +
-                                              (room.otherUser.length > 14 ? '...' : '')
-                                            : room.otherUser
-                                        : windowSize.width < 640
-                                          ? room.roomName.substring(0, 14) +
-                                            (room.roomName.length > 14 ? '...' : '')
-                                          : room.roomName}
-                                </h1>
-                                <div className="flex items-center gap-1">
-                                    {room.type === 'direct' ? (
-                                        room.onlineMembers.length === 2 ? (
-                                            <div className="flex items-center justify-center gap-1">
-                                                <div className="size-3 rounded-full bg-green-400"></div>
-                                                <div className="text-[rgb(97,7,180)]">online</div>
-                                            </div>
-                                        ) : (
-                                            <div className="flex items-center justify-center gap-1">
-                                                <div className="size-3 rounded-full bg-red-400"></div>
-                                                <div className="text-[rgb(97,7,180)]">offline</div>
-                                            </div>
-                                        )
-                                    ) : room.onlineMembers.length > 1 ? (
-                                        <div className="flex items-center justify-center gap-1">
-                                            <div className="size-3 rounded-full bg-green-400"></div>
-                                            <h1 className="text-[rgb(97,7,180)]">
-                                                {room.onlineMembers.length - 1}/
-                                                {room.users.length - 1}
-                                            </h1>
-                                        </div>
-                                    ) : (
-                                        <div className="flex items-center justify-center gap-1">
-                                            <div className="size-3 rounded-full bg-red-400"></div>
-                                            <h1 className="text-[rgb(97,7,180)]">
-                                                {room.onlineMembers.length - 1}/
-                                                {room.users.length - 1}
-                                            </h1>
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
-                        </div>
-                        <div
-                            className={`${isChatInfoActive ? 'bg-[rgb(97,7,180)] text-[rgb(176,168,226)]' : ' text-[rgb(97,7,180)]'} w-fit rounded-full transition duration-200 ease-in-out hover:scale-110 hover:cursor-pointer`}
-                            onClick={() => {
-                                setIsChatInfoActive(!isChatInfoActive);
-                            }}
-                        >
-                            <Info size={30} />
-                        </div>
-                    </div>
-                ) : (
-                    <h1 className="text-3xl font-medium text-[rgb(54,0,105)]">No Chat Selected</h1>
-                )}
-            </div>
+            <ChatHeader
+                room={room}
+                isChatInfoActive={isChatInfoActive}
+                setIsChatInfoActive={setIsChatInfoActive}
+            />
             <div className="flex min-h-0 flex-1 flex-col rounded-2xl bg-white/30">
                 {room ? (
                     <>
                         <div className="custom-scrollbar mr-1 flex flex-1 flex-col overflow-y-auto px-4">
                             <div className="flex-grow"></div>
                             {chatHistory.map(({ role, message }, index) => {
-                                return role !== 'system' ? (
-                                    role === 'user' ? (
-                                        <div
-                                            className="my-2 flex w-full flex-col items-end gap-2"
-                                            key={index}
-                                            onMouseEnter={() => setHoveredMessageId(index)}
-                                            onMouseLeave={() => setHoveredMessageId(null)}
-                                        >
-                                            <div className="flex max-w-[70%] items-center gap-2">
-                                                <div className="flex flex-col items-end gap-1">
-                                                    <div className="flex w-full justify-end gap-2">
-                                                        {message.replyToId && (
-                                                            <div className="self-center text-[0.7rem] text-[rgb(153,122,255)] sm:text-[1rem]">
-                                                                You replied to{' '}
-                                                                {user.username ===
-                                                                message.replyTo.username
-                                                                    ? 'yourself'
-                                                                    : message.replyTo.username}
-                                                            </div>
-                                                        )}
-                                                        {message.isEdited && (
-                                                            <div className="text-[0.7rem] text-[rgb(153,122,255)] sm:text-[1rem]">
-                                                                Edited
-                                                            </div>
-                                                        )}
-                                                    </div>
-                                                    <div className="flex w-fit flex-col gap-1">
-                                                        {message.replyToId && (
-                                                            <div className="flex items-center gap-1 self-end">
-                                                                <h1 className="w-fit self-end rounded-2xl bg-[rgb(153,122,255)] p-2 text-[0.8rem] break-words text-white sm:p-4 sm:text-[1.2rem]">
-                                                                    {message.replyTo.content}
-                                                                </h1>
-                                                                <Reply className="text-[rgb(80,53,168)]" />
-                                                            </div>
-                                                        )}
-                                                        <div className="flex items-center gap-2 self-end">
-                                                            <div className="flex items-center gap-1">
-                                                                <MessageActionsBar
-                                                                    isHovered={
-                                                                        windowSize.width >= 1024 &&
-                                                                        hoveredMessageId === index
-                                                                    }
-                                                                    message={message}
-                                                                    setSelectedEditMessage={
-                                                                        setSelectedEditMessage
-                                                                    }
-                                                                    setSelectedReplyMessage={
-                                                                        setSelectedReplyMessage
-                                                                    }
-                                                                />
-                                                                <h1 className="rounded-l-2xl rounded-tr-2xl rounded-br-2xl bg-[rgb(80,53,168)] p-2 text-[0.8rem] break-words text-white sm:rounded-br-none sm:p-4 sm:text-[1.2rem]">
-                                                                    {message.message}
-                                                                </h1>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            {message.readUsers.length > 0 && (
-                                                <div className="flex w-full justify-end gap-1">
-                                                    {message.readUsers.map(
-                                                        ({ username }, index) => (
-                                                            <div
-                                                                key={index}
-                                                                className="flex size-5 items-center justify-center rounded-full bg-violet-300 p-2"
-                                                            >
-                                                                <h1 className="text-[0.7rem] font-bold text-[rgb(80,53,168)]">
-                                                                    {username[0].toUpperCase()}
-                                                                </h1>
-                                                            </div>
-                                                        )
-                                                    )}
-                                                </div>
-                                            )}
-                                        </div>
-                                    ) : (
-                                        <div
-                                            className={`mt-2 mb-2 flex w-full flex-col items-start`}
-                                            key={index}
-                                            onMouseEnter={() => setHoveredMessageId(index)}
-                                            onMouseLeave={() => setHoveredMessageId(null)}
-                                        >
-                                            <div className="flex max-w-[70%] items-center gap-2">
-                                                <div className="flex flex-col items-end gap-1">
-                                                    <div className="flex w-full justify-start gap-2 pl-10">
-                                                        {message.replyToId && (
-                                                            <div className="self-center text-[0.7rem] text-[rgb(153,122,255)] sm:text-[1rem]">
-                                                                {user.username ===
-                                                                message.replyTo.username
-                                                                    ? `${message.replyTo.username} replied to you`
-                                                                    : `${message.replyTo.username} replied to ${message.username}`}
-                                                            </div>
-                                                        )}
-                                                        {message.isEdited && (
-                                                            <div className="text-[0.7rem] text-[rgb(153,122,255)] sm:text-[1rem]">
-                                                                Edited
-                                                            </div>
-                                                        )}
-                                                    </div>
-                                                    <div className="flex w-fit flex-col gap-1 self-start">
-                                                        {message.replyToId && (
-                                                            <div className="ml-12 flex items-center gap-1 self-start">
-                                                                <Reply className="scale-x-[-1] text-[rgb(153,122,255)]" />
-                                                                <h1 className="w-fit self-start rounded-2xl bg-[rgb(96,75,163)] p-2 text-[0.8rem] break-words text-white sm:p-4 sm:text-[1.2rem]">
-                                                                    {message.replyTo.content}
-                                                                </h1>
-                                                            </div>
-                                                        )}
-                                                        <div className="flex items-center gap-2 self-start">
-                                                            <div className="flex size-7 items-center justify-center rounded-full bg-white/30 p-2 backdrop-blur-2xl sm:size-10">
-                                                                <h1 className="font-bold text-[rgb(80,53,168)]">
-                                                                    {message.username[0].toUpperCase()}
-                                                                </h1>
-                                                            </div>
-                                                            <div className="flex items-center gap-1">
-                                                                <h1 className="rounded-tl-2xl rounded-r-2xl rounded-bl-2xl bg-[rgb(138,102,255)] p-2 text-[0.8rem] break-words text-white sm:rounded-bl-none sm:p-4 sm:text-[1.2rem]">
-                                                                    {message.message}
-                                                                </h1>
-                                                                <MessageActionsBar
-                                                                    isUser={false}
-                                                                    isHovered={
-                                                                        windowSize.width >= 1024 &&
-                                                                        hoveredMessageId === index
-                                                                    }
-                                                                    message={message}
-                                                                    setSelectedEditMessage={
-                                                                        setSelectedEditMessage
-                                                                    }
-                                                                    setSelectedReplyMessage={
-                                                                        setSelectedReplyMessage
-                                                                    }
-                                                                />
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            {message.readUsers.length > 0 && (
-                                                <div className="flex w-full justify-end gap-1">
-                                                    {message.readUsers.map(
-                                                        ({ username }, index) => (
-                                                            <div
-                                                                key={index}
-                                                                className="flex size-5 items-center justify-center rounded-full bg-violet-300 p-2"
-                                                            >
-                                                                <h1 className="text-[0.7rem] font-bold text-[rgb(80,53,168)]">
-                                                                    {username[0].toUpperCase()}
-                                                                </h1>
-                                                            </div>
-                                                        )
-                                                    )}
-                                                </div>
-                                            )}
-                                        </div>
-                                    )
-                                ) : (
-                                    <div
-                                        className={`mb-2 flex w-full justify-center break-words`}
-                                        key={index}
-                                    >
-                                        <h1 className="text-[0.8rem] text-[rgb(59,37,119)] sm:text-[1rem]">
-                                            {message.message}
-                                        </h1>
-                                    </div>
+                                return (
+                                    <Message
+                                        role={role}
+                                        message={message}
+                                        index={index}
+                                        hoveredMessageId={hoveredMessageId}
+                                        setHoveredMessageId={setHoveredMessageId}
+                                        user={user}
+                                        setSelectedEditMessage={setSelectedEditMessage}
+                                        setSelectedReplyMessage={setSelectedReplyMessage}
+                                    />
                                 );
                             })}
                             <div ref={chatEndRef}></div>

@@ -51,7 +51,7 @@ const HomePage = () => {
     if (!user || !isConnected) {
         return (
             <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-[#363163] via-[#695ce0] to-[#595C8A]">
-                <div className="text-4xl text-[rgb(255,255,255)]">
+                <div className="text-2xl text-[rgb(255,255,255)] sm:text-4xl">
                     {!user ? 'Loading user...' : 'Connecting to server...'}
                 </div>
             </div>
