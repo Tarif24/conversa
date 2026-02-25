@@ -44,6 +44,10 @@ const MessageTypingBar = ({
         }
         setInputText(e.target.value);
 
+        e.target.style.height = 'auto';
+        e.target.style.height =
+            e.target.scrollHeight < 150 ? `${e.target.scrollHeight}px` : '150px';
+
         // Send "started typing" if not already typing
         if (!isTyping.current && e.target.value.length > 0) {
             isTyping.current = true;
@@ -240,20 +244,29 @@ const MessageTypingBar = ({
                 className="flex h-fit flex-col items-end justify-center rounded-full pl-4"
                 onSubmit={submitForm}
             >
-                <div className="mx-2 mb-2 flex h-fit w-full items-center rounded-[5rem] border-2 border-[rgb(59,37,119)] bg-white/20 backdrop-blur-2xl">
-                    <input
+                <div className="mx-2 mb-2 flex h-fit w-full items-center rounded-2xl border-2 border-[rgb(59,37,119)] bg-white/20 backdrop-blur-2xl">
+                    {/* <input
                         type="text"
                         placeholder="Send a message..."
                         className="relative h-full w-full rounded-[5rem] px-5 break-words text-[rgb(81,46,177)] focus:outline-none"
                         value={inputText}
                         onChange={e => handleTyping(e)}
+                    /> */}
+                    <textarea
+                        value={inputText}
+                        placeholder="Send a message..."
+                        rows={1}
+                        className="custom-scrollbar relative mr-1 h-full w-full resize-none overflow-auto rounded-2xl px-3 break-words text-[rgb(81,46,177)] focus:outline-none"
+                        onChange={e => handleTyping(e)}
                     />
-                    <div className="mr-2 text-[rgb(81,46,177)]">{inputText.length}/500</div>
+                    <div className="mr-2 text-[0.8rem] text-[rgb(81,46,177)] sm:text-[1rem]">
+                        {inputText.length}/500
+                    </div>
                     <button
                         className="flex h-full items-center justify-center rounded-[5rem] border-2 border-white bg-[rgb(59,37,119)] p-3 text-white transition duration-300 ease-in-out hover:cursor-pointer hover:bg-[rgb(173,154,226)]"
                         type="submit"
                     >
-                        <Send className="rounded-[5rem]" />
+                        <Send className="size-4 rounded-[5rem] sm:size-6" />
                     </button>
                 </div>
             </form>

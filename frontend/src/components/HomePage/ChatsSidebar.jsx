@@ -10,6 +10,8 @@ const MessagesSidebar = ({
     setActiveRoom,
     activeRoom,
     setIsChatInfoActive,
+    setIsActive = null,
+    isResponsive = false,
 }) => {
     const { isConnected, connectionState, user, sendProtected, sendRefresh, sendLastEmitted } =
         useSocketIO();
@@ -19,6 +21,20 @@ const MessagesSidebar = ({
     const [inputText, setInputText] = useState('');
 
     const [activeRoomId, setActiveRoomId] = useState(null);
+
+    // For responsive design
+    const [windowSize, setWindowSize] = useState({
+        width: window.innerWidth,
+        height: window.innerHeight,
+    });
+
+    useEffect(() => {
+        function handleResize() {
+            setWindowSize({ width: window.innerWidth, height: window.innerHeight });
+        }
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
 
     useEffect(() => {
         updateRooms();
@@ -86,6 +102,9 @@ const MessagesSidebar = ({
         setActiveRoomId(room._id);
         onRoomClicked(room);
         setIsCreateChatActive(false);
+        if (setIsActive) {
+            setIsActive(false);
+        }
     };
 
     const handleTextOnChange = input => {
@@ -109,7 +128,7 @@ const MessagesSidebar = ({
     };
 
     return (
-        <div className="flex h-full w-100 flex-col gap-1">
+        <div className="flex h-full w-60 flex-col gap-1 md:w-100">
             <div className="flex items-center gap-2 rounded-2xl bg-white/50 px-4 backdrop-blur-2xl">
                 <Search color="rgb(59,37,119)" />
                 <input
@@ -120,35 +139,51 @@ const MessagesSidebar = ({
                     onChange={e => handleTextOnChange(e.target.value)}
                 />
             </div>
-            <div className="flex h-full w-full flex-1 flex-col justify-between rounded-2xl bg-white/50 pt-4 pr-1 pl-4 backdrop-blur-2xl">
+            <div className="flex min-h-0 w-full flex-1 flex-col justify-between rounded-2xl bg-white/50 pt-4 pr-1 pl-4 backdrop-blur-2xl">
                 <div className="flex items-center">
-                    <h1 className="text-3xl font-medium text-[rgb(59,37,119)]">Chats</h1>
+                    <h1 className="text-2xl font-medium text-[rgb(59,37,119)] sm:text-3xl">
+                        Chats
+                    </h1>
                 </div>
-                <div className="custom-scrollbar flex h-189 flex-col gap-4 overflow-x-hidden py-2 pr-1">
+                <div className="custom-scrollbar flex flex-1 flex-col gap-2 overflow-y-auto py-2 pr-1 sm:gap-4">
                     {filteredRooms && filteredRooms.length > 0 ? (
                         filteredRooms.map(room => (
                             <div
                                 key={room._id}
-                                className="relative flex h-fit w-full gap-3 rounded-xl px-4 py-6 transition duration-300 ease-in-out hover:cursor-pointer hover:bg-white/30"
+                                className="relative flex h-fit w-full items-center gap-3 rounded-xl py-2 transition duration-300 ease-in-out hover:cursor-pointer hover:bg-white/30 sm:px-4 sm:py-6"
                                 onClick={() => handleOnRoomClicked(room)}
                             >
-                                <div className="flex size-15 items-center justify-center rounded-full bg-white/30 p-2 backdrop-blur-2xl">
-                                    <h1 className="text-2xl font-bold text-[rgb(80,53,168)]">
+                                <div className="flex size-8 items-center justify-center rounded-full bg-white/30 p-2 backdrop-blur-2xl sm:size-15">
+                                    <h1 className="font-bold text-[rgb(80,53,168)] sm:text-2xl">
                                         {room.type === 'direct' ? (
                                             room.otherUser[0].toUpperCase()
                                         ) : (
-                                            <Users />
+                                            <Users className="size-4 sm:size-6" />
                                         )}
                                     </h1>
                                 </div>
                                 <div>
-                                    <h1 className="text-3xl font-medium text-[rgb(80,53,168)]">
-                                        {room.type === 'direct' ? room.otherUser : room.roomName}
+                                    <h1 className="font-bold text-[rgb(80,53,168)] sm:text-3xl sm:font-medium">
+                                        {room.type === 'direct'
+                                            ? windowSize.width < 640
+                                                ? room.otherUser.substring(0, 15) +
+                                                  (room.otherUser.length > 15 ? '...' : '')
+                                                : room.otherUser
+                                            : windowSize.width < 640
+                                              ? room.roomName.substring(0, 15) +
+                                                (room.roomName.length > 15 ? '...' : '')
+                                              : room.roomName}
                                     </h1>
                                     <h1
                                         className={`text-[rgb(80,53,168)] ${room.isTyping ? '' : ''}`}
                                     >
-                                        {room.isTyping ? 'typing...' : room.message.message}
+                                        {room.isTyping
+                                            ? 'typing...'
+                                            : windowSize.width < 640
+                                              ? room.message.message.substring(0, 15) +
+                                                (room.message.message.length > 10 ? '...' : '')
+                                              : room.message.message.substring(0, 20) +
+                                                (room.message.message.length > 20 ? '...' : '')}
                                     </h1>
                                 </div>
                                 <div className="flex flex-1 items-center justify-end">
@@ -170,7 +205,7 @@ const MessagesSidebar = ({
                                     )}
                                 </div>
                                 {room.unreadCount > 0 && (
-                                    <div className="g-white/30 absolute top-1 right-1 flex size-6 items-center justify-center rounded-full p-1 text-[rgb(80,53,168)] backdrop-blur-2xl">
+                                    <div className="absolute top-1 right-1 flex size-6 items-center justify-center rounded-full bg-white/30 p-1 text-[rgb(80,53,168)] backdrop-blur-2xl">
                                         {room.unreadCount}
                                     </div>
                                 )}

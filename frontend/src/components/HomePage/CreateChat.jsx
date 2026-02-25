@@ -60,7 +60,10 @@ const CreateChat = ({ isCreateChatActive }) => {
         <div className="flex h-full flex-1 flex-col items-center justify-center rounded-2xl">
             <div className="flex h-full w-full flex-col items-center justify-center rounded-2xl bg-white/65 backdrop-blur-2xl">
                 <h1 className="text-3xl font-bold text-[rgb(110,84,181)]">New Chat</h1>
-                <form onSubmit={handleSubmitForm} className="w-150 space-y-4 rounded-lg p-6">
+                <form
+                    onSubmit={handleSubmitForm}
+                    className="w-full space-y-4 rounded-lg p-6 sm:w-150"
+                >
                     {/* CHAT NAME */}
                     <div className={newChat.users.length < 2 ? 'hidden' : 'block'}>
                         <input

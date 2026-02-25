@@ -6,7 +6,13 @@ import { House } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
-const Navbar = ({ isCreateChatActive, setActiveRoom, setIsChatInfoActive }) => {
+const Navbar = ({
+    isCreateChatActive,
+    setActiveRoom,
+    setIsChatInfoActive,
+    setIsActive = null,
+    isResponsive = false,
+}) => {
     const {
         isConnected,
         connectionState,
@@ -22,11 +28,14 @@ const Navbar = ({ isCreateChatActive, setActiveRoom, setIsChatInfoActive }) => {
     const navigate = useNavigate();
 
     const navButtonStyle =
-        'flex size-15 items-center justify-center rounded-full bg-white/60 backdrop-blur-2xl p-2 hover:cursor-pointer hover:scale-110 transition-all duration-200 ease-in-out';
+        'flex size-10 sm:size-15 items-center justify-center rounded-full bg-white/60 backdrop-blur-2xl p-2 hover:cursor-pointer hover:scale-110 transition-all duration-200 ease-in-out';
 
     const handleOnNewChatClicked = () => {
         setIsChatInfoActive(false);
         isCreateChatActive(true);
+        if (setIsActive) {
+            setIsActive(false);
+        }
     };
 
     const handleOnLogoutClicked = () => {
@@ -43,27 +52,32 @@ const Navbar = ({ isCreateChatActive, setActiveRoom, setIsChatInfoActive }) => {
         setIsChatInfoActive(false);
         setActiveRoom(null);
         isCreateChatActive(false);
+        if (setIsActive) {
+            setIsActive(false);
+        }
     };
 
     return (
-        <div className="flex h-full w-30 flex-col items-center justify-between rounded-full bg-white/20 p-4 backdrop-blur-2xl">
+        <div
+            className={`${isResponsive ? 'bg-white/50' : 'bg-white/20'} flex h-full w-15 flex-col items-center justify-between rounded-full p-4 backdrop-blur-2xl sm:w-30`}
+        >
             <div>
                 <div className={navButtonStyle} title="Profile">
-                    <h1 className="text-2xl font-bold text-[rgb(152,114,255)]">
+                    <h1 className="font-bold text-[rgb(152,114,255)] sm:text-2xl">
                         {userFirstLetter}
                     </h1>
                 </div>
             </div>
             <div className="flex flex-col gap-4">
                 <div className={navButtonStyle} onClick={() => handleOnHomeClicked()} title="Home">
-                    <House color="rgb(152,114,255)" />
+                    <House color="rgb(152,114,255)" className="size-5 sm:size-8" />
                 </div>
                 <div
                     className={navButtonStyle}
                     onClick={() => handleOnNewChatClicked()}
                     title="New Chat"
                 >
-                    <MessageCirclePlus color="rgb(152,114,255)" />
+                    <MessageCirclePlus color="rgb(152,114,255)" className="size-5 sm:size-8" />
                 </div>
             </div>
             <div>
@@ -72,7 +86,7 @@ const Navbar = ({ isCreateChatActive, setActiveRoom, setIsChatInfoActive }) => {
                     onClick={() => handleOnLogoutClicked()}
                     title="Logout"
                 >
-                    <LogOut color="rgb(152,114,255)" />
+                    <LogOut color="rgb(152,114,255)" className="size-5 sm:size-8" />
                 </div>
             </div>
         </div>

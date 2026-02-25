@@ -8,6 +8,7 @@ import Navbar from '../components/HomePage/Navbar';
 import ChatInfo from '../components/HomePage/ChatInfo';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import SlideInNav from '../components/HomePage/SlideInNav';
 
 const HomePage = () => {
     const {
@@ -62,19 +63,30 @@ const HomePage = () => {
     };
 
     return (
-        <div className="flex h-full w-full items-center justify-center gap-2 bg-gradient-to-br from-[#363163] via-[#695ce0] to-[#595C8A] p-5">
-            <Navbar
-                isCreateChatActive={setIsCreateChatActive}
-                setActiveRoom={setActiveRoom}
-                setIsChatInfoActive={setIsChatInfoActive}
-            />
-            <ChatsSidebar
-                onRoomClicked={roomClicked}
+        <div className="flex h-full w-full gap-2 bg-gradient-to-br from-[#363163] via-[#695ce0] to-[#595C8A] p-1 sm:items-center sm:justify-center sm:p-5">
+            <div className="hidden h-full gap-2 lg:flex">
+                <Navbar
+                    isCreateChatActive={setIsCreateChatActive}
+                    setActiveRoom={setActiveRoom}
+                    setIsChatInfoActive={setIsChatInfoActive}
+                />
+                <ChatsSidebar
+                    onRoomClicked={roomClicked}
+                    setIsCreateChatActive={setIsCreateChatActive}
+                    setActiveRoom={setActiveRoom}
+                    activeRoom={activeRoom}
+                    setIsChatInfoActive={setIsChatInfoActive}
+                />
+            </div>
+
+            <SlideInNav
                 setIsCreateChatActive={setIsCreateChatActive}
                 setActiveRoom={setActiveRoom}
-                activeRoom={activeRoom}
                 setIsChatInfoActive={setIsChatInfoActive}
+                roomClicked={roomClicked}
+                activeRoom={activeRoom}
             />
+
             {isCreateChatActive ? (
                 <CreateChat isCreateChatActive={setIsCreateChatActive} />
             ) : (
