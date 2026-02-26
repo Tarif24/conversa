@@ -86,7 +86,6 @@ const MessagesSidebar = ({
 
                 for (const room of response.rooms) {
                     if (activeRoom._id === room._id) {
-                        console.log(room);
                         setActiveRoom(room);
                         return;
                     }

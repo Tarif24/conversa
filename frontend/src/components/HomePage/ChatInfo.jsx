@@ -5,6 +5,7 @@ import MessageSearch from './MessageSearch';
 import UserAdd from './UserAdd';
 import { Users } from 'lucide-react';
 import { UserMinus } from 'lucide-react';
+import { ClipLoader } from 'react-spinners';
 
 const ChatInfo = ({ room, setActiveRoom, setIsChatInfoActive }) => {
     const {
@@ -95,13 +96,13 @@ const ChatInfo = ({ room, setActiveRoom, setIsChatInfoActive }) => {
     };
 
     return (
-        <div className="absolute flex h-full w-full flex-col items-center rounded-2xl bg-white/50 p-4 backdrop-blur-2xl transition duration-200 ease-in-out sm:static sm:w-100">
-            {room &&
+        <div className="flex h-full w-full flex-1 flex-col items-center rounded-2xl pr-2 pl-4 transition duration-200 ease-in-out sm:static sm:w-100 sm:flex-none sm:bg-white/50 sm:p-4">
+            {room ? (
                 roomMembers &&
                 (room.type === 'direct' ? (
-                    <div className="my-10 flex h-full w-full flex-col justify-between">
-                        <div className="flex w-full flex-col gap-5">
-                            <div className="flex flex-col items-center justify-center gap-3">
+                    <div className="custom-scrollbar flex h-full w-full flex-col justify-between overflow-auto">
+                        <div className="flex w-full flex-col gap-5 pr-2">
+                            <div className="mt-10 flex flex-col items-center justify-center gap-3">
                                 <div className="flex size-15 items-center justify-center rounded-full bg-white/30 p-2 backdrop-blur-2xl">
                                     <h1 className="text-2xl font-bold text-[rgb(80,53,168)]">
                                         {room.otherUser[0].toUpperCase()}
@@ -132,20 +133,20 @@ const ChatInfo = ({ room, setActiveRoom, setIsChatInfoActive }) => {
                                 ))}
                             </div>
                             <MessageSearch roomId={room._id} />
-                        </div>
-                        <div className="flex justify-center">
-                            <button
-                                className="w-50 rounded-2xl bg-red-400 px-2 py-3 text-2xl text-white transition duration-200 ease-in-out hover:cursor-pointer hover:ring-3 hover:ring-red-600 hover:ring-offset-5 hover:ring-offset-[rgb(175,175,213)]"
-                                onClick={() => handleOnLeaveClicked()}
-                            >
-                                Leave
-                            </button>
+                            <div className="mb-4 flex justify-center">
+                                <button
+                                    className="w-50 rounded-2xl bg-red-400 px-2 py-3 text-2xl text-white transition duration-200 ease-in-out hover:cursor-pointer hover:ring-3 hover:ring-red-600 hover:ring-offset-5 hover:ring-offset-[rgb(175,175,213)]"
+                                    onClick={() => handleOnLeaveClicked()}
+                                >
+                                    Leave
+                                </button>
+                            </div>
                         </div>
                     </div>
                 ) : (
-                    <div className="my-10 flex h-full w-full flex-col justify-between">
-                        <div className="flex w-full flex-col gap-5">
-                            <div className="flex flex-col items-center justify-center gap-3">
+                    <div className="custom-scrollbar flex h-full w-full flex-col justify-between overflow-auto">
+                        <div className="flex w-full flex-col gap-5 pr-2">
+                            <div className="mt-10 flex flex-col items-center justify-center gap-3">
                                 <div className="flex size-15 items-center justify-center rounded-full bg-white/30 p-2 backdrop-blur-2xl">
                                     <h1 className="text-2xl font-bold text-[rgb(80,53,168)]">
                                         <Users />
@@ -191,17 +192,22 @@ const ChatInfo = ({ room, setActiveRoom, setIsChatInfoActive }) => {
                             </div>
                             <MessageSearch roomId={room._id} />
                             <UserAdd room={room} />
-                        </div>
-                        <div className="flex justify-center">
-                            <button
-                                className="w-50 rounded-2xl bg-red-400 px-2 py-3 text-2xl text-white transition duration-200 ease-in-out hover:cursor-pointer hover:ring-3 hover:ring-red-600 hover:ring-offset-5 hover:ring-offset-[rgb(175,175,213)]"
-                                onClick={() => handleOnLeaveClicked()}
-                            >
-                                Leave
-                            </button>
+                            <div className="mb-4 flex justify-center">
+                                <button
+                                    className="w-50 rounded-2xl bg-red-400 px-2 py-3 text-2xl text-white transition duration-200 ease-in-out hover:cursor-pointer hover:ring-3 hover:ring-red-600 hover:ring-offset-5 hover:ring-offset-[rgb(175,175,213)]"
+                                    onClick={() => handleOnLeaveClicked()}
+                                >
+                                    Leave
+                                </button>
+                            </div>
                         </div>
                     </div>
-                ))}
+                ))
+            ) : (
+                <div className="flex h-full w-full items-center justify-center">
+                    <ClipLoader color="rgb(97,7,180)" size={100} />
+                </div>
+            )}
         </div>
     );
 };

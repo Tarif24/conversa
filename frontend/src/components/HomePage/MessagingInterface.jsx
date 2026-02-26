@@ -6,12 +6,14 @@ import { MessageCirclePlus } from 'lucide-react';
 import MessageTypingBar from './MessageTypingBar';
 import Message from './Message';
 import ChatHeader from './ChatHeader';
+import ChatInfo from './ChatInfo';
 
 const MessagingInterface = ({
     room,
     isCreateChatActive,
     setIsChatInfoActive,
     isChatInfoActive,
+    setActiveRoom,
 }) => {
     const { isConnected, connectionState, user, sendProtected, sendRefresh, sendLastEmitted } =
         useSocketIO();
@@ -26,6 +28,20 @@ const MessagingInterface = ({
     const [hoveredMessageId, setHoveredMessageId] = useState(null);
     const [selectedEditMessage, setSelectedEditMessage] = useState(null);
     const [selectedReplyMessage, setSelectedReplyMessage] = useState(null);
+
+    // For responsive design
+    const [windowSize, setWindowSize] = useState({
+        width: window.innerWidth,
+        height: window.innerHeight,
+    });
+
+    useEffect(() => {
+        function handleResize() {
+            setWindowSize({ width: window.innerWidth, height: window.innerHeight });
+        }
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
 
     // Handles what happens on chat switch
     useEffect(() => {
@@ -111,56 +127,80 @@ const MessagingInterface = ({
     };
 
     return (
-        <div className="flex h-full flex-1 flex-col justify-between rounded-2xl bg-white/50 backdrop-blur-2xl">
-            <ChatHeader
-                room={room}
-                isChatInfoActive={isChatInfoActive}
-                setIsChatInfoActive={setIsChatInfoActive}
-            />
-            <div className="flex min-h-0 flex-1 flex-col rounded-2xl bg-white/30">
-                {room ? (
-                    <>
-                        <div className="custom-scrollbar mr-1 flex flex-1 flex-col overflow-y-auto px-4">
-                            <div className="flex-grow"></div>
-                            {chatHistory.map(({ role, message }, index) => {
-                                return (
-                                    <Message
-                                        role={role}
-                                        message={message}
-                                        index={index}
-                                        hoveredMessageId={hoveredMessageId}
-                                        setHoveredMessageId={setHoveredMessageId}
-                                        user={user}
-                                        setSelectedEditMessage={setSelectedEditMessage}
-                                        setSelectedReplyMessage={setSelectedReplyMessage}
-                                    />
-                                );
-                            })}
-                            <div ref={chatEndRef}></div>
-                        </div>
-                        <MessageTypingBar
-                            room={room}
-                            setMessages={organizeMessageStructureAndSave}
-                            selectedEditMessage={selectedEditMessage}
-                            selectedReplyMessage={selectedReplyMessage}
-                            setSelectedEditMessage={setSelectedEditMessage}
-                            setSelectedReplyMessage={setSelectedReplyMessage}
-                        />
-                    </>
-                ) : (
-                    <div className="flex flex-1 flex-col items-center justify-center gap-4">
-                        <h1 className="text-3xl font-bold text-[rgb(96,82,143)]">
-                            Create New Chat
-                        </h1>
+        <div className="flex h-full w-full gap-2">
+            <div className="flex h-full flex-1 flex-col justify-between rounded-2xl bg-white/50 backdrop-blur-2xl">
+                <ChatHeader
+                    room={room}
+                    isChatInfoActive={isChatInfoActive}
+                    setIsChatInfoActive={setIsChatInfoActive}
+                />
+
+                <div className="flex min-h-0 flex-1 flex-col rounded-2xl bg-white/30">
+                    {room ? (
                         <div
-                            className="flex size-15 items-center justify-center rounded-full border-1 border-[rgb(183,161,255)] bg-white/70 p-2 transition-all duration-200 ease-in-out hover:scale-110 hover:cursor-pointer"
-                            onClick={() => handleOnNewChatClicked()}
+                            className={`flex min-h-0 flex-1 flex-col ${isChatInfoActive && windowSize.width < 1024 && 'hidden'}`}
                         >
-                            <MessageCirclePlus color="rgb(183,161,255)" />
+                            <div
+                                className={`custom-scrollbar mr-1 flex flex-1 flex-col overflow-y-auto px-4`}
+                            >
+                                <div className="flex-grow"></div>
+                                {chatHistory.map(({ role, message }, index) => {
+                                    return (
+                                        <Message
+                                            key={index}
+                                            role={role}
+                                            message={message}
+                                            index={index}
+                                            hoveredMessageId={hoveredMessageId}
+                                            setHoveredMessageId={setHoveredMessageId}
+                                            user={user}
+                                            setSelectedEditMessage={setSelectedEditMessage}
+                                            setSelectedReplyMessage={setSelectedReplyMessage}
+                                        />
+                                    );
+                                })}
+                                <div ref={chatEndRef}></div>
+                            </div>
+                            <MessageTypingBar
+                                room={room}
+                                setMessages={organizeMessageStructureAndSave}
+                                selectedEditMessage={selectedEditMessage}
+                                selectedReplyMessage={selectedReplyMessage}
+                                setSelectedEditMessage={setSelectedEditMessage}
+                                setSelectedReplyMessage={setSelectedReplyMessage}
+                            />
                         </div>
-                    </div>
-                )}
+                    ) : (
+                        <div className="flex flex-1 flex-col items-center justify-center gap-4">
+                            <h1 className="text-3xl font-bold text-[rgb(96,82,143)]">
+                                Create New Chat
+                            </h1>
+                            <div
+                                className="flex size-15 items-center justify-center rounded-full border-1 border-[rgb(183,161,255)] bg-white/70 p-2 transition-all duration-200 ease-in-out hover:scale-110 hover:cursor-pointer"
+                                onClick={() => handleOnNewChatClicked()}
+                            >
+                                <MessageCirclePlus color="rgb(183,161,255)" />
+                            </div>
+                        </div>
+                    )}
+                    {isChatInfoActive && windowSize.width < 1024 && (
+                        <ChatInfo
+                            room={room}
+                            setActiveRoom={setActiveRoom}
+                            setIsChatInfoActive={setIsChatInfoActive}
+                            isChatInfoActive={isChatInfoActive}
+                        />
+                    )}
+                </div>
             </div>
+            {isChatInfoActive && windowSize.width > 1024 && (
+                <ChatInfo
+                    room={room}
+                    setActiveRoom={setActiveRoom}
+                    setIsChatInfoActive={setIsChatInfoActive}
+                    isChatInfoActive={isChatInfoActive}
+                />
+            )}
         </div>
     );
 };

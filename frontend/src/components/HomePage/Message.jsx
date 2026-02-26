@@ -30,7 +30,6 @@ const Message = ({
         role === 'user' ? (
             <div
                 className="my-2 flex w-full flex-col items-end gap-2"
-                key={index}
                 onMouseEnter={() => setHoveredMessageId(index)}
                 onMouseLeave={() => setHoveredMessageId(null)}
             >

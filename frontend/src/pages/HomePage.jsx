@@ -5,7 +5,6 @@ import MessagingInterface from '../components/HomePage/MessagingInterface';
 import ChatsSidebar from '../components/HomePage/ChatsSidebar';
 import CreateChat from '../components/HomePage/CreateChat';
 import Navbar from '../components/HomePage/Navbar';
-import ChatInfo from '../components/HomePage/ChatInfo';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import SlideInNav from '../components/HomePage/SlideInNav';
@@ -95,13 +94,7 @@ const HomePage = () => {
                     isCreateChatActive={setIsCreateChatActive}
                     setIsChatInfoActive={setIsChatInfoActive}
                     isChatInfoActive={isChatInfoActive}
-                />
-            )}
-            {isChatInfoActive && (
-                <ChatInfo
-                    room={activeRoom}
                     setActiveRoom={setActiveRoom}
-                    setIsChatInfoActive={setIsChatInfoActive}
                 />
             )}
         </div>

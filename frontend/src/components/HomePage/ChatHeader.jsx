@@ -74,7 +74,7 @@ const ChatHeader = ({ room, isChatInfoActive, setIsChatInfoActive }) => {
                         </div>
                     </div>
                     <div
-                        className={`${isChatInfoActive ? 'bg-[rgb(97,7,180)] text-[rgb(176,168,226)]' : ' text-[rgb(97,7,180)]'} w-fit rounded-full transition duration-200 ease-in-out hover:scale-110 hover:cursor-pointer`}
+                        className={`${isChatInfoActive ? ' bg-[rgb(97,7,180)] text-[rgb(176,168,226)]' : ' text-[rgb(97,7,180)]'} w-fit rounded-full transition duration-200 ease-in-out hover:scale-110 hover:cursor-pointer`}
                         onClick={() => {
                             setIsChatInfoActive(!isChatInfoActive);
                         }}
