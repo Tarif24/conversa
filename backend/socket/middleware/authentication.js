@@ -26,7 +26,8 @@ const authenticateSocket = (socket, logManager) => {
             // For admin events
             if (
                 eventName === EVENTS.GET_ALL_ADMIN_DATA ||
-                eventName === EVENTS.GET_ADMIN_LOG_FOR_DAY
+                eventName === EVENTS.GET_ADMIN_LOG_FOR_DAY ||
+                eventName === EVENTS.DELETE_ALL_DATA
             ) {
                 const decoded = verifyAdminToken(data.token);
 

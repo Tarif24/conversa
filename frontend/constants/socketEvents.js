@@ -47,6 +47,8 @@ const SOCKET_EVENTS = {
     ADMIN_LOGIN: 'admin_login',
     GET_ALL_ADMIN_DATA: 'get_all_admin_data',
     GET_ADMIN_LOG_FOR_DAY: 'get_admin_log_for_day',
+    DELETE_ALL_DATA: 'delete_all_data',
+    FORCE_LOGOUT: 'force_logout',
 
     // System events
     ERROR: 'error',

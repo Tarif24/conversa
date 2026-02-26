@@ -3,6 +3,7 @@ import {
     adminLogin,
     getAllAdminData,
     getAdminLogForDay,
+    deleteAllData,
 } from '../../controllers/adminController.js';
 
 class AdminHandler {
@@ -21,6 +22,9 @@ class AdminHandler {
         );
         socket.on(EVENTS.GET_ADMIN_LOG_FOR_DAY, (data, callback) =>
             this.handleGetAdminLogForDay(socket, data, callback)
+        );
+        socket.on(EVENTS.DELETE_ALL_DATA, (data, callback) =>
+            this.handleDeleteAllData(socket, data, callback)
         );
     }
 
@@ -78,6 +82,28 @@ class AdminHandler {
             console.error('handleGetAdminLogForDay error:', error);
             socket.emit(EVENTS.ERROR, {
                 event: EVENTS.GET_ADMIN_LOG_FOR_DAY,
+                message: 'Server error',
+            });
+        }
+    }
+
+    async handleDeleteAllData(socket, data, callback) {
+        try {
+            const result = await deleteAllData();
+
+            this.io.emit(EVENTS.FORCE_LOGOUT, {
+                message: 'All data has been deleted. You have been logged out.',
+            });
+
+            if (callback) {
+                callback(result);
+            } else {
+                console.log('No callback provided for Delete All Data event');
+            }
+        } catch (error) {
+            console.error('handleDeleteAllData error:', error);
+            socket.emit(EVENTS.ERROR, {
+                event: EVENTS.DELETE_ALL_DATA,
                 message: 'Server error',
             });
         }

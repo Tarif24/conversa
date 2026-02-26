@@ -4,6 +4,7 @@ import {
     getTotalUserCount,
     getTotalRoomCount,
     getTotalMessageCount,
+    deleteAllDBData,
 } from '../services/databaseService.js';
 
 export const adminLogin = async user => {
@@ -61,6 +62,17 @@ export const getAdminLogForDay = async day => {
     } catch (error) {
         console.error('Controller getAdminLogForDay error:', error);
         const message = 'Failed to getAdminLogForDay user: ' + error;
+        return { success: false, message: message };
+    }
+};
+
+export const deleteAllData = async () => {
+    try {
+        await deleteAllDBData();
+        return { success: true, message: 'All data deleted successfully' };
+    } catch (error) {
+        console.error('Controller deleteAllData error:', error);
+        const message = 'Failed to deleteAllData user: ' + error;
         return { success: false, message: message };
     }
 };

@@ -388,3 +388,12 @@ export const getTotalRoomCount = async () => {
 export const getTotalMessageCount = async () => {
     return await Message.countDocuments();
 };
+
+export const deleteAllDBData = async () => {
+    await User.deleteMany({});
+    await Message.deleteMany({});
+    await File.deleteMany({});
+    await Room.deleteMany({});
+    await RefreshToken.deleteMany({});
+    await RoomMember.deleteMany({});
+};
