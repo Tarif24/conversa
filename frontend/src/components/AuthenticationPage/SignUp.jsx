@@ -24,8 +24,32 @@ const SignUp = () => {
     const textInputStyle =
         'w-full rounded bg-[rgb(59,54,76)] px-3 py-2 text-white shadow-sm placeholder:text-[rgb(97,91,110)] focus:ring-2 focus:ring-[rgb(184,169,233)] focus:outline-none';
 
+    // Email format validator
+    const isValidEmail = email => {
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    };
+
+    // Password format validator
+    const isValidPassword = password => {
+        // Minimum 8 chars, 1 uppercase, 1 lowercase, 1 number, 1 special char
+        return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/.test(password);
+    };
+
     const handleSubmit = async e => {
         e.preventDefault();
+
+        // Email and password validation
+        if (!isValidEmail(user.email)) {
+            toast.error('Please enter a valid email address.');
+            return;
+        }
+
+        if (!isValidPassword(user.password)) {
+            toast.error(
+                'Password must be at least 8 characters long and include uppercase, lowercase, number, and special character.'
+            );
+            return;
+        }
 
         sendSignup(user, response => {
             if (response.success) {
