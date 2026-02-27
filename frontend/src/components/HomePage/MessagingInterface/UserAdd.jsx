@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { useSocketIO, useSocketIOEvent, useSocketIOState } from '../../hooks/useSocketIO';
-import EVENTS from '../../../constants/socketEvents';
+import { useSocketIO, useSocketIOEvent, useSocketIOState } from '../../../hooks/useSocketIO';
+import EVENTS from '../../../../constants/socketEvents';
+import { UserPlus } from 'lucide-react';
 
-const UserSearch = ({ handleOnUserClicked, selectedUsers }) => {
+const UserAdd = ({ room }) => {
     const { isConnected, connectionState, user, sendProtected, sendRefresh, sendLastEmitted } =
         useSocketIO();
 
@@ -12,7 +13,6 @@ const UserSearch = ({ handleOnUserClicked, selectedUsers }) => {
     const textOnChange = e => {
         setInputText(e.target.value);
 
-        const userId = user._id.toString();
         const input = e.target.value.trim();
 
         if (input === '') {
@@ -20,16 +20,12 @@ const UserSearch = ({ handleOnUserClicked, selectedUsers }) => {
             return;
         }
 
-        const excludedUsers = selectedUsers.map(user => {
-            return user.userId;
-        });
-
         try {
             sendProtected(
                 EVENTS.USER_SEARCH,
                 {
                     text: input,
-                    excludeUsers: [...excludedUsers, user._id],
+                    excludeUsers: room.users,
                 },
                 response => {
                     setSearchResult(response.userList);
@@ -40,8 +36,15 @@ const UserSearch = ({ handleOnUserClicked, selectedUsers }) => {
         }
     };
 
-    const userResultOnClick = user => {
-        handleOnUserClicked(user);
+    const handleOnAddClicked = userId => {
+        sendProtected(
+            EVENTS.JOIN_ROOM,
+            {
+                roomId: room._id,
+                userId: userId,
+            },
+            () => {}
+        );
         setInputText('');
         setSearchResult([]);
     };
@@ -51,7 +54,7 @@ const UserSearch = ({ handleOnUserClicked, selectedUsers }) => {
             <div className="w-full overflow-hidden rounded-md border-1 border-[rgb(103,67,221)] bg-white/80 p-2 focus:ring-0">
                 <input
                     type="text"
-                    placeholder="Search for users"
+                    placeholder="Add users to group"
                     className="h-7 w-full rounded-[5rem] px-1 text-[rgb(103,67,221)] focus:outline-none"
                     value={inputText}
                     onChange={textOnChange}
@@ -61,13 +64,17 @@ const UserSearch = ({ handleOnUserClicked, selectedUsers }) => {
                         <span className="w-[75%] border-1 border-[rgb(164,146,224)]"></span>
                         {searchResult.map(result => (
                             <div
-                                className="w-[90%] rounded-xl border-1 border-[rgb(103,67,221)] bg-gray-100 px-5 py-1 text-[rgb(103,67,221)] hover:cursor-pointer"
+                                className="flex w-[90%] items-center justify-between rounded-xl border-1 border-[rgb(103,67,221)] bg-gray-100 px-5 py-1 text-[rgb(103,67,221)] hover:cursor-pointer"
                                 key={result.userId}
-                                onClick={() => {
-                                    userResultOnClick(result);
-                                }}
                             >
                                 <h1>{result.username}</h1>
+                                {result.userId !== 'NOT FOUND' && (
+                                    <UserPlus
+                                        className="rounded-full bg-white p-1 text-[rgb(103,67,221)] transition duration-150 ease-in-out hover:bg-[rgb(103,67,221)] hover:text-white"
+                                        size={30}
+                                        onClick={() => handleOnAddClicked(result.userId)}
+                                    />
+                                )}
                             </div>
                         ))}
                     </div>
@@ -77,4 +84,4 @@ const UserSearch = ({ handleOnUserClicked, selectedUsers }) => {
     );
 };
 
-export default UserSearch;
+export default UserAdd;

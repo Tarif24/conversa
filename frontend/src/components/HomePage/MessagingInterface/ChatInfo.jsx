@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { useSocketIO, useSocketIOEvent, useSocketIOState } from '../../hooks/useSocketIO';
-import EVENTS from '../../../constants/socketEvents';
+import { useSocketIO, useSocketIOEvent, useSocketIOState } from '../../../hooks/useSocketIO';
+import EVENTS from '../../../../constants/socketEvents';
 import MessageSearch from './MessageSearch';
 import UserAdd from './UserAdd';
 import { Users } from 'lucide-react';

@@ -3,10 +3,10 @@ import { useSocketIO, useSocketIOEvent, useSocketIOState } from '../../hooks/use
 import { toast } from 'react-toastify';
 import EVENTS from '../../../constants/socketEvents';
 import { MessageCirclePlus } from 'lucide-react';
-import MessageTypingBar from './MessageTypingBar';
-import Message from './Message';
-import ChatHeader from './ChatHeader';
-import ChatInfo from './ChatInfo';
+import MessageTypingBar from './MessagingInterface/MessageTypingBar';
+import Message from './MessagingInterface/Message';
+import ChatHeader from './MessagingInterface/ChatHeader';
+import ChatInfo from './MessagingInterface/ChatInfo';
 
 const MessagingInterface = ({
     room,

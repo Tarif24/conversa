@@ -1,6 +1,6 @@
 import React from 'react';
-import EVENTS from '../../../constants/socketEvents';
-import { useSocketIO, useSocketIOEvent, useSocketIOState } from '../../hooks/useSocketIO';
+import EVENTS from '../../../../constants/socketEvents';
+import { useSocketIO, useSocketIOEvent, useSocketIOState } from '../../../hooks/useSocketIO';
 import { Reply } from 'lucide-react';
 import { Pencil } from 'lucide-react';
 import { Trash2 } from 'lucide-react';

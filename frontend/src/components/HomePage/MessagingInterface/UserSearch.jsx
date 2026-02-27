@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
-import { useSocketIO, useSocketIOEvent, useSocketIOState } from '../../hooks/useSocketIO';
-import EVENTS from '../../../constants/socketEvents';
-import { UserPlus } from 'lucide-react';
+import { useSocketIO, useSocketIOEvent, useSocketIOState } from '../../../hooks/useSocketIO';
+import EVENTS from '../../../../constants/socketEvents';
 
-const UserAdd = ({ room }) => {
+const UserSearch = ({ handleOnUserClicked, selectedUsers }) => {
     const { isConnected, connectionState, user, sendProtected, sendRefresh, sendLastEmitted } =
         useSocketIO();
 
@@ -13,6 +12,7 @@ const UserAdd = ({ room }) => {
     const textOnChange = e => {
         setInputText(e.target.value);
 
+        const userId = user._id.toString();
         const input = e.target.value.trim();
 
         if (input === '') {
@@ -20,12 +20,16 @@ const UserAdd = ({ room }) => {
             return;
         }
 
+        const excludedUsers = selectedUsers.map(user => {
+            return user.userId;
+        });
+
         try {
             sendProtected(
                 EVENTS.USER_SEARCH,
                 {
                     text: input,
-                    excludeUsers: room.users,
+                    excludeUsers: [...excludedUsers, user._id],
                 },
                 response => {
                     setSearchResult(response.userList);
@@ -36,15 +40,8 @@ const UserAdd = ({ room }) => {
         }
     };
 
-    const handleOnAddClicked = userId => {
-        sendProtected(
-            EVENTS.JOIN_ROOM,
-            {
-                roomId: room._id,
-                userId: userId,
-            },
-            () => {}
-        );
+    const userResultOnClick = user => {
+        handleOnUserClicked(user);
         setInputText('');
         setSearchResult([]);
     };
@@ -54,7 +51,7 @@ const UserAdd = ({ room }) => {
             <div className="w-full overflow-hidden rounded-md border-1 border-[rgb(103,67,221)] bg-white/80 p-2 focus:ring-0">
                 <input
                     type="text"
-                    placeholder="Add users to group"
+                    placeholder="Search for users"
                     className="h-7 w-full rounded-[5rem] px-1 text-[rgb(103,67,221)] focus:outline-none"
                     value={inputText}
                     onChange={textOnChange}
@@ -64,15 +61,13 @@ const UserAdd = ({ room }) => {
                         <span className="w-[75%] border-1 border-[rgb(164,146,224)]"></span>
                         {searchResult.map(result => (
                             <div
-                                className="flex w-[90%] items-center justify-between rounded-xl border-1 border-[rgb(103,67,221)] bg-gray-100 px-5 py-1 text-[rgb(103,67,221)] hover:cursor-pointer"
+                                className="w-[90%] rounded-xl border-1 border-[rgb(103,67,221)] bg-gray-100 px-5 py-1 text-[rgb(103,67,221)] hover:cursor-pointer"
                                 key={result.userId}
+                                onClick={() => {
+                                    userResultOnClick(result);
+                                }}
                             >
                                 <h1>{result.username}</h1>
-                                <UserPlus
-                                    className="rounded-full bg-white p-1 text-[rgb(103,67,221)] transition duration-150 ease-in-out hover:bg-[rgb(103,67,221)] hover:text-white"
-                                    size={30}
-                                    onClick={() => handleOnAddClicked(result.userId)}
-                                />
                             </div>
                         ))}
                     </div>
@@ -82,4 +77,4 @@ const UserAdd = ({ room }) => {
     );
 };
 
-export default UserAdd;
+export default UserSearch;

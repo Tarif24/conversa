@@ -3,7 +3,7 @@ import { useSocketIO, useSocketIOEvent, useSocketIOState } from '../hooks/useSoc
 import EVENTS from '../../constants/socketEvents';
 import MessagingInterface from '../components/HomePage/MessagingInterface';
 import ChatsSidebar from '../components/HomePage/ChatsSidebar';
-import CreateChat from '../components/HomePage/CreateChat';
+import CreateChat from '../components/HomePage/MessagingInterface/CreateChat';
 import Navbar from '../components/HomePage/Navbar';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';

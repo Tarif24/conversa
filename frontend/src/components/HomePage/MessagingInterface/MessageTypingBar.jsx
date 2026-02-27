@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, use } from 'react';
-import EVENTS from '../../../constants/socketEvents';
-import { useSocketIO, useSocketIOEvent, useSocketIOState } from '../../hooks/useSocketIO';
+import EVENTS from '../../../../constants/socketEvents';
+import { useSocketIO, useSocketIOEvent, useSocketIOState } from '../../../hooks/useSocketIO';
 import { Send } from 'lucide-react';
 import { X } from 'lucide-react';
 import { PulseLoader } from 'react-spinners';

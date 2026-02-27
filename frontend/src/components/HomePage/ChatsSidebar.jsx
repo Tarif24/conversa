@@ -204,7 +204,7 @@ const MessagesSidebar = ({
                                     )}
                                 </div>
                                 {room.unreadCount > 0 && (
-                                    <div className="absolute top-1 right-1 flex size-6 items-center justify-center rounded-full bg-white/30 p-1 text-[rgb(80,53,168)] backdrop-blur-2xl">
+                                    <div className="absolute top-1 right-1 flex size-4 items-center justify-center rounded-full bg-white/30 p-1 text-[0.8rem] text-[rgb(80,53,168)] backdrop-blur-2xl sm:size-6 sm:text-[1rem]">
                                         {room.unreadCount}
                                     </div>
                                 )}
