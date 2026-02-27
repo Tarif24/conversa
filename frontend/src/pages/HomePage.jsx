@@ -46,6 +46,12 @@ const HomePage = () => {
         toast.error('RATE LIMIT REACHED PLEASE WAIT');
     });
 
+    useSocketIOEvent(EVENTS.FORCE_LOGOUT, data => {
+        clearAuth();
+        toast.info('FORCE LOGOUT:');
+        navigate('/', { replace: true, state: { fromLogout: true } });
+    });
+
     // Wait for both user and socket connection
     if (!user || !isConnected) {
         return (

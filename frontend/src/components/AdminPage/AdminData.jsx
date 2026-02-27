@@ -107,6 +107,18 @@ const AdminData = ({ adminToken, setIsLoggedIn }) => {
         setLastRefreshTime(0);
     };
 
+    const handleOnDeleteAllDatabaseDataClicked = () => {
+        const result = confirm(
+            'Are you sure you want to delete all database data? This action cannot be undone.'
+        );
+        if (result) {
+            sendAdmin(EVENTS.DELETE_ALL_DATA, {}, response => {}, adminToken);
+            toast.success('All database data deleted successfully!');
+        } else {
+            toast.info('Action cancelled');
+        }
+    };
+
     return (
         adminData && (
             <div className="flex h-full w-full flex-col gap-5 overflow-auto p-2 sm:p-10">
@@ -204,6 +216,20 @@ const AdminData = ({ adminToken, setIsLoggedIn }) => {
                                 </div>
                             )}
                         </div>
+                    </div>
+                </div>
+                <div className="flex w-full flex-col items-center gap-12 rounded-2xl bg-red-400 p-2 sm:p-5">
+                    <h1 className="w-full text-center text-3xl font-bold text-white">
+                        DANGER ZONE
+                    </h1>
+                    <div className="flex w-full items-center justify-between rounded-2xl bg-red-300 p-2 sm:p-5">
+                        <h1 className="font-medium sm:text-2xl">Delete all database data</h1>
+                        <button
+                            className="mt-2 rounded-md bg-white px-4 py-2 font-medium text-red-500 transition duration-150 ease-in-out hover:cursor-pointer hover:bg-red-500 hover:text-white"
+                            onClick={() => handleOnDeleteAllDatabaseDataClicked()}
+                        >
+                            DELETE
+                        </button>
                     </div>
                 </div>
             </div>
