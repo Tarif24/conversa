@@ -33,8 +33,8 @@ export const createChatRoom = async (sentRoom, userId) => {
             // Check if a direct chat already exists
             for (const roomId of userResult.rooms) {
                 const result = await getRoomByRoomId(roomId);
-                const room = result.room;
-                if (result.exists) {
+                const room = result;
+                if (result) {
                     if (room.type === 'direct') {
                         const other = room.users.find(u => u !== userId);
 
