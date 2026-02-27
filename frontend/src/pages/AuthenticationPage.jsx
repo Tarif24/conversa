@@ -17,18 +17,18 @@ const AuthenticationPage = () => {
                             <div className="h-full w-[50%] pt-6 pr-3 pb-3 pl-6">
                                 <div className="h-full w-full rounded-xl bg-[rgb(165,143,224)]">
                                     <img
-                                        src={IMG2}
-                                        alt="Auth Screen 1"
-                                        className="h-full w-full rounded-xl"
+                                        src={IMG3}
+                                        alt="Auth Screen 2"
+                                        className="h-full w-full rounded-xl object-cover object-left"
                                     />
                                 </div>
                             </div>
                             <div className="h-full w-[50%] pt-6 pr-6 pb-3 pl-3">
                                 <div className="h-full w-full rounded-xl bg-[rgb(83,41,197)]">
                                     <img
-                                        src={IMG3}
-                                        alt="Auth Screen 1"
-                                        className="h-full w-full rounded-xl"
+                                        src={IMG2}
+                                        alt="Auth Screen 3"
+                                        className="h-full w-full rounded-xl object-cover"
                                     />
                                 </div>
                             </div>
@@ -38,7 +38,7 @@ const AuthenticationPage = () => {
                                 <img
                                     src={IMG1}
                                     alt="Auth Screen 1"
-                                    className="h-full w-full rounded-xl"
+                                    className="h-full w-full rounded-xl object-cover object-top"
                                 />
                             </div>
                         </div>

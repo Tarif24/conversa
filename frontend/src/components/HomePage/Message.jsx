@@ -105,8 +105,8 @@ const Message = ({
                             {message.replyToId && (
                                 <div className="self-center text-[0.7rem] text-[rgb(153,122,255)] sm:text-[1rem]">
                                     {user.username === message.replyTo.username
-                                        ? `${message.replyTo.username} replied to you`
-                                        : `${message.replyTo.username} replied to ${message.username}`}
+                                        ? `${message.username} replied to you`
+                                        : `${message.username} replied to ${message.replyTo.username}`}
                                 </div>
                             )}
                             {message.isEdited && (

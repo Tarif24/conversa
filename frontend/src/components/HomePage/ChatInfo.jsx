@@ -96,7 +96,7 @@ const ChatInfo = ({ room, setActiveRoom, setIsChatInfoActive }) => {
     };
 
     return (
-        <div className="flex h-full w-full flex-1 flex-col items-center rounded-2xl pr-2 pl-4 transition duration-200 ease-in-out sm:static sm:w-100 sm:flex-none sm:bg-white/50 sm:p-4">
+        <div className="flex h-full w-full flex-1 flex-col items-center rounded-2xl pr-2 pl-4 transition duration-200 ease-in-out sm:static sm:flex-none sm:bg-white/50 sm:p-4 lg:w-100">
             {room ? (
                 roomMembers &&
                 (room.type === 'direct' ? (
