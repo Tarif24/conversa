@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useSocketIO } from '../../hooks/useSocketIO';
 import { toast } from 'react-toastify';
+import { Eye } from 'lucide-react';
+import { EyeOff } from 'lucide-react';
 
 const AdminLogIn = ({ setIsLoggedIn, setAdminToken }) => {
     const { sendAdminLogin, isConnected } = useSocketIO();
 
     const [login, setLogin] = useState({ username: '', password: '' });
+    const [showPassword, setShowPassword] = useState(false);
 
     const textInputStyle =
         'w-full rounded bg-[rgb(59,54,76)] px-3 py-2 text-white shadow-md placeholder:text-[rgb(97,91,110)] focus:ring-2 focus:ring-[rgb(184,169,233)] focus:outline-none';
@@ -47,18 +50,25 @@ const AdminLogIn = ({ setIsLoggedIn, setAdminToken }) => {
                         />
 
                         {/* PASSWORD */}
-
-                        <input
-                            type="text"
-                            id="password"
-                            name="password"
-                            className={textInputStyle}
-                            placeholder="Password"
-                            autoComplete="off"
-                            required
-                            value={login.password}
-                            onChange={e => setLogin({ ...login, password: e.target.value })}
-                        />
+                        <div className="relative">
+                            <input
+                                type={showPassword ? 'text' : 'password'}
+                                id="password"
+                                name="password"
+                                className={textInputStyle}
+                                placeholder="Password"
+                                autoComplete="off"
+                                required
+                                value={login.password}
+                                onChange={e => setLogin({ ...login, password: e.target.value })}
+                            />
+                            <div
+                                className="absolute top-0 right-0 flex h-full w-10 cursor-pointer items-center justify-center rounded-r-md bg-[rgb(59,54,76)] text-gray-400"
+                                onClick={() => setShowPassword(!showPassword)}
+                            >
+                                {showPassword ? <Eye className="" /> : <EyeOff className="" />}
+                            </div>
+                        </div>
 
                         {/* SUBMIT BUTTON */}
 

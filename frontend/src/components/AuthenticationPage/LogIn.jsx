@@ -2,6 +2,8 @@ import React, { useState, useEffect, use } from 'react';
 import { useSocketIO, useSocketIOEvent, useSocketIOState } from '../../hooks/useSocketIO';
 import { toast } from 'react-toastify';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { Eye } from 'lucide-react';
+import { EyeOff } from 'lucide-react';
 
 const LogIn = () => {
     const { isConnected, connectionState, send, user, isAuthenticated, sendLogin } = useSocketIO();
@@ -9,6 +11,7 @@ const LogIn = () => {
     const [login, setLogin] = useState({ email: '', password: '' });
 
     const [didRedirect, setDidRedirect] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
 
     const navigate = useNavigate();
     const location = useLocation();
@@ -69,18 +72,25 @@ const LogIn = () => {
                 />
 
                 {/* PASSWORD */}
-
-                <input
-                    type="text"
-                    id="password"
-                    name="password"
-                    className={textInputStyle}
-                    placeholder="Enter your password"
-                    autoComplete="off"
-                    required
-                    value={login.password}
-                    onChange={e => setLogin({ ...login, password: e.target.value })}
-                />
+                <div className="relative">
+                    <input
+                        type={showPassword ? 'text' : 'password'}
+                        id="password"
+                        name="password"
+                        className={textInputStyle}
+                        placeholder="Enter your password"
+                        autoComplete="off"
+                        required
+                        value={login.password}
+                        onChange={e => setLogin({ ...login, password: e.target.value })}
+                    />
+                    <div
+                        className="absolute top-0 right-0 flex h-full w-10 cursor-pointer items-center justify-center rounded-r-md bg-[rgb(59,54,76)] text-gray-400"
+                        onClick={() => setShowPassword(!showPassword)}
+                    >
+                        {showPassword ? <Eye className="" /> : <EyeOff className="" />}
+                    </div>
+                </div>
 
                 {/* SUBMIT BUTTON */}
 

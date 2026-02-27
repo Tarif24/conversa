@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { useSocketIO, useSocketIOEvent, useSocketIOState } from '../../hooks/useSocketIO';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
+import { Eye } from 'lucide-react';
+import { EyeOff } from 'lucide-react';
 
 const SignUp = () => {
     const { isConnected, connectionState, send, sendSignup } = useSocketIO();
@@ -15,6 +17,7 @@ const SignUp = () => {
             lastName: '',
         },
     });
+    const [showPassword, setShowPassword] = useState(false);
 
     const navigate = useNavigate();
 
@@ -114,17 +117,25 @@ const SignUp = () => {
                 />
 
                 {/* PASSWORD */}
-                <input
-                    type="text"
-                    id="password"
-                    name="password"
-                    className={textInputStyle}
-                    placeholder="Enter your password"
-                    autoComplete="off"
-                    required
-                    value={user.password}
-                    onChange={e => setUser({ ...user, password: e.target.value })}
-                />
+                <div className="relative">
+                    <input
+                        type={showPassword ? 'text' : 'password'}
+                        id="password"
+                        name="password"
+                        className={textInputStyle}
+                        placeholder="Enter your password"
+                        autoComplete="off"
+                        required
+                        value={user.password}
+                        onChange={e => setUser({ ...user, password: e.target.value })}
+                    />
+                    <div
+                        className="absolute top-0 right-0 flex h-full w-10 cursor-pointer items-center justify-center rounded-r-md bg-[rgb(59,54,76)] text-gray-400"
+                        onClick={() => setShowPassword(!showPassword)}
+                    >
+                        {showPassword ? <Eye className="" /> : <EyeOff className="" />}
+                    </div>
+                </div>
 
                 {/* SUBMIT BUTTON */}
                 <button
